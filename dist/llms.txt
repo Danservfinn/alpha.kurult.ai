@@ -4,7 +4,7 @@
 
 Research only. Not financial advice. Nothing on this site is an offer to buy, sell, or hold any asset. No wallet. No comments.
 
-Static site. No scripts, no remote assets, no wallet, no comments, no analytics.
+One first-party script draws market panels from public sources. No third-party script host. No wallet. No comments. No analytics.
 
 ## Articles
 

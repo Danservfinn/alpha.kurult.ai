@@ -44,4 +44,4 @@ After Temujin approves the live cutover, and only then: deploy the production br
 
 ## What this host is not
 
-No analytics. No wallet connect. No comments. No production `.env`. No client JavaScript.
+No analytics. No wallet connect. No comments. No production `.env`. One first-party script, `/market.js`, draws the market panels. No third-party script host. Pages Functions in `functions/` cache the Treasury yield XML and the chain RPC calls. They are not copied into `dist/`.

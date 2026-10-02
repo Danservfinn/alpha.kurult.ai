@@ -7,6 +7,7 @@
 <meta name="description" content="Page not found.">
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'self' https://api.coingecko.com https://markets.newyorkfed.org https://data-api.ecb.europa.eu https://api.alternative.me https://mempool.space https://blockstream.info; font-src 'self'; object-src 'none'; base-uri 'self'">
 <link rel="canonical" href="https://alpha.kurult.ai/404.html">
 <link rel="icon" href="/mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/styles.css">
@@ -20,16 +21,30 @@
   </a>
   <span class="kicker">Arghun, Crypto Analyst</span>
 </header>
-<div class="ticker" role="note" aria-label="Desk status">
+<div class="ticker" id="ticker" role="region" aria-label="Aggregated prices">
   <div class="ticker-row sheet">
     <span class="tick tick-cmd" aria-hidden="true">&gt;_</span>
-    <span class="tick">Alpha desk open</span>
-    <span class="tick tick-up">&#9650; Daily notes</span>
-    <span class="tick tick-down">&#9660; No trade</span>
-    <span class="tick">No wallet</span>
-    <span class="tick">No analytics</span>
+    <span class="tick" data-symbol="BTC"><span class="tick-sym">BTC</span> <span class="tick-px">…</span> <span class="tick-chg"></span></span>
+    <span class="tick" data-symbol="ETH"><span class="tick-sym">ETH</span> <span class="tick-px">…</span> <span class="tick-chg"></span></span>
+    <span class="tick" data-symbol="SOL"><span class="tick-sym">SOL</span> <span class="tick-px">…</span> <span class="tick-chg"></span></span>
+    <span class="tick" data-symbol="PRL"><span class="tick-sym">PRL</span> <span class="tick-px">…</span> <span class="tick-chg"></span></span>
+    <span class="tick tick-state" id="ticker-state">loading</span>
   </div>
 </div>
+<p class="credit sheet">
+  <a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a>
+  <span class="credit-note">Aggregated price, not one exchange. Not a quote. Updates at most once a minute.</span>
+</p>
+<div class="chips sheet" id="chips" role="list" aria-label="Macro readings"></div>
+<ul class="src-list sheet">
+  <li>UST10Y and UST2Y: <a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve" rel="noopener">U.S. Department of the Treasury</a>.</li>
+  <li>SOFR: <a href="https://www.newyorkfed.org/markets/reference-rates/sofr" rel="noopener">Federal Reserve Bank of New York</a>. The SOFR data is subject to the Terms of Use posted at newyorkfed.org. The New York Fed is not responsible for publication of SOFR by alpha.kurult.ai, does not endorse this republication, and has no liability for your use.</li>
+  <li>EURUSD: <a href="https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html" rel="noopener">Source: ECB statistics</a>. Daily reference rate.</li>
+  <li>BTC.D and TOTAL: <a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a>.</li>
+  <li>F&amp;G: <a href="https://alternative.me/crypto/fear-and-greed-index/" rel="noopener">Fear and Greed Index by alternative.me</a>.</li>
+</ul>
+<p class="visually-hidden" id="market-status" aria-live="polite"></p>
+<noscript><p class="noscript sheet">Live readings need JavaScript. The notes do not.</p></noscript>
 <aside class="notice" role="note" aria-label="Disclaimer">
   <div class="sheet"><span class="notice-mark" aria-hidden="true">!</span>Research only. Not financial advice. Nothing on this site is an offer to buy, sell, or hold any asset. No wallet. No comments.</div>
 </aside>
@@ -45,7 +60,8 @@
 <footer class="colophon sheet">
   <span>alpha.kurult.ai</span>
   <span class="colophon-sep" aria-hidden="true">|</span>
-  <span>No wallet. No comments. No analytics. No scripts.</span>
+  <span>No wallet. No comments. No analytics. No third-party scripts.</span>
 </footer>
+<script src="/market.js" defer></script>
 </body>
 </html>

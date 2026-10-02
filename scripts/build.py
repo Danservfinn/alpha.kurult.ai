@@ -2,7 +2,7 @@
 """Static site builder for alpha.kurult.ai.
 
 Python 3 standard library only. Reads articles/YYYY-MM-DD-slug.md and writes
-a fully static, script-free site into dist/.
+dist/. One first-party script draws the market panels. No third-party script host.
 
 Last line of output is BUILD_OK or BUILD_FAIL.
 """
@@ -323,6 +323,84 @@ def time_tag(article: Article) -> str:
     return f'<time datetime="{article.date.isoformat()}">{article.date_display}</time>'
 
 
+ASSET_BY_SLUG = {"2026-10-02-pearl": "PRL"}
+HOME_SYMBOLS = ("BTC", "ETH", "SOL", "PRL")
+
+
+def article_asset(article: Article) -> str | None:
+    raw = str(article.meta.get("asset", "")).strip().upper()
+    if re.fullmatch(r"[A-Z0-9]{2,8}", raw):
+        return raw
+    return ASSET_BY_SLUG.get(article.dir_name)
+
+
+def ticker_html() -> str:
+    ticks = "\n    ".join(
+        f'<span class="tick" data-symbol="{sym}"><span class="tick-sym">{sym}</span> '
+        f'<span class="tick-px">…</span> <span class="tick-chg"></span></span>'
+        for sym in HOME_SYMBOLS
+    )
+    return f"""<div class="ticker" id="ticker" role="region" aria-label="Aggregated prices">
+  <div class="ticker-row sheet">
+    <span class="tick tick-cmd" aria-hidden="true">&gt;_</span>
+    {ticks}
+    <span class="tick tick-state" id="ticker-state">loading</span>
+  </div>
+</div>
+<p class="credit sheet">
+  <a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a>
+  <span class="credit-note">Aggregated price, not one exchange. Not a quote. Updates at most once a minute.</span>
+</p>
+<div class="chips sheet" id="chips" role="list" aria-label="Macro readings"></div>
+<ul class="src-list sheet">
+  <li>UST10Y and UST2Y: <a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve" rel="noopener">U.S. Department of the Treasury</a>.</li>
+  <li>SOFR: <a href="https://www.newyorkfed.org/markets/reference-rates/sofr" rel="noopener">Federal Reserve Bank of New York</a>. The SOFR data is subject to the Terms of Use posted at newyorkfed.org. The New York Fed is not responsible for publication of SOFR by alpha.kurult.ai, does not endorse this republication, and has no liability for your use.</li>
+  <li>EURUSD: <a href="https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html" rel="noopener">Source: ECB statistics</a>. Daily reference rate.</li>
+  <li>BTC.D and TOTAL: <a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a>.</li>
+  <li>F&amp;G: <a href="https://alternative.me/crypto/fear-and-greed-index/" rel="noopener">Fear and Greed Index by alternative.me</a>.</li>
+</ul>
+<p class="visually-hidden" id="market-status" aria-live="polite"></p>
+<noscript><p class="noscript sheet">Live readings need JavaScript. The notes do not.</p></noscript>"""
+
+
+def chart_mount(symbols: tuple[str, ...], default: str, locked: bool) -> str:
+    symbol_btns = "".join(
+        f'<button type="button" class="seg-btn" data-symbol="{esc(sym)}" aria-pressed="{"true" if sym == default else "false"}"'
+        f'{"" if not locked or sym == default else " disabled"}>{esc(sym)}</button>'
+        for sym in symbols
+    )
+    tf_btns = "".join(
+        f'<button type="button" class="seg-btn" data-tf="{tf}" aria-pressed="{"true" if tf == "1D" else "false"}">{tf}</button>'
+        for tf in ("1H", "4H", "1D")
+    )
+    return f"""<section class="panel" id="chart-panel" data-symbols="{esc(",".join(symbols))}" data-default="{esc(default)}" data-locked="{"true" if locked else "false"}" aria-labelledby="chart-heading">
+  <div class="panel-head"><span id="chart-heading">Chart</span><span class="badge" id="chart-badge">aggregated</span></div>
+  <div class="panel-body">
+    <div class="seg" role="group" aria-label="Asset">{symbol_btns}</div>
+    <div class="seg" role="group" aria-label="Timeframe">{tf_btns}</div>
+    <p class="chart-note" id="chart-note">Aggregated price, not one exchange. 1H is hourly, 4H is 4-hour OHLC, 1D is daily. Weekly is not offered.</p>
+    <div class="chart-frame" id="chart-frame"><p class="chart-empty">Loading chart.</p></div>
+    <p class="chart-readout" id="chart-readout"></p>
+    <p class="src-foot"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a></p>
+  </div>
+</section>"""
+
+
+def markets_mount() -> str:
+    return """<section class="panel" id="markets-panel" aria-labelledby="markets-heading">
+  <div class="panel-head"><span id="markets-heading">Markets</span><span class="badge" id="markets-badge">…</span></div>
+  <div class="panel-body" id="markets-body"><p class="chart-empty">Loading markets.</p></div>
+</section>"""
+
+
+def chain_mount(scope: str) -> str:
+    return f"""<section class="panel" id="chain-panel" data-chain="{esc(scope)}" aria-labelledby="chain-heading">
+  <div class="panel-head"><span id="chain-heading">On-chain</span><span class="badge" id="chain-badge">…</span></div>
+  <div class="panel-body" id="chain-body"><p class="chart-empty">Loading chain stats.</p></div>
+  <p class="src-foot chain-credit">Bitcoin figures come from <a href="https://mempool.space/" rel="noopener">mempool.space</a>, with <a href="https://blockstream.info/" rel="noopener">Blockstream</a> as fallback. alpha.kurult.ai is not affiliated with either. Ether gas and Solana epoch come from public RPCs through our cache. Pearl chain stats, when shown, come from pearlchain.live and are not an affiliation.</p>
+</section>"""
+
+
 def page(title: str, description: str, path: str, body: str, body_class: str) -> str:
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -333,6 +411,7 @@ def page(title: str, description: str, path: str, body: str, body_class: str) ->
 <meta name="description" content="{esc(description)}">
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'self' https://api.coingecko.com https://markets.newyorkfed.org https://data-api.ecb.europa.eu https://api.alternative.me https://mempool.space https://blockstream.info; font-src 'self'; object-src 'none'; base-uri 'self'">
 <link rel="canonical" href="{esc(SITE_URL + path)}">
 <link rel="icon" href="/mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/styles.css">
@@ -346,16 +425,7 @@ def page(title: str, description: str, path: str, body: str, body_class: str) ->
   </a>
   <span class="kicker">{esc(SITE_KICKER)}</span>
 </header>
-<div class="ticker" role="note" aria-label="Desk status">
-  <div class="ticker-row sheet">
-    <span class="tick tick-cmd" aria-hidden="true">&gt;_</span>
-    <span class="tick">Alpha desk open</span>
-    <span class="tick tick-up">&#9650; Daily notes</span>
-    <span class="tick tick-down">&#9660; No trade</span>
-    <span class="tick">No wallet</span>
-    <span class="tick">No analytics</span>
-  </div>
-</div>
+{ticker_html()}
 <aside class="notice" role="note" aria-label="Disclaimer">
   <div class="sheet"><span class="notice-mark" aria-hidden="true">!</span>{esc(DISCLAIMER)}</div>
 </aside>
@@ -365,8 +435,9 @@ def page(title: str, description: str, path: str, body: str, body_class: str) ->
 <footer class="colophon sheet">
   <span>{esc(SITE_NAME)}</span>
   <span class="colophon-sep" aria-hidden="true">|</span>
-  <span>No wallet. No comments. No analytics. No scripts.</span>
+  <span>No wallet. No comments. No analytics. No third-party scripts.</span>
 </footer>
+<script src="/market.js" defer></script>
 </body>
 </html>
 """
@@ -388,7 +459,12 @@ def render_index(articles: list[Article]) -> str:
         ledger_core = f'<ol class="ledger" reversed>\n{entries}\n  </ol>'
     else:
         ledger_core = '<p class="empty">No entries filed.</p>'
-    body = f"""<section class="panel">
+    body = f"""{chart_mount(HOME_SYMBOLS, "BTC", False)}
+<div class="desk-split">
+{markets_mount()}
+{chain_mount("all")}
+</div>
+<section class="panel">
   <div class="panel-head"><span>Alpha desk</span><span>{esc(count)}</span></div>
   <div class="panel-body">
     <h1 class="command-title">{esc(SITE_NAME)}</h1>
@@ -417,7 +493,11 @@ def render_sources(article: Article) -> str:
 
 
 def render_article(article: Article) -> str:
-    body = f"""<article class="article panel">
+    asset = article_asset(article)
+    mounts = ""
+    if asset:
+        mounts = chart_mount((asset,), asset, True) + "\n" + chain_mount(asset) + "\n"
+    body = f"""{mounts}<article class="article panel">
   <div class="panel-head"><span><a href="/">&laquo; Ledger</a></span><span>{time_tag(article)}</span></div>
   <header class="article-head">
     <h1 class="article-title">{esc(article.title)}</h1>
@@ -486,6 +566,7 @@ body {
   line-height: 1.65;
   position: relative;
   isolation: isolate;
+  overflow-x: clip;
 }
 
 /* faint CRT scanlines */
@@ -562,10 +643,90 @@ a:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
   letter-spacing: .10em;
   text-transform: uppercase;
 }
-.tick { color: var(--amber-dim); white-space: nowrap; }
+.tick { color: var(--text); white-space: nowrap; }
+.tick-sym { color: var(--amber); }
 .tick-cmd { color: var(--amber); font-weight: 700; }
 .tick-up { color: var(--up); }
 .tick-down { color: var(--down); }
+.tick-state { color: var(--text-dim); }
+.tick-stale, .tick-na { color: var(--amber-mid); }
+.tick.flash { animation: flash .3s ease; }
+@keyframes flash {
+  from { background: rgba(255, 176, 0, .22); }
+  to { background: transparent; }
+}
+
+.credit { margin: .45rem auto 0; font-size: .75rem; color: var(--text-dim); }
+.credit a { color: var(--amber); }
+.credit-note { display: block; margin-top: .15rem; }
+.chips { display: flex; flex-wrap: wrap; gap: .4rem; padding-block: .7rem .2rem; }
+.chip {
+  display: grid;
+  gap: .05rem;
+  min-width: 5.5rem;
+  padding: .35rem .5rem;
+  border: 1px solid var(--edge);
+  background: #000;
+  color: var(--text);
+}
+.chip-id { color: var(--amber); font-size: .68rem; letter-spacing: .08em; }
+.chip-px { font-size: .84rem; }
+.chip-asof { color: var(--text-dim); font-size: .68rem; }
+.chip-stale .chip-asof { color: var(--amber-mid); }
+.src-list {
+  margin: 0 auto .4rem;
+  padding: 0 0 .4rem;
+  list-style: none;
+  font-size: .72rem;
+  line-height: 1.45;
+  color: var(--text-dim);
+}
+.src-list li { margin: .2rem 0; }
+.noscript { color: var(--amber-mid); font-size: .78rem; }
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.seg { display: flex; flex-wrap: wrap; gap: .35rem; margin: 0 0 .7rem; }
+.seg-btn {
+  font: inherit;
+  font-size: .72rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text);
+  background: #000;
+  border: 1px solid var(--edge);
+  padding: .35rem .55rem;
+  cursor: pointer;
+}
+.seg-btn[aria-pressed="true"] { color: #000; background: var(--amber); border-color: var(--amber); }
+.seg-btn:disabled { opacity: 1; color: #000; background: var(--amber); }
+.seg-btn:focus-visible, .chip:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.chart-note, .chart-readout, .src-foot, .breadth, .macro-line {
+  color: var(--text-dim);
+  font-size: .75rem;
+  margin: .35rem 0;
+}
+.chart-empty { color: var(--text-dim); margin: 0; }
+.chart-svg { width: 100%; height: auto; display: block; }
+.badge { color: var(--text-dim); }
+.desk-split { display: grid; gap: 1.25rem; }
+.mkt-grid { display: grid; gap: 1rem; }
+.mkt { width: 100%; border-collapse: collapse; font-size: .78rem; }
+.mkt th, .mkt td { text-align: right; padding: .28rem .35rem; border-bottom: 1px solid var(--edge-soft); }
+.mkt th:first-child, .mkt td:first-child { text-align: left; }
+.mkt th { color: var(--amber); font-weight: 700; letter-spacing: .06em; }
+.mkt-title { margin: 0 0 .3rem; color: var(--amber); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
+.chain-list { margin: 0; padding-left: 1.1rem; color: var(--text); }
+.chain-card { margin: 0 0 .9rem; }
+.chain-credit { padding: 0 .9rem .8rem; }
 
 /* Disclaimer strip -------------------------------------------------------- */
 .notice {
@@ -773,6 +934,10 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
   .entry { grid-template-columns: 7.5rem minmax(0, 1fr); }
   .entry-summary { grid-column: 2; }
 }
+@media (min-width: 64rem) {
+  .desk-split { grid-template-columns: minmax(0, 1.4fr) minmax(0, .8fr); }
+  .mkt-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 @media (min-width: 72rem) {
   .entry { grid-template-columns: 7.5rem 17rem minmax(0, 1fr); }
   .entry-summary { grid-column: 3; }
@@ -813,7 +978,7 @@ def render_llms(articles: list[Article]) -> str:
         "",
         DISCLAIMER,
         "",
-        "Static site. No scripts, no remote assets, no wallet, no comments, no analytics.",
+        "One first-party script draws market panels from public sources. No third-party script host. No wallet. No comments. No analytics.",
         "",
         "## Articles",
         "",
@@ -871,6 +1036,11 @@ def build() -> None:
         write(DIST / "articles" / article.dir_name / "index.html", render_article(article))
     write(DIST / "404.html", render_404())
     write(DIST / "styles.css", STYLES)
+    market_js = ROOT / "static" / "market.js"
+    if not market_js.is_file():
+        raise BuildError("missing static/market.js")
+    shutil.copyfile(market_js, DIST / "market.js")
+    print("  copied market.js")
     write(DIST / "robots.txt", render_robots())
     write(DIST / "llms.txt", render_llms(articles))
     write(DIST / "sitemap.xml", render_sitemap(articles))

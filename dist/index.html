@@ -7,6 +7,7 @@
 <meta name="description" content="Daily research notes. Research only. Not a trading desk.">
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'self' https://api.coingecko.com https://markets.newyorkfed.org https://data-api.ecb.europa.eu https://api.alternative.me https://mempool.space https://blockstream.info; font-src 'self'; object-src 'none'; base-uri 'self'">
 <link rel="canonical" href="https://alpha.kurult.ai/">
 <link rel="icon" href="/mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/styles.css">
@@ -20,31 +21,72 @@
   </a>
   <span class="kicker">Arghun, Crypto Analyst</span>
 </header>
-<div class="ticker" role="note" aria-label="Desk status">
+<div class="ticker" id="ticker" role="region" aria-label="Aggregated prices">
   <div class="ticker-row sheet">
     <span class="tick tick-cmd" aria-hidden="true">&gt;_</span>
-    <span class="tick">Alpha desk open</span>
-    <span class="tick tick-up">&#9650; Daily notes</span>
-    <span class="tick tick-down">&#9660; No trade</span>
-    <span class="tick">No wallet</span>
-    <span class="tick">No analytics</span>
+    <span class="tick" data-symbol="BTC"><span class="tick-sym">BTC</span> <span class="tick-px">…</span> <span class="tick-chg"></span></span>
+    <span class="tick" data-symbol="ETH"><span class="tick-sym">ETH</span> <span class="tick-px">…</span> <span class="tick-chg"></span></span>
+    <span class="tick" data-symbol="SOL"><span class="tick-sym">SOL</span> <span class="tick-px">…</span> <span class="tick-chg"></span></span>
+    <span class="tick" data-symbol="PRL"><span class="tick-sym">PRL</span> <span class="tick-px">…</span> <span class="tick-chg"></span></span>
+    <span class="tick tick-state" id="ticker-state">loading</span>
   </div>
 </div>
+<p class="credit sheet">
+  <a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a>
+  <span class="credit-note">Aggregated price, not one exchange. Not a quote. Updates at most once a minute.</span>
+</p>
+<div class="chips sheet" id="chips" role="list" aria-label="Macro readings"></div>
+<ul class="src-list sheet">
+  <li>UST10Y and UST2Y: <a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve" rel="noopener">U.S. Department of the Treasury</a>.</li>
+  <li>SOFR: <a href="https://www.newyorkfed.org/markets/reference-rates/sofr" rel="noopener">Federal Reserve Bank of New York</a>. The SOFR data is subject to the Terms of Use posted at newyorkfed.org. The New York Fed is not responsible for publication of SOFR by alpha.kurult.ai, does not endorse this republication, and has no liability for your use.</li>
+  <li>EURUSD: <a href="https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html" rel="noopener">Source: ECB statistics</a>. Daily reference rate.</li>
+  <li>BTC.D and TOTAL: <a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a>.</li>
+  <li>F&amp;G: <a href="https://alternative.me/crypto/fear-and-greed-index/" rel="noopener">Fear and Greed Index by alternative.me</a>.</li>
+</ul>
+<p class="visually-hidden" id="market-status" aria-live="polite"></p>
+<noscript><p class="noscript sheet">Live readings need JavaScript. The notes do not.</p></noscript>
 <aside class="notice" role="note" aria-label="Disclaimer">
   <div class="sheet"><span class="notice-mark" aria-hidden="true">!</span>Research only. Not financial advice. Nothing on this site is an offer to buy, sell, or hold any asset. No wallet. No comments.</div>
 </aside>
 <main id="main" class="sheet">
+<section class="panel" id="chart-panel" data-symbols="BTC,ETH,SOL,PRL" data-default="BTC" data-locked="false" aria-labelledby="chart-heading">
+  <div class="panel-head"><span id="chart-heading">Chart</span><span class="badge" id="chart-badge">aggregated</span></div>
+  <div class="panel-body">
+    <div class="seg" role="group" aria-label="Asset"><button type="button" class="seg-btn" data-symbol="BTC" aria-pressed="true">BTC</button><button type="button" class="seg-btn" data-symbol="ETH" aria-pressed="false">ETH</button><button type="button" class="seg-btn" data-symbol="SOL" aria-pressed="false">SOL</button><button type="button" class="seg-btn" data-symbol="PRL" aria-pressed="false">PRL</button></div>
+    <div class="seg" role="group" aria-label="Timeframe"><button type="button" class="seg-btn" data-tf="1H" aria-pressed="false">1H</button><button type="button" class="seg-btn" data-tf="4H" aria-pressed="false">4H</button><button type="button" class="seg-btn" data-tf="1D" aria-pressed="true">1D</button></div>
+    <p class="chart-note" id="chart-note">Aggregated price, not one exchange. 1H is hourly, 4H is 4-hour OHLC, 1D is daily. Weekly is not offered.</p>
+    <div class="chart-frame" id="chart-frame"><p class="chart-empty">Loading chart.</p></div>
+    <p class="chart-readout" id="chart-readout"></p>
+    <p class="src-foot"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a></p>
+  </div>
+</section>
+<div class="desk-split">
+<section class="panel" id="markets-panel" aria-labelledby="markets-heading">
+  <div class="panel-head"><span id="markets-heading">Markets</span><span class="badge" id="markets-badge">…</span></div>
+  <div class="panel-body" id="markets-body"><p class="chart-empty">Loading markets.</p></div>
+</section>
+<section class="panel" id="chain-panel" data-chain="all" aria-labelledby="chain-heading">
+  <div class="panel-head"><span id="chain-heading">On-chain</span><span class="badge" id="chain-badge">…</span></div>
+  <div class="panel-body" id="chain-body"><p class="chart-empty">Loading chain stats.</p></div>
+  <p class="src-foot chain-credit">Bitcoin figures come from <a href="https://mempool.space/" rel="noopener">mempool.space</a>, with <a href="https://blockstream.info/" rel="noopener">Blockstream</a> as fallback. alpha.kurult.ai is not affiliated with either. Ether gas and Solana epoch come from public RPCs through our cache. Pearl chain stats, when shown, come from pearlchain.live and are not an affiliation.</p>
+</section>
+</div>
 <section class="panel">
-  <div class="panel-head"><span>Alpha desk</span><span>1 entry</span></div>
+  <div class="panel-head"><span>Alpha desk</span><span>2 entries</span></div>
   <div class="panel-body">
     <h1 class="command-title">alpha.kurult.ai</h1>
     <p class="command-lede">Daily research notes. Research only. Not a trading desk.</p>
   </div>
 </section>
 <section class="panel" aria-label="Article ledger">
-  <div class="panel-head"><span>Ledger</span><span>1 entry</span></div>
+  <div class="panel-head"><span>Ledger</span><span>2 entries</span></div>
 <ol class="ledger" reversed>
   <li class="entry" style="--i:0">
+    <span class="entry-date"><time datetime="2026-10-02">02 Oct 2026</time></span>
+    <h2 class="entry-title"><a href="/articles/2026-10-02-pearl/">Pearl (PRL): real proof-of-useful-work tech, a token priced ahead of its usage</a></h2>
+    <p class="entry-summary">Deep dive on Pearl, the matrix-multiplication proof-of-work chain: on-chain data, holder and pool concentration, emissions, liquidity, the hype cycle on X, and bear/base/bull scenarios. Research only.</p>
+  </li>
+  <li class="entry" style="--i:1">
     <span class="entry-date"><time datetime="2026-10-02">02 Oct 2026</time></span>
     <h2 class="entry-title"><a href="/articles/2026-10-02-desk-open/">Desk open</a></h2>
     <p class="entry-summary">Placeholder. The daily article desk is standing. No market call in this file.</p>
@@ -55,7 +97,8 @@
 <footer class="colophon sheet">
   <span>alpha.kurult.ai</span>
   <span class="colophon-sep" aria-hidden="true">|</span>
-  <span>No wallet. No comments. No analytics. No scripts.</span>
+  <span>No wallet. No comments. No analytics. No third-party scripts.</span>
 </footer>
+<script src="/market.js" defer></script>
 </body>
 </html>
