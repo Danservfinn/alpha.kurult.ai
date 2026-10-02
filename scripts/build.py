@@ -69,24 +69,27 @@ def split_frontmatter(text: str, name: str) -> tuple[str, str]:
     return text[4:end], text[end + 5 :]
 
 
-def parse_source_list(lines: list[str], i: int, name: str) -> tuple[list[dict], int]:
+def parse_pair_list(
+    lines: list[str], i: int, name: str, fields: tuple[str, ...], label: str
+) -> tuple[list[dict], int]:
     items: list[dict] = []
+    field_re = re.compile(r"^(" + "|".join(fields) + r"):\s*(.*)$")
     while i < len(lines):
         line = lines[i]
         if not line.strip():
             i += 1
             continue
-        if not line[0] in " \t-":
+        if line[0] not in " \t-":
             break
         stripped = line.strip()
         if stripped.startswith("- "):
             items.append({})
             stripped = stripped[2:].strip()
         if not items:
-            raise BuildError(f"{name}: malformed sources list near {line!r}")
-        m = re.match(r"^(label|url):\s*(.*)$", stripped)
+            raise BuildError(f"{name}: malformed {label} list near {line!r}")
+        m = field_re.match(stripped)
         if not m:
-            raise BuildError(f"{name}: unexpected sources line {line!r}")
+            raise BuildError(f"{name}: unexpected {label} line {line!r}")
         items[-1][m.group(1)] = unquote(m.group(2).strip())
         i += 1
     return items, i
@@ -108,7 +111,12 @@ def parse_frontmatter(block: str, name: str) -> dict:
         if key == "sources":
             if value:
                 raise BuildError(f"{name}: sources must be a list")
-            meta[key], i = parse_source_list(lines, i + 1, name)
+            meta[key], i = parse_pair_list(lines, i + 1, name, ("label", "url"), "sources")
+            continue
+        if key == "keys":
+            if value:
+                raise BuildError(f"{name}: keys must be a list")
+            meta[key], i = parse_pair_list(lines, i + 1, name, ("label", "value"), "keys")
             continue
         meta[key] = unquote(value)
         i += 1
@@ -139,6 +147,39 @@ def validate_meta(meta: dict, file_date: str, name: str) -> None:
             raise BuildError(f"{name}: source {idx} is missing a label")
         if not URL_RE.match(url):
             raise BuildError(f"{name}: source {idx} has an invalid url {url!r}")
+
+
+DESK_FIELDS = ("ticker", "rating", "horizon", "conviction", "price")
+
+
+def opt_str(meta: dict, key: str, name: str) -> str:
+    value = meta.get(key, "")
+    if value is None or value == "":
+        return ""
+    if not isinstance(value, str):
+        raise BuildError(f"{name}: frontmatter '{key}' must be a string")
+    return value.strip()
+
+
+def validate_desk(meta: dict, name: str) -> None:
+    present = [key for key in DESK_FIELDS if opt_str(meta, key, name)]
+    if not present and "keys" not in meta and not opt_str(meta, "call", name) and not opt_str(meta, "position", name):
+        return
+    missing = [key for key in DESK_FIELDS if key not in present]
+    if missing:
+        raise BuildError(f"{name}: desk row missing {', '.join(missing)}")
+    if not opt_str(meta, "call", name):
+        raise BuildError(f"{name}: desk row requires call")
+    if not opt_str(meta, "position", name):
+        raise BuildError(f"{name}: desk row requires position")
+    keys = meta.get("keys")
+    if not isinstance(keys, list) or not keys:
+        raise BuildError(f"{name}: keys must be a non-empty list")
+    for idx, item in enumerate(keys, 1):
+        label = item.get("label", "").strip()
+        value = item.get("value", "").strip()
+        if not label or not value:
+            raise BuildError(f"{name}: key {idx} needs label and value")
 
 
 # --------------------------------------------------------------------------- #
@@ -189,6 +230,11 @@ def render_inline(text: str) -> str:
     return "".join(out)
 
 
+def is_table_row(line: str) -> bool:
+    stripped = line.strip()
+    return stripped.startswith("|") and stripped.endswith("|") and stripped.count("|") >= 2
+
+
 def is_block_start(line: str) -> bool:
     return bool(
         not line.strip()
@@ -196,6 +242,7 @@ def is_block_start(line: str) -> bool:
         or HEADING_RE.match(line)
         or UL_RE.match(line)
         or OL_RE.match(line)
+        or is_table_row(line)
     )
 
 
@@ -214,8 +261,9 @@ def render_fence(lines: list[str], i: int, out: list[str], name: str) -> int:
 
 
 def render_heading(m: re.Match, out: list[str]) -> None:
-    # Article title owns <h1>; shift markdown headings down one level.
-    level = min(len(m.group(1)) + 1, 6)
+    # Article title owns <h1>. ## is h2. ### is h3. A lone # is h2, not a second h1.
+    raw = len(m.group(1))
+    level = 2 if raw <= 2 else min(raw, 6)
     out.append(f"<h{level}>{render_inline(m.group(2))}</h{level}>")
 
 
@@ -232,6 +280,50 @@ def render_list(lines: list[str], i: int, out: list[str], marker: re.Pattern, ta
             break
         i += 1
     out.append(f"<{tag}>" + "".join(f"<li>{render_inline(t)}</li>" for t in items) + f"</{tag}>")
+    return i
+
+
+def split_table_row(line: str) -> list[str]:
+    stripped = line.strip()
+    if stripped.startswith("|"):
+        stripped = stripped[1:]
+    if stripped.endswith("|"):
+        stripped = stripped[:-1]
+    return [cell.strip() for cell in stripped.split("|")]
+
+
+TABLE_SEP_RE = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$")
+
+
+def render_table(lines: list[str], i: int, out: list[str], name: str) -> int:
+    header = split_table_row(lines[i])
+    if i + 1 >= len(lines) or not TABLE_SEP_RE.match(lines[i + 1]):
+        raise BuildError(f"{name}: table at line {i + 1} is missing a separator row")
+    i += 2
+    rows: list[list[str]] = []
+    while i < len(lines) and is_table_row(lines[i]):
+        cells = split_table_row(lines[i])
+        if len(cells) != len(header):
+            raise BuildError(
+                f"{name}: table row has {len(cells)} cells, header has {len(header)}"
+            )
+        rows.append(cells)
+        i += 1
+    if not rows:
+        raise BuildError(f"{name}: table has a header and no rows")
+    head = "".join(f"<th>{render_inline(cell)}</th>" for cell in header)
+    body = []
+    for row in rows:
+        cells = "".join(
+            f'<td data-label="{esc(header[idx])}">{render_inline(cell)}</td>'
+            for idx, cell in enumerate(row)
+        )
+        body.append(f"<tr>{cells}</tr>")
+    out.append(
+        '<div class="table-wrap"><table>'
+        f"<thead><tr>{head}</tr></thead>"
+        f"<tbody>{''.join(body)}</tbody></table></div>"
+    )
     return i
 
 
@@ -261,6 +353,8 @@ def render_markdown(text: str, name: str) -> str:
             i = render_list(lines, i, out, UL_RE, "ul")
         elif OL_RE.match(line):
             i = render_list(lines, i, out, OL_RE, "ol")
+        elif is_table_row(line):
+            i = render_table(lines, i, out, name)
         else:
             i = render_paragraph(lines, i, out)
     return "\n".join(out)
@@ -284,10 +378,19 @@ class Article:
         front, body = split_frontmatter(path.read_text(encoding="utf-8"), path.name)
         self.meta = parse_frontmatter(front, path.name)
         validate_meta(self.meta, self.file_date, path.name)
+        validate_desk(self.meta, path.name)
         self.date = dt.date.fromisoformat(self.meta["date"])
         self.title = self.meta["title"].strip()
         self.summary = self.meta["summary"].strip()
         self.sources = self.meta["sources"]
+        self.ticker = opt_str(self.meta, "ticker", path.name)
+        self.rating = opt_str(self.meta, "rating", path.name)
+        self.horizon = opt_str(self.meta, "horizon", path.name)
+        self.conviction = opt_str(self.meta, "conviction", path.name)
+        self.price = opt_str(self.meta, "price", path.name)
+        self.call = opt_str(self.meta, "call", path.name)
+        self.position = opt_str(self.meta, "position", path.name)
+        self.keys = self.meta.get("keys") or []
         self.body_html = render_markdown(body, path.name)
         if not self.body_html.strip():
             raise BuildError(f"{path.name}: article body is empty")
@@ -380,11 +483,28 @@ def page(title: str, description: str, path: str, body: str, body_class: str) ->
 
 
 def render_index_entry(article: Article, i: int) -> str:
+    tape = render_tape(article)
+    summary = article.call or article.summary
     return f"""  <li class="entry" style="--i:{i}">
-    <span class="entry-date">{time_tag(article)}</span>
+    {tape}
     <h2 class="entry-title"><a href="{esc(article.path)}">{esc(article.title)}</a></h2>
-    <p class="entry-summary">{esc(article.summary)}</p>
+    <p class="entry-summary">{esc(summary)}</p>
   </li>"""
+
+
+def render_tape(article: Article) -> str:
+    if not article.ticker:
+        return f'<p class="entry-tape">{time_tag(article)}</p>'
+    cells = [
+        time_tag(article),
+        f'<span class="entry-ticker">{esc(article.ticker)}</span>',
+        f'<span class="entry-rating">{esc(article.rating)}</span>',
+        f'<span class="entry-horizon">{esc(article.horizon)}</span>',
+        f'<span class="entry-conviction">{esc(article.conviction)}</span>',
+        f'<span class="entry-price">{esc(article.price)}</span>',
+    ]
+    sep = '<span class="pipe" aria-hidden="true">|</span>'
+    return f'<p class="entry-tape">{sep.join(cells)}</p>'
 
 
 def render_index(articles: list[Article]) -> str:
@@ -423,11 +543,24 @@ def render_sources(article: Article) -> str:
 </section>"""
 
 
+def render_tearsheet(article: Article) -> str:
+    if not article.call:
+        return ""
+    cells = "".join(
+        f"<div><dt>{esc(item['label'].strip())}</dt><dd>{esc(item['value'].strip())}</dd></div>"
+        for item in article.keys
+    )
+    return f"""  <p class="callstrip"><strong>{esc(article.ticker)}.</strong> {esc(article.call)}</p>
+  <p class="position-box">{esc(article.position)}</p>
+  <dl class="keystrip">{cells}</dl>
+"""
+
+
 def render_article(article: Article) -> str:
     body = f"""<article class="article panel">
   <div class="panel-head"><span><a href="/">&laquo; Ledger</a></span><span class="data">{time_tag(article)}</span></div>
   <header class="article-head">
-    <h1 class="article-title">{esc(article.title)}</h1>
+{render_tearsheet(article)}    <h1 class="article-title">{esc(article.title)}</h1>
     <p class="article-lede">{esc(article.summary)}</p>
   </header>
   <div class="prose">
@@ -453,12 +586,11 @@ def render_404() -> str:
 # CSS
 # --------------------------------------------------------------------------- #
 
-STYLES = """/* Bloomberg Terminal palette.
-   Sampled 2026-10-02 from photographs, not from a brand sheet.
+STYLES = """/* Terminal palette.
+   Sampled 2026-10-02 from reference terminal screenshots, not from a brand sheet.
 
-   Screen colors: Wikimedia Commons, File:Bloomberg Terminal Museum.jpg
-   https://commons.wikimedia.org/wiki/File:Bloomberg_Terminal_Museum.jpg
-   Left monitor of the in-use terminal. Glyph cores are local-maxima pixels
+   Screen colors: reference terminal screenshots.
+   Left monitor of an in-use terminal. Glyph cores are local-maxima pixels
    so antialiased edges do not darken the ink. Solid fills are
    4-neighbor-stable pixels.
 
@@ -474,9 +606,8 @@ STYLES = """/* Bloomberg Terminal palette.
    --yellow  #f8c800  on-screen highlight fill. Mode of solid yellow fills
                       (the CLM6 COMB highlight bar). Black text on it is 13.25:1.
    --key     #c89830  function-key yellow. Mode of the yellow key row in
-                      Wikimedia Commons, File:Bloomberg terminal keyboard.jpg
-                      https://commons.wikimedia.org/wiki/File:Bloomberg_terminal_keyboard.jpg
-                      crop y=580-640. Black text on it is 7.99:1.
+                      a reference terminal screenshot, crop y=580-640.
+                      Black text on it is 7.99:1.
    --blue    #001060  header, title bar, and panel-header fill. Mode of the
                       solid blue command-bar fill (n=34962 in the dense stripe).
                       Not used as text on black (1.24:1, would fail AA).
@@ -509,7 +640,8 @@ STYLES = """/* Bloomberg Terminal palette.
   --rule: #507098;
   --edge: #507098;
   --edge-soft: #1a2a55;
-  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --mono: ui-monospace, monospace;
+  --serif: Georgia, serif;
   --measure: 72ch;
   --gutter: clamp(1rem, 3vw, 2rem);
 }
@@ -519,7 +651,7 @@ STYLES = """/* Bloomberg Terminal palette.
 html {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--mono);
+  font-family: var(--mono), var(--serif);
   font-size: 100%;
   -webkit-text-size-adjust: 100%;
   text-rendering: optimizeLegibility;
@@ -696,9 +828,9 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
 /* Ledger ------------------------------------------------------------------ */
 .ledger { list-style: none; margin: 0; padding: 0; }
 .entry {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: .15rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
   padding: .7rem .9rem;
   border-bottom: 1px solid var(--edge-soft);
   min-width: 0;
@@ -707,15 +839,21 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
 }
 .entry:last-child { border-bottom: 0; }
 .entry:hover,
-.entry:hover .entry-date,
+.entry:hover .entry-tape,
 .entry:hover .entry-title a,
 .entry:hover .entry-summary { background: var(--yellow); color: #000; }
-.entry-date {
+.entry-tape {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .15rem .4rem;
+  margin: 0;
   font-size: .74rem;
-  letter-spacing: .08em;
+  letter-spacing: .06em;
   text-transform: uppercase;
   color: var(--data);
+  min-width: 0;
 }
+.entry-tape .pipe { color: var(--amber); }
 .entry-title { margin: 0; font-size: 1.02rem; line-height: 1.3; font-weight: 700; }
 .entry-title a { color: var(--amber); text-decoration: none; }
 .entry-title a:hover { background: none; color: #000; text-decoration: underline; }
@@ -731,7 +869,45 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
 }
 
 /* Article ----------------------------------------------------------------- */
-.article-head { padding: 1.1rem 1.15rem 0; }
+.article-head { padding: .7rem 1.15rem 0; }
+.callstrip {
+  font-family: var(--mono);
+  font-size: .78rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  border: 1px solid var(--rule);
+  padding: .45rem .7rem;
+  margin: 0 0 .45rem;
+}
+.callstrip strong { color: var(--amber); }
+.position-box {
+  border: 1px solid var(--edge);
+  padding: .4rem .7rem;
+  margin: 0 0 .45rem;
+  font-size: .84rem;
+  line-height: 1.35;
+}
+.keystrip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--edge);
+  border: 1px solid var(--edge);
+  margin: 0 0 .7rem;
+}
+.keystrip div { background: #000; padding: .32rem .5rem; min-width: 0; }
+.keystrip dt {
+  font-size: .68rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+.keystrip dd {
+  margin: 0;
+  color: var(--data);
+  font-size: .84rem;
+  overflow-wrap: anywhere;
+}
 .article-title {
   color: var(--amber);
   font-weight: 700;
@@ -749,6 +925,36 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
 }
 
 .prose { padding: 1.15rem 1.15rem 1.4rem; min-width: 0; overflow-wrap: break-word; }
+.prose > p:first-child::first-letter {
+  float: none;
+  font-size: inherit;
+  line-height: inherit;
+  padding: 0;
+  color: inherit;
+}
+.table-wrap { min-width: 0; max-width: 100%; overflow-x: clip; }
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: .78rem;
+  margin: 0 0 1.1em;
+}
+.prose th, .prose td {
+  border: 1px solid var(--edge);
+  padding: .4rem .5rem;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.prose th {
+  background: var(--blue);
+  color: var(--amber);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.prose td { color: var(--data); }
 .prose > * { margin-block: 0 1.1em; }
 .prose p, .prose li { color: var(--text); max-width: var(--measure); }
 .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
@@ -820,7 +1026,7 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
 .source-table a { color: var(--text); text-decoration: none; }
 .source-url {
   grid-column: 2;
-  display: block;
+  display: none;
   font-size: .7rem;
   color: var(--data);
   overflow-wrap: anywhere;
@@ -855,22 +1061,44 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
 }
 
 /* Wide -------------------------------------------------------------------- */
-@media (min-width: 48rem) {
-  .entry { grid-template-columns: 7.5rem minmax(0, 1fr); }
-  .entry-summary { grid-column: 2; }
-}
-@media (min-width: 72rem) {
-  .entry { grid-template-columns: 7.5rem 17rem minmax(0, 1fr); }
-  .entry-summary { grid-column: 3; }
+@media (min-width: 40rem) {
+  .keystrip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 /* Narrow ------------------------------------------------------------------ */
+@media (max-width: 40rem) {
+  .keystrip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .prose table, .prose thead, .prose tbody, .prose tr, .prose th, .prose td {
+    display: block;
+    width: 100%;
+  }
+  .prose thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .prose tr {
+    border: 1px solid var(--edge);
+    margin: 0 0 .75rem;
+    padding: .35rem .55rem;
+  }
+  .prose td { border: 0; padding: .28rem 0; }
+  .prose td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: .68rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--amber);
+  }
+}
 @media (max-width: 48rem) {
   .masthead-row { flex-direction: column; align-items: flex-start; gap: .45rem; }
   .prose, .article-head { padding-inline: .9rem; }
   .panel-head { padding: .4rem .7rem; }
-  .entry { grid-template-columns: 1fr; padding: .65rem .7rem; }
-  .entry-summary { grid-column: 1; }
+  .entry { padding: .65rem .7rem; }
   .source-table li { padding-inline: .7rem; grid-template-columns: 2.2rem minmax(0, 1fr); }
 }
 
@@ -880,6 +1108,7 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
   .panel { border-color: #000; background: #fff; }
   .panel-head, .notice, .colophon { color: #000; border-color: #000; background: none; }
   a { color: #000; background: none; }
+  .source-url { display: block; color: #000; }
 }
 """
 
