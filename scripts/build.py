@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parent.parent
 ARTICLES_DIR = ROOT / "articles"
 DIST = ROOT / "dist"
 MARK_SRC = ROOT / "mark.svg"
+ASSETS_DIR = ROOT / "assets"
 
 SITE_HOST = "alpha.kurult.ai"
 SITE_URL = f"https://{SITE_HOST}"
@@ -187,6 +188,9 @@ LINK_RE = re.compile(r"\[([^\]\n]+)\]\(([^)\s]+)\)")
 STRONG_RE = re.compile(r"(\*\*|__)(?=\S)(.+?)(?<=\S)\1")
 EM_RE = re.compile(r"(?<![\w*])(\*|_)(?=\S)(.+?)(?<=\S)\1(?![\w*])")
 SAFE_HREF_RE = re.compile(r"^(https?:|mailto:|/|#|\.)", re.I)
+# Block image: a line on its own, ![alt](/assets/<article>/<file> "optional caption")
+IMG_RE = re.compile(r'^!\[([^\]\n]*)\]\((\S+?)(?:\s+"([^"\n]*)")?\)\s*$')
+IMG_SRC_RE = re.compile(r"^/assets/[a-z0-9][a-z0-9._/-]*\.(svg|png|jpe?g|webp)$")
 
 
 def esc(text: str) -> str:
@@ -235,6 +239,7 @@ def is_block_start(line: str) -> bool:
         or UL_RE.match(line)
         or OL_RE.match(line)
         or is_table_row(line)
+        or IMG_RE.match(line)
     )
 
 
@@ -319,6 +324,21 @@ def render_table(lines: list[str], i: int, out: list[str], name: str) -> int:
     return i
 
 
+def render_figure(m: re.Match, out: list[str], name: str) -> None:
+    alt, src, caption = m.group(1).strip(), m.group(2), (m.group(3) or "").strip()
+    if not alt:
+        raise BuildError(f"{name}: image {src!r} needs alt text")
+    if not IMG_SRC_RE.match(src) or ".." in src:
+        raise BuildError(f"{name}: image src must be a local /assets/... path, got {src!r}")
+    if not (ROOT / src.lstrip("/")).is_file():
+        raise BuildError(f"{name}: image file not found: {src}")
+    cap = f"<figcaption>{render_inline(caption)}</figcaption>" if caption else ""
+    out.append(
+        f'<figure class="figure"><a href="{esc(src)}"><img src="{esc(src)}" alt="{esc(alt)}" '
+        f'loading="lazy" decoding="async"></a>{cap}</figure>'
+    )
+
+
 def render_paragraph(lines: list[str], i: int, out: list[str]) -> int:
     buf: list[str] = []
     while i < len(lines) and not is_block_start(lines[i]):
@@ -340,6 +360,9 @@ def render_markdown(text: str, name: str) -> str:
             i = render_fence(lines, i, out, name)
         elif HEADING_RE.match(line):
             render_heading(HEADING_RE.match(line), out)
+            i += 1
+        elif IMG_RE.match(line):
+            render_figure(IMG_RE.match(line), out, name)
             i += 1
         elif UL_RE.match(line):
             i = render_list(lines, i, out, UL_RE, "ul")
@@ -1001,6 +1024,22 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
   color: var(--data);
 }
 .prose pre code { background: none; padding: 0; font-size: inherit; color: inherit; }
+.prose figure { margin: 2.2em 0; width: min(48rem, calc(100vw - 2 * var(--gutter))); max-width: none; }
+.prose figure a { display: block; text-decoration: none; }
+.prose figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--edge);
+  background: var(--bg);
+}
+.prose figcaption {
+  margin-top: .6rem;
+  font-family: var(--mono);
+  font-size: .7rem;
+  line-height: 1.55;
+  color: var(--data);
+}
 
 /* Sources ----------------------------------------------------------------- */
 .source-table { list-style: none; margin: 0; padding: 0; counter-reset: src; }
@@ -1189,6 +1228,9 @@ def build() -> None:
     write(DIST / "sitemap.xml", render_sitemap(listed))
     shutil.copyfile(MARK_SRC, DIST / "mark.svg")
     print("  copied mark.svg")
+    if ASSETS_DIR.is_dir():
+        shutil.copytree(ASSETS_DIR, DIST / "assets")
+        print("  copied assets/")
 
 
 def main() -> int:
