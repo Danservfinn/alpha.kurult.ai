@@ -337,13 +337,6 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
 }
 
 .prose { padding: 1.15rem 1.15rem 1.4rem; min-width: 0; overflow-wrap: break-word; }
-.prose > p:first-child::first-letter {
-  float: none;
-  font-size: inherit;
-  line-height: inherit;
-  padding: 0;
-  color: inherit;
-}
 .table-wrap { min-width: 0; max-width: 100%; overflow-x: clip; }
 .prose table {
   width: 100%;
