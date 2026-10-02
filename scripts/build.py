@@ -402,6 +402,8 @@ class Article:
         self.call = opt_str(self.meta, "call", path.name)
         self.position = opt_str(self.meta, "position", path.name)
         self.keys = self.meta.get("keys") or []
+        unlisted_raw = str(self.meta.get("unlisted", "")).strip().lower()
+        self.unlisted = unlisted_raw in ("true", "1", "yes")
         check_images(body, path)
         self.body_html = render_markdown(body, path.name)
         if not self.body_html.strip():
@@ -1378,10 +1380,11 @@ def build() -> None:
     if not MARK_SRC.is_file():
         raise BuildError(f"missing {MARK_SRC.name} at repository root")
     articles = load_articles()
-    print(f"  {len(articles)} article(s) loaded")
+    listed = [a for a in articles if not a.unlisted]
+    print(f"  {len(articles)} article(s) loaded ({len(listed)} listed, {len(articles) - len(listed)} unlisted)")
 
     reset_dist()
-    write(DIST / "index.html", render_index(articles))
+    write(DIST / "index.html", render_index(listed))
     for article in articles:
         write(DIST / "articles" / article.dir_name / "index.html", render_article(article))
     write(DIST / "404.html", render_404())
@@ -1392,8 +1395,8 @@ def build() -> None:
     shutil.copyfile(market_js, DIST / "market.js")
     print("  copied market.js")
     write(DIST / "robots.txt", render_robots())
-    write(DIST / "llms.txt", render_llms(articles))
-    write(DIST / "sitemap.xml", render_sitemap(articles))
+    write(DIST / "llms.txt", render_llms(listed))
+    write(DIST / "sitemap.xml", render_sitemap(listed))
     shutil.copyfile(MARK_SRC, DIST / "mark.svg")
     print("  copied mark.svg")
 

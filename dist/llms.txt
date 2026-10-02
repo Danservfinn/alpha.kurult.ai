@@ -9,4 +9,3 @@ One first-party script draws market panels from public sources. No third-party s
 ## Articles
 
 - [Pearl (PRL): real proof-of-useful-work tech, a token priced ahead of its usage](https://alpha.kurult.ai/articles/2026-10-02-pearl/): Deep dive on Pearl, the matrix-multiplication proof-of-work chain: on-chain data, holder and pool concentration, emissions, liquidity, the hype cycle on X, and bear/base/bull scenarios. Research only.
-- [Desk open](https://alpha.kurult.ai/articles/2026-10-02-desk-open/): Placeholder. The daily article desk is standing. No market call in this file.
