@@ -1,0 +1,11 @@
+# alpha.kurult.ai
+
+> Daily research notes. Research only. Not a trading desk.
+
+Research only. Not financial advice. Nothing on this site is an offer to buy, sell, or hold any asset. No wallet. No comments.
+
+Static site. No scripts, no remote assets, no wallet, no comments, no analytics.
+
+## Articles
+
+- [Desk open](https://alpha.kurult.ai/articles/2026-10-02-desk-open/): Placeholder. The daily article desk is standing. No market call in this file.
