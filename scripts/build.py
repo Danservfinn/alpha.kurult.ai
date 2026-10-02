@@ -149,9 +149,6 @@ def validate_meta(meta: dict, file_date: str, name: str) -> None:
             raise BuildError(f"{name}: source {idx} has an invalid url {url!r}")
 
 
-DESK_FIELDS = ("ticker", "rating", "horizon", "conviction", "price")
-
-
 def opt_str(meta: dict, key: str, name: str) -> str:
     value = meta.get(key, "")
     if value is None or value == "":
@@ -162,22 +159,17 @@ def opt_str(meta: dict, key: str, name: str) -> str:
 
 
 def validate_desk(meta: dict, name: str) -> None:
-    present = [key for key in DESK_FIELDS if opt_str(meta, key, name)]
-    if not present and "keys" not in meta and not opt_str(meta, "call", name) and not opt_str(meta, "position", name):
+    """Call, position, rating, and keys are optional. Render nothing when absent."""
+    keys = meta.get("keys", None)
+    if keys is None or keys == "":
         return
-    missing = [key for key in DESK_FIELDS if key not in present]
-    if missing:
-        raise BuildError(f"{name}: desk row missing {', '.join(missing)}")
-    if not opt_str(meta, "call", name):
-        raise BuildError(f"{name}: desk row requires call")
-    if not opt_str(meta, "position", name):
-        raise BuildError(f"{name}: desk row requires position")
-    keys = meta.get("keys")
-    if not isinstance(keys, list) or not keys:
-        raise BuildError(f"{name}: keys must be a non-empty list")
+    if not isinstance(keys, list):
+        raise BuildError(f"{name}: keys must be a list")
     for idx, item in enumerate(keys, 1):
-        label = item.get("label", "").strip()
-        value = item.get("value", "").strip()
+        if not isinstance(item, dict):
+            raise BuildError(f"{name}: key {idx} must be a mapping")
+        label = str(item.get("label", "")).strip()
+        value = str(item.get("value", "")).strip()
         if not label or not value:
             raise BuildError(f"{name}: key {idx} needs label and value")
 
@@ -195,6 +187,25 @@ LINK_RE = re.compile(r"\[([^\]\n]+)\]\(([^)\s]+)\)")
 STRONG_RE = re.compile(r"(\*\*|__)(?=\S)(.+?)(?<=\S)\1")
 EM_RE = re.compile(r"(?<![\w*])(\*|_)(?=\S)(.+?)(?<=\S)\1(?![\w*])")
 SAFE_HREF_RE = re.compile(r"^(https?:|mailto:|/|#|\.)", re.I)
+IMAGE_RE = re.compile(r"!\[[^\]]*\]\(\s*<?([^)\s>]+)>?")
+
+
+def check_images(body: str, article_path: Path) -> None:
+    for match in IMAGE_RE.finditer(body):
+        ref = match.group(1).strip()
+        if ref.startswith(("http://", "https://", "data:")):
+            continue
+        rel = ref.split("?", 1)[0].split("#", 1)[0]
+        if rel.startswith("/"):
+            candidates = [ROOT / rel.lstrip("/")]
+        else:
+            candidates = [
+                article_path.parent / rel,
+                ROOT / rel,
+                ARTICLES_DIR / rel,
+            ]
+        if not any(path.is_file() for path in candidates):
+            raise BuildError(f"{article_path.name}: missing image {ref}")
 
 
 def esc(text: str) -> str:
@@ -391,6 +402,7 @@ class Article:
         self.call = opt_str(self.meta, "call", path.name)
         self.position = opt_str(self.meta, "position", path.name)
         self.keys = self.meta.get("keys") or []
+        check_images(body, path)
         self.body_html = render_markdown(body, path.name)
         if not self.body_html.strip():
             raise BuildError(f"{path.name}: article body is empty")
@@ -504,7 +516,8 @@ def chain_mount(scope: str) -> str:
 </section>"""
 
 
-def page(title: str, description: str, path: str, body: str, body_class: str) -> str:
+def page(title: str, description: str, path: str, body: str, body_class: str, market_chrome: bool = True) -> str:
+    chrome = ticker_html() if market_chrome else ""
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -535,7 +548,7 @@ def page(title: str, description: str, path: str, body: str, body_class: str) ->
     <a class="fnkey" href="/">F1 LEDGER</a>
   </div>
 </nav>
-{ticker_html()}
+{chrome}
 <aside class="notice" role="note" aria-label="Disclaimer">
   <div class="sheet"><span class="notice-mark" aria-hidden="true">!</span>{esc(DISCLAIMER)}</div>
 </aside>
@@ -564,16 +577,19 @@ def render_index_entry(article: Article, i: int) -> str:
 
 
 def render_tape(article: Article) -> str:
-    if not article.ticker:
-        return f'<p class="entry-tape">{time_tag(article)}</p>'
-    cells = [
-        time_tag(article),
-        f'<span class="entry-ticker">{esc(article.ticker)}</span>',
-        f'<span class="entry-rating">{esc(article.rating)}</span>',
-        f'<span class="entry-horizon">{esc(article.horizon)}</span>',
-        f'<span class="entry-conviction">{esc(article.conviction)}</span>',
-        f'<span class="entry-price">{esc(article.price)}</span>',
-    ]
+    cells = [time_tag(article)]
+    if article.ticker:
+        cells.append(f'<span class="entry-ticker">{esc(article.ticker)}</span>')
+    if article.rating:
+        cells.append(f'<span class="entry-rating">{esc(article.rating)}</span>')
+    if article.horizon:
+        cells.append(f'<span class="entry-horizon">{esc(article.horizon)}</span>')
+    if article.conviction:
+        cells.append(f'<span class="entry-conviction">{esc(article.conviction)}</span>')
+    if article.price:
+        cells.append(f'<span class="entry-price">{esc(article.price)}</span>')
+    if len(cells) == 1:
+        return f'<p class="entry-tape">{cells[0]}</p>'
     sep = '<span class="pipe" aria-hidden="true">|</span>'
     return f'<p class="entry-tape">{sep.join(cells)}</p>'
 
@@ -620,16 +636,22 @@ def render_sources(article: Article) -> str:
 
 
 def render_tearsheet(article: Article) -> str:
-    if not article.call:
-        return ""
+    parts: list[str] = []
+    if article.call:
+        ticker = f"<strong>{esc(article.ticker)}.</strong> " if article.ticker else ""
+        parts.append(f'  <p class="callstrip">{ticker}{esc(article.call)}</p>')
+    if article.position:
+        parts.append(f'  <p class="position-box">{esc(article.position)}</p>')
     cells = "".join(
-        f"<div><dt>{esc(item['label'].strip())}</dt><dd>{esc(item['value'].strip())}</dd></div>"
+        f"<div><dt>{esc(str(item.get('label', '')).strip())}</dt><dd>{esc(str(item.get('value', '')).strip())}</dd></div>"
         for item in article.keys
+        if isinstance(item, dict) and str(item.get("label", "")).strip() and str(item.get("value", "")).strip()
     )
-    return f"""  <p class="callstrip"><strong>{esc(article.ticker)}.</strong> {esc(article.call)}</p>
-  <p class="position-box">{esc(article.position)}</p>
-  <dl class="keystrip">{cells}</dl>
-"""
+    if cells:
+        parts.append(f'  <dl class="keystrip">{cells}</dl>')
+    if not parts:
+        return ""
+    return "\n".join(parts) + "\n"
 
 
 def render_article(article: Article) -> str:
@@ -637,7 +659,7 @@ def render_article(article: Article) -> str:
     mounts = ""
     if asset:
         mounts = chart_mount((asset,), asset, True) + "\n" + chain_mount(asset) + "\n"
-    body = f"""{mounts}<article class="article panel">
+    body = f"""<article class="article panel">
   <div class="panel-head"><span><a href="/">&laquo; Ledger</a></span><span class="data">{time_tag(article)}</span></div>
   <header class="article-head">
 {render_tearsheet(article)}    <h1 class="article-title">{esc(article.title)}</h1>
@@ -647,8 +669,8 @@ def render_article(article: Article) -> str:
 {article.body_html}
   </div>
 </article>
-{render_sources(article)}"""
-    return page(f"{article.title} | {SITE_NAME}", article.summary, article.path, body, "page-article")
+{mounts}{render_sources(article)}"""
+    return page(f"{article.title} | {SITE_NAME}", article.summary, article.path, body, "page-article", market_chrome=False)
 
 
 def render_404() -> str:
@@ -883,14 +905,18 @@ a:hover { background: var(--yellow); color: #000; text-decoration: none; }
 .chip-asof { color: var(--text-dim); font-size: .68rem; }
 .chip-stale .chip-asof { color: var(--amber-mid); }
 .src-list {
+  width: auto;
+  max-width: calc(100% - 2 * max(1rem, var(--gutter)));
   margin: 0 auto .4rem;
-  padding: 0 0 .4rem;
+  padding-block: 0 .4rem;
+  padding-inline: 0;
   list-style: none;
   font-size: .72rem;
   line-height: 1.45;
   color: var(--text-dim);
+  overflow-wrap: anywhere;
 }
-.src-list li { margin: .2rem 0; }
+.src-list li { margin: .2rem 0; overflow-wrap: anywhere; }
 .noscript { color: var(--amber-mid); font-size: .78rem; }
 .visually-hidden {
   position: absolute;
@@ -1031,6 +1057,13 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
 
 /* Article ----------------------------------------------------------------- */
 .article-head { padding: .7rem 1.15rem 0; }
+.page-article main { padding-top: .4rem; gap: .7rem; }
+.page-article .article-head { padding-top: .3rem; }
+.page-article .notice .sheet { padding-block: .3rem; }
+.page-article .callstrip { padding: .3rem .55rem; margin-bottom: .3rem; }
+.page-article .position-box { padding: .28rem .55rem; margin-bottom: .3rem; }
+.page-article .keystrip { margin-bottom: .45rem; }
+.page-article .keystrip div { padding: .2rem .4rem; }
 .callstrip {
   font-family: var(--mono);
   font-size: .78rem;
@@ -1086,13 +1119,6 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
 }
 
 .prose { padding: 1.15rem 1.15rem 1.4rem; min-width: 0; overflow-wrap: break-word; }
-.prose > p:first-child::first-letter {
-  float: none;
-  font-size: inherit;
-  line-height: inherit;
-  padding: 0;
-  color: inherit;
-}
 .table-wrap { min-width: 0; max-width: 100%; overflow-x: clip; }
 .prose table {
   width: 100%;

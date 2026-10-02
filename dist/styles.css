@@ -215,14 +215,18 @@ a:hover { background: var(--yellow); color: #000; text-decoration: none; }
 .chip-asof { color: var(--text-dim); font-size: .68rem; }
 .chip-stale .chip-asof { color: var(--amber-mid); }
 .src-list {
+  width: auto;
+  max-width: calc(100% - 2 * max(1rem, var(--gutter)));
   margin: 0 auto .4rem;
-  padding: 0 0 .4rem;
+  padding-block: 0 .4rem;
+  padding-inline: 0;
   list-style: none;
   font-size: .72rem;
   line-height: 1.45;
   color: var(--text-dim);
+  overflow-wrap: anywhere;
 }
-.src-list li { margin: .2rem 0; }
+.src-list li { margin: .2rem 0; overflow-wrap: anywhere; }
 .noscript { color: var(--amber-mid); font-size: .78rem; }
 .visually-hidden {
   position: absolute;
@@ -363,6 +367,13 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
 
 /* Article ----------------------------------------------------------------- */
 .article-head { padding: .7rem 1.15rem 0; }
+.page-article main { padding-top: .4rem; gap: .7rem; }
+.page-article .article-head { padding-top: .3rem; }
+.page-article .notice .sheet { padding-block: .3rem; }
+.page-article .callstrip { padding: .3rem .55rem; margin-bottom: .3rem; }
+.page-article .position-box { padding: .28rem .55rem; margin-bottom: .3rem; }
+.page-article .keystrip { margin-bottom: .45rem; }
+.page-article .keystrip div { padding: .2rem .4rem; }
 .callstrip {
   font-family: var(--mono);
   font-size: .78rem;
@@ -418,13 +429,6 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
 }
 
 .prose { padding: 1.15rem 1.15rem 1.4rem; min-width: 0; overflow-wrap: break-word; }
-.prose > p:first-child::first-letter {
-  float: none;
-  font-size: inherit;
-  line-height: inherit;
-  padding: 0;
-  color: inherit;
-}
 .table-wrap { min-width: 0; max-width: 100%; overflow-x: clip; }
 .prose table {
   width: 100%;

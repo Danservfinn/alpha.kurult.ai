@@ -14,8 +14,8 @@
     usdt: 1, usdc: 1, usds: 1, dai: 1, fdusd: 1, usde: 1, pyusd: 1, tusd: 1,
     usdd: 1, usd1: 1, wbtc: 1, weth: 1, steth: 1, wsteth: 1, weeth: 1, cbbtc: 1, wbt: 1
   };
-  var cgNext = 0;
-  var cgWait = 60000;
+  var hostWait = {};
+  var hostNext = {};
   var lastTicker = 0;
   var state = { ticker: null, chips: {}, markets: null, chain: null, chart: {} };
 
@@ -68,46 +68,139 @@
     }
   }
 
-  function note429(res) {
-    var retry = Number(res.headers.get("retry-after"));
-    var wait = Number.isFinite(retry) && retry > 0 ? retry * 1000 : cgWait;
-    cgWait = Math.min(Math.max(cgWait * 2, 60000), 600000);
-    cgNext = Date.now() + Math.min(Math.max(wait, 60000), 600000);
+  function hostOf(url) {
+    if (!url || url.charAt(0) === "/") return "self";
+    var match = String(url).match(/^https?:\/\/([^\/]+)/i);
+    return match ? match[1].toLowerCase() : "self";
   }
 
-  function cgBlocked() {
-    return Date.now() < cgNext;
+  function isCoinGecko(url) {
+    return hostOf(url).indexOf("coingecko.com") !== -1;
+  }
+
+  function hostBlocked(host) {
+    return Date.now() < (hostNext[host] || 0);
+  }
+
+  function backOff(host) {
+    var prev = hostWait[host] || 30000;
+    var wait = Math.min(Math.max(prev * 2, 60000), 600000);
+    hostWait[host] = wait;
+    hostNext[host] = Date.now() + wait;
+  }
+
+  function limitedFailure(url, err) {
+    var host = hostOf(url);
+    if (isCoinGecko(url)) {
+      backOff(host);
+      return;
+    }
+    if (!err) return;
+    var name = err.name || "";
+    var msg = String(err.message || err);
+    if (name === "TypeError" || name === "AbortError" || /429|opaque|failed to fetch|network|cors/i.test(msg)) {
+      backOff(host);
+    }
+  }
+
+  function sourceWhen(raw) {
+    var n = Number(raw);
+    if (!Number.isFinite(n) || n <= 0) return "";
+    var ms = n < 1e12 ? n * 1000 : n;
+    var date = etDate(ms);
+    var clock = etClock(ms);
+    if (date && clock) return date + " " + clock;
+    return date || clock;
+  }
+
+  function chipSaved(id) {
+    var live = state.chips && state.chips[id];
+    if (live && live.value && live.value !== "unavailable") return live;
+    var saved = load("alpha.chips.v1") || {};
+    return saved[id] || null;
+  }
+
+  function keepChip(id) {
+    var saved = chipSaved(id);
+    if (saved) {
+      state.chips[id] = {
+        value: saved.value,
+        asof: saved.asof || "",
+        stale: true
+      };
+    } else {
+      state.chips[id] = { value: "unavailable", asof: "", stale: true };
+    }
+  }
+
+  function opaque(res) {
+    return !res || res.type === "opaque" || res.type === "opaqueredirect" || res.status === 0;
   }
 
   async function getJson(url, timeout) {
+    var host = hostOf(url);
+    if (hostBlocked(host)) {
+      var blocked = new Error("backoff");
+      blocked.limited = true;
+      throw blocked;
+    }
     var ctrl = new AbortController();
     var timer = setTimeout(function () { ctrl.abort(); }, timeout || 12000);
     try {
-      var res = await fetch(url, {
-        headers: { Accept: "application/json" },
-        signal: ctrl.signal
-      });
-      if (res.status === 429) {
-        note429(res);
-        throw new Error("429");
+      var res;
+      try {
+        res = await fetch(url, {
+          headers: { Accept: "application/json" },
+          signal: ctrl.signal
+        });
+      } catch (err) {
+        limitedFailure(url, err);
+        throw err;
       }
-      if (!res.ok) throw new Error(String(res.status));
-      return await res.json();
+      if (opaque(res) || (isCoinGecko(url) && !res.ok) || res.status === 429) {
+        backOff(host);
+        throw new Error(opaque(res) ? "opaque" : String(res.status));
+      }
+      if (!res.ok) {
+        if (res.status >= 500) backOff(host);
+        throw new Error(String(res.status));
+      }
+      try {
+        return await res.json();
+      } catch (err) {
+        if (isCoinGecko(url) || err.name === "TypeError") backOff(host);
+        throw err;
+      }
     } finally {
       clearTimeout(timer);
     }
   }
 
   async function getText(url) {
+    var host = hostOf(url);
+    if (hostBlocked(host)) {
+      var blocked = new Error("backoff");
+      blocked.limited = true;
+      throw blocked;
+    }
     var ctrl = new AbortController();
     var timer = setTimeout(function () { ctrl.abort(); }, 12000);
     try {
-      var res = await fetch(url, { headers: { Accept: "text/csv, text/plain, */*" }, signal: ctrl.signal });
-      if (res.status === 429) {
-        var retry = Number(res.headers.get("retry-after"));
-        throw new Error("429");
+      var res;
+      try {
+        res = await fetch(url, { headers: { Accept: "text/csv, text/plain, */*" }, signal: ctrl.signal });
+      } catch (err) {
+        limitedFailure(url, err);
+        throw err;
       }
-      if (!res.ok) throw new Error(String(res.status));
+      if (opaque(res) || res.status === 429) {
+        backOff(host);
+        throw new Error(opaque(res) ? "opaque" : "429");
+      }
+      if (!res.ok) {
+        if (res.status >= 500) backOff(host);
+        throw new Error(String(res.status));
+      }
       return await res.text();
     } finally {
       clearTimeout(timer);
@@ -179,15 +272,24 @@
     });
     var badge = document.getElementById("ticker-state");
     if (badge) {
-      badge.textContent = stale ? "stale" : "agg " + etClock(payload.as_of);
+      var when = payload && payload.as_of ? etClock(payload.as_of) : "";
+      badge.textContent = stale ? ("stale" + (when ? " " + when : "")) : ("agg " + when);
       badge.className = "tick tick-state" + (stale ? " tick-stale" : "");
     }
   }
 
+  function tickerSaved() {
+    return state.ticker || load("alpha.ticker.v1");
+  }
+
   async function pullTicker(force) {
     if (!force && Date.now() - lastTicker < TICKER_MS) return;
-    if (cgBlocked()) {
-      paintTicker(state.ticker, true);
+    if (hostBlocked(hostOf(CG))) {
+      var held = tickerSaved();
+      if (held) {
+        state.ticker = held;
+        paintTicker(held, true);
+      }
       return;
     }
     lastTicker = Date.now();
@@ -217,11 +319,16 @@
       });
       setStatus("Aggregated prices. " + bits.join(", ") + ". Data provided by CoinGecko.");
     } catch (err) {
-      paintTicker(state.ticker, true);
-      var badge = document.getElementById("ticker-state");
-      if (badge) {
-        badge.textContent = state.ticker ? "stale" : "unavailable";
-        badge.className = "tick tick-state tick-stale";
+      var saved = tickerSaved();
+      if (saved) {
+        state.ticker = saved;
+        paintTicker(saved, true);
+      } else {
+        var badge = document.getElementById("ticker-state");
+        if (badge) {
+          badge.textContent = "unavailable";
+          badge.className = "tick tick-state tick-stale";
+        }
       }
     }
   }
@@ -267,10 +374,8 @@
         stale: !!data.stale
       };
     } catch (err) {
-      if (state.chips.ust10y) state.chips.ust10y.stale = true;
-      else state.chips.ust10y = { value: "unavailable", asof: "", stale: true };
-      if (state.chips.ust2y) state.chips.ust2y.stale = true;
-      else state.chips.ust2y = { value: "unavailable", asof: "", stale: true };
+      keepChip("ust10y");
+      keepChip("ust2y");
     }
   }
 
@@ -281,8 +386,7 @@
       if (!row || !Number.isFinite(row.percentRate)) throw new Error("sofr");
       state.chips.sofr = { value: row.percentRate.toFixed(2) + "%", asof: row.effectiveDate, stale: false };
     } catch (err) {
-      if (state.chips.sofr) state.chips.sofr.stale = true;
-      else state.chips.sofr = { value: "unavailable", asof: "", stale: true };
+      keepChip("sofr");
     }
   }
 
@@ -306,15 +410,14 @@
       if (!row) throw new Error("ecb");
       state.chips.eurusd = { value: row.value.toFixed(4), asof: row.date, stale: false };
     } catch (err) {
-      if (state.chips.eurusd) state.chips.eurusd.stale = true;
-      else state.chips.eurusd = { value: "unavailable", asof: "", stale: true };
+      keepChip("eurusd");
     }
   }
 
   async function pullGlobal() {
-    if (cgBlocked()) {
-      if (state.chips.btcd) state.chips.btcd.stale = true;
-      if (state.chips.total) state.chips.total.stale = true;
+    if (hostBlocked(hostOf(CG))) {
+      keepChip("btcd");
+      keepChip("total");
       return;
     }
     try {
@@ -323,14 +426,12 @@
       var btc = body && body.market_cap_percentage && body.market_cap_percentage.btc;
       var total = body && body.total_market_cap && body.total_market_cap.usd;
       if (!Number.isFinite(btc) || !Number.isFinite(total)) throw new Error("global");
-      var asof = etDate(Date.now());
+      var asof = sourceWhen(body.updated_at);
       state.chips.btcd = { value: btc.toFixed(1) + "%", asof: asof, stale: false };
       state.chips.total = { value: fmtCompact(total), asof: asof, stale: false };
     } catch (err) {
-      if (state.chips.btcd) state.chips.btcd.stale = true;
-      else state.chips.btcd = { value: "unavailable", asof: "", stale: true };
-      if (state.chips.total) state.chips.total.stale = true;
-      else state.chips.total = { value: "unavailable", asof: "", stale: true };
+      keepChip("btcd");
+      keepChip("total");
     }
   }
 
@@ -346,8 +447,7 @@
         stale: false
       };
     } catch (err) {
-      if (state.chips.fng) state.chips.fng.stale = true;
-      else state.chips.fng = { value: "unavailable", asof: "", stale: true };
+      keepChip("fng");
     }
   }
 
@@ -456,14 +556,28 @@
     if (note) {
       note.textContent = (NAMES[sym] || sym) + " " + kind + ". Aggregated price, not one exchange." + (stale ? " Stale." : "");
     }
-    if (badge) badge.textContent = stale ? "stale" : "aggregated";
+    if (badge) {
+      var last = series.length ? series[series.length - 1] : null;
+      var when = last ? (etDate(last.t) + " " + etClock(last.t)) : "";
+      badge.textContent = stale ? ("stale" + (when ? " " + when : "")) : "aggregated";
+    }
     if (readout && series.length) {
-      var last = series[series.length - 1];
-      var when = etDate(last.t) + " " + etClock(last.t);
-      readout.textContent = "Last " + fmtPx(last.c) + " at " + when + ". Data provided by CoinGecko.";
+      var row = series[series.length - 1];
+      var stamp = etDate(row.t) + " " + etClock(row.t);
+      readout.textContent = "Last " + fmtPx(row.c) + " at " + stamp + ". Data provided by CoinGecko." + (stale ? " Stale." : "");
     } else if (readout) {
       readout.textContent = "Chart unavailable.";
     }
+  }
+
+  function chartSaved(key) {
+    var live = state.chart[key];
+    if (live && live.series && live.series.length) return live;
+    var stored = load("alpha.chart.v1");
+    if (stored && stored.key === key && stored.series && stored.series.length) {
+      return { at: stored.at, series: stored.series };
+    }
+    return null;
   }
 
   async function pullChart(sym, tf, force) {
@@ -473,9 +587,14 @@
       paintChart(sym, tf, cached.series, false);
       return;
     }
-    if (cgBlocked()) {
-      if (cached) paintChart(sym, tf, cached.series, true);
-      else paintChart(sym, tf, [], true);
+    if (hostBlocked(hostOf(CG))) {
+      var held = chartSaved(key);
+      if (held) {
+        state.chart[key] = held;
+        paintChart(sym, tf, held.series, true);
+      } else {
+        paintChart(sym, tf, [], true);
+      }
       return;
     }
     try {
@@ -486,8 +605,13 @@
       save("alpha.chart.v1", { key: key, at: Date.now(), series: series });
       paintChart(sym, tf, series, false);
     } catch (err) {
-      if (cached) paintChart(sym, tf, cached.series, true);
-      else paintChart(sym, tf, [], true);
+      var saved = chartSaved(key);
+      if (saved) {
+        state.chart[key] = saved;
+        paintChart(sym, tf, saved.series, true);
+      } else {
+        paintChart(sym, tf, [], true);
+      }
     }
   }
 
@@ -551,13 +675,22 @@
       '<div><h3 class="mkt-title">Losers</h3>' + head + losers.map(rowHtml).join("") + "</tbody></table></div>" +
       '<div><h3 class="mkt-title">Volume</h3>' + head + volume.map(rowHtml).join("") + "</tbody></table></div></div>" +
       '<p class="src-foot">Prices, movers, volume, BTC.D, and total cap: <a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a>. Aggregated, not one exchange.' +
-      (pack.stale ? " Stale." : "") + "</p>";
+      (pack.stale ? " Stale" + (pack.at ? " as of " + etClock(pack.at) : "") + "." : "") + "</p>";
     if (badge) badge.textContent = pack.stale ? "stale" : "agg";
   }
 
+  function marketsSaved() {
+    if (state.markets && state.markets.rows) return state.markets;
+    var stored = load("alpha.markets.v1");
+    if (stored && stored.rows) return { rows: stored.rows, at: stored.at, stale: true };
+    return null;
+  }
+
   async function pullMarkets() {
-    if (cgBlocked()) {
-      if (state.markets) {
+    if (hostBlocked(hostOf(CG))) {
+      var held = marketsSaved();
+      if (held) {
+        state.markets = held;
         state.markets.stale = true;
         paintMarkets();
       }
@@ -577,7 +710,9 @@
       }) });
       paintMarkets();
     } catch (err) {
-      if (state.markets) {
+      var saved = marketsSaved();
+      if (saved) {
+        state.markets = saved;
         state.markets.stale = true;
         paintMarkets();
       } else {
