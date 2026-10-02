@@ -410,7 +410,7 @@
       series.forEach(function (row, i) {
         var x = padL + i * slot + slot / 2;
         var up = row.c >= row.o;
-        var color = up ? "#00e676" : "#ff6b6b";
+        var color = up ? "#39d441" : "#dc5d5e";
         var top = y(Math.max(row.o, row.c));
         var bot = y(Math.min(row.o, row.c));
         var bw = Math.max(slot * 0.55, 1.2);
@@ -422,10 +422,10 @@
       var points = series.map(function (row, i) {
         return (padL + i * step).toFixed(1) + "," + y(row.c).toFixed(1);
       }).join(" ");
-      parts.push('<polyline fill="none" stroke="#ffb000" stroke-width="1.6" points="' + points + '"/>');
+      parts.push('<polyline fill="none" stroke="#f1bd59" stroke-width="1.6" points="' + points + '"/>');
     }
     var last = series[series.length - 1];
-    parts.push('<text x="' + (w - padR + 6) + '" y="' + Math.max(12, y(last.c)).toFixed(1) + '" fill="#f2ecdc" font-size="12" font-family="ui-monospace, Menlo, Consolas, monospace">' + esc(fmtPx(last.c)) + '</text>');
+    parts.push('<text x="' + (w - padR + 6) + '" y="' + Math.max(12, y(last.c)).toFixed(1) + '" fill="#ffffff" font-size="12" font-family="ui-monospace, Menlo, Consolas, monospace">' + esc(fmtPx(last.c)) + '</text>');
     var label = tf === "4H" ? "4H aggregated OHLC" : tf + " aggregated price";
     return '<svg class="chart-svg" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="' + esc(label) + '">' + parts.join("") + '</svg>';
   }
