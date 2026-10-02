@@ -16,21 +16,21 @@ text{font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;fill:#f3ead7}
 <text x="32" y="44" class="h">PRL token flow: where new coins go</text>
 <text x="32" y="68" class="s">New supply moves one way, toward the order books. Little takes coins out of circulation.</text>
 <text x="928" y="30" class="f" text-anchor="end">alpha.kurult.ai | research only</text>
-<rect x="32" y="104" width="196" height="132" rx="4" class="hot"/><text x="48" y="130">Protocol emission</text><text x="48" y="154" class="s">2,288 PRL per block</text><text x="48" y="174" class="s">1,065,348 PRL on Oct 1</text><text x="48" y="194" class="s">about $1.18M a day at $1.11</text><text x="48" y="220" class="f">unconfirmed supply data</text>
+<rect x="32" y="104" width="196" height="132" rx="4" class="hot"/><text x="48" y="130">Protocol emission</text><text x="48" y="154" class="s">2,287 PRL per block</text><text x="48" y="174" class="s">1,065,348 PRL on Oct 1</text><text x="48" y="194" class="s">about $1.18M a day at $1.11</text><text x="48" y="220" class="f">unconfirmed supply data</text>
 <path d="M228 170 H274" class="ln" marker-end="url(#a)"/>
-<rect x="278" y="104" width="196" height="132" rx="4" class="hot"/><text x="294" y="130">Mining pools</text><text x="294" y="154" class="s">top payee: 51% of blocks</text><text x="294" y="174" class="s">top three: 84%</text><text x="294" y="194" class="s">(last 200 blocks)</text><text x="294" y="220" class="f">pool names not mappable</text>
-<path d="M474 170 H520" class="ln" marker-end="url(#a)"/><text x="497" y="160" class="f" text-anchor="middle">~99.8%</text>
+<rect x="278" y="104" width="196" height="132" rx="4" class="hot"/><text x="294" y="130">Mining pools</text><text x="294" y="154" class="s">top payee: 52.5% of blocks</text><text x="294" y="174" class="s">top three: 86.5%</text><text x="294" y="194" class="s">(last 200 blocks)</text><text x="294" y="220" class="f">by payout address</text>
+<path d="M474 170 H520" class="ln" marker-end="url(#a)"/><text x="497" y="160" class="f" text-anchor="middle">~99.7%</text>
 <rect x="524" y="104" width="196" height="132" rx="4" class="box"/><text x="540" y="130">GPU miners</text><text x="540" y="154" class="s">costs are in USD: power,</text><text x="540" y="174" class="s">rent, hardware; breakeven</text><text x="540" y="194" class="s">near spot for rented GPUs</text><text x="540" y="220" class="f">duplex miners sell to fund discounts</text>
 <path d="M720 170 H766" class="lr" marker-end="url(#ar)"/><text x="743" y="160" class="f" text-anchor="middle" style="fill:#c4664a">sell</text>
 <rect x="770" y="104" width="158" height="132" rx="4" class="sell"/><text x="786" y="130">Venues</text><text x="786" y="154" class="s">BigONE, SafeTrade</text><text x="786" y="174" class="s">(null trust scores)</text><text x="786" y="194" class="s">OTC desks</text><text x="786" y="214" class="s">Uniswap WPRL</text>
 <path d="M849 236 V300" class="lr" marker-end="url(#ar)"/>
 <rect x="524" y="304" width="404" height="104" rx="4" class="sell"/><text x="540" y="332">Buyers must absorb the new supply</text><text x="540" y="356" class="s">issuance about 25% of reported 24h volume ($4.80M)</text><text x="540" y="376" class="s">volume / market cap 0.011, lowest of the peer set</text><text x="540" y="396" class="f">depth about $5k to $8k within 2% on SafeTrade (X, unverified)</text>
-<rect x="32" y="304" width="442" height="104" rx="4" class="use"/><text x="48" y="332">Sinks that remove coins: close to none</text><text x="48" y="356" class="s">fees: about 7,187 PRL all time, ~0.002% of issuance</text><text x="48" y="376" class="s">Pearl inference is priced in USD, not PRL</text><text x="48" y="396" class="s">WPRL on Ethereum: 2.0M outstanding (~0.6%), locked not burned</text>
+<rect x="32" y="304" width="442" height="104" rx="4" class="use"/><text x="48" y="332">Sinks that remove coins: close to none</text><text x="48" y="356" class="s">fees: about 7,193 PRL all time, ~0.002% of issuance</text><text x="48" y="376" class="s">Pearl inference is priced in USD, not PRL</text><text x="48" y="396" class="s">WPRL on Ethereum: 2.0M outstanding (~0.6%), locked not burned</text>
 <rect x="32" y="426" width="896" height="78" rx="4" class="box" stroke-dasharray="4 4"/>
 <text x="48" y="452" class="k">OVERHANG</text>
-<text x="48" y="474" class="s">17 of the top 25 wallets (60.2M PRL) have never sent a coin. 37.6% of today's supply was mined in launch week (Apr 27 to May 3).</text>
+<text x="48" y="474" class="s">15 of the top 25 ranked wallets (50.2M PRL) have never sent a coin. 37.6% of today's supply was mined in launch week (Apr 27 to May 3).</text>
 <text x="48" y="494" class="s">Supply grows about +27% in 3 months and +92% in 12 on the emission formula.</text>
-<text x="32" y="530" class="f">Sources: pearlchain.live stats, charts, addresses, coinbase crawl (2026-10-02 11:45 to 11:50 ET); CoinGecko price $1.11 and volume (18:41 ET), venues (19:23 ET);</text>
-<text x="32" y="548" class="f">Ethplorer WPRL (11:50 ET); @headroomcapital on X (depth, unverified). Breakeven: prlstats.com estimates scaled to 43.7 EH/s (derived). All supply figures unconfirmed.</text>
-<text x="32" y="566" class="f">~99.8% = share of mined coins the two largest payout addresses sent onward (top_miner_payees, 11:45 ET).</text>
+<text x="32" y="530" class="f">Sources: pearlchain.live stats, charts, addresses, coinbase crawl, address detail (Oct 2, 19:33 to 19:36 ET); CoinGecko price $1.11 and volume (18:41 ET), venues (19:23 ET);</text>
+<text x="32" y="548" class="f">Ethplorer WPRL (11:50 ET); @headroomcapital on X (depth, unverified). Breakeven: prlstats.com estimates scaled to 42.2 EH/s (derived). All supply figures unconfirmed.</text>
+<text x="32" y="566" class="f">~99.7% = share of mined coins the two largest payout addresses sent onward (address detail, 19:36 ET).</text>
 </svg>
