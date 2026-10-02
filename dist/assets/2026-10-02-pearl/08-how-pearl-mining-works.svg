@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600" role="img" aria-labelledby="t d">
+<title id="t">How Pearl mining works compared with Bitcoin</title>
+<desc id="d">Bitcoin miners hash random nonces with SHA-256 and the work is discarded. Pearl miners multiply noised matrices on GPUs; a hash of the computation is checked against the difficulty target, and the noise can be removed so the matrix product serves as AI inference output.</desc>
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b08d57"/></marker>
+<marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a8273"/></marker>
+<marker id="at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5fa8a0"/></marker>
+<style>
+text{font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;fill:#f3ead7}
+.h{font-size:20px}.s{font-size:13px;fill:#c9c0ae}.f{font-size:11.5px;fill:#8a8273}.k{font-size:12px;letter-spacing:.12em;fill:#b08d57}
+.box{fill:#1b1813;stroke:#3a3226;stroke-width:1.2}.hot{fill:#1b1813;stroke:#b08d57;stroke-width:1.4}.use{fill:#1b1813;stroke:#5fa8a0;stroke-width:1.4}
+.ln{stroke:#b08d57;stroke-width:1.6;fill:none}.lg{stroke:#8a8273;stroke-width:1.4;fill:none;stroke-dasharray:4 4}.lt{stroke:#5fa8a0;stroke-width:1.6;fill:none}
+</style>
+</defs>
+<rect width="960" height="600" fill="#14120e"/>
+<text x="32" y="44" class="h">How Pearl mining works</text>
+<text x="32" y="68" class="s">Same block race as Bitcoin. Different work: the puzzle is a matrix multiplication a GPU can also use for AI.</text>
+<text x="928" y="30" class="f" text-anchor="end">alpha.kurult.ai | research only</text>
+<line x1="330" y1="96" x2="330" y2="530" stroke="#3a3226"/>
+<!-- Bitcoin -->
+<text x="32" y="110" class="k">BITCOIN (SHA-256)</text>
+<rect x="32" y="128" width="268" height="56" rx="4" class="box"/><text x="48" y="152">Block header + random nonce</text><text x="48" y="172" class="s">try billions of nonces</text>
+<path d="M166 184 V218" class="ln" marker-end="url(#a)"/>
+<rect x="32" y="222" width="268" height="56" rx="4" class="box"/><text x="48" y="246">SHA-256 hash (ASIC)</text><text x="48" y="266" class="s">output has no other use</text>
+<path d="M166 278 V312" class="ln" marker-end="url(#a)"/>
+<rect x="32" y="316" width="268" height="56" rx="4" class="hot"/><text x="48" y="340">Hash below difficulty target?</text><text x="48" y="360" class="s">yes: block found, BTC reward</text>
+<path d="M166 372 V406" class="lg" marker-end="url(#ag)"/>
+<rect x="32" y="410" width="268" height="56" rx="4" class="box" stroke-dasharray="4 4"/><text x="48" y="434" fill="#8a8273" style="fill:#8a8273">All other hashes discarded</text><text x="48" y="454" class="f">energy buys security only</text>
+<!-- Pearl -->
+<text x="362" y="110" class="k">PEARL (NOISED MATRIX MULTIPLICATION)</text>
+<rect x="362" y="128" width="250" height="70" rx="4" class="use"/><text x="378" y="152">Matrices A and B</text><text x="378" y="172" class="s">e.g. model weights x inputs</text><text x="378" y="189" class="s">from a real AI job (or random)</text>
+<rect x="650" y="128" width="278" height="70" rx="4" class="box"/><text x="666" y="152">Noise from the block header</text><text x="666" y="172" class="s">fresh per block, so work cannot</text><text x="666" y="189" class="s">be precomputed or reused</text>
+<path d="M487 198 V236" class="ln" marker-end="url(#a)"/><path d="M789 198 C789 220 700 228 610 244" class="ln" marker-end="url(#a)"/>
+<rect x="362" y="240" width="566" height="64" rx="4" class="hot"/><text x="378" y="266">GPU multiplies the noised matrices: (A + noise) x (B + noise)</text><text x="378" y="288" class="s">one computation, two outputs ("duplex compute")</text>
+<path d="M520 304 V350" class="ln" marker-end="url(#a)"/><path d="M780 304 V350" class="lt" marker-end="url(#at)"/>
+<text x="530" y="332" class="f">output 1</text><text x="790" y="332" class="f" style="fill:#5fa8a0">output 2</text>
+<rect x="362" y="354" width="300" height="84" rx="4" class="hot"/><text x="378" y="378">Hash of the computation</text><text x="378" y="398" class="s">below difficulty target?</text><text x="378" y="420" class="s">yes: block found, 2,287 PRL reward</text>
+<rect x="680" y="354" width="248" height="84" rx="4" class="use"/><text x="696" y="378">Remove the noise</text><text x="696" y="398" class="s">recovers A x B, the answer</text><text x="696" y="420" class="s">the AI job needed (inference)</text>
+<rect x="362" y="456" width="566" height="74" rx="4" class="box" stroke-dasharray="4 4"/>
+<text x="378" y="480" class="s">Caveats: usefulness is enabled, not enforced. Random matrices mine too ("spam mining").</text>
+<text x="378" y="500" class="s">Overhead today 10 to 15% (INT8, per the CEO on X); Pearl-GEMM targets 0 to 3%, not yet live.</text>
+<text x="378" y="520" class="s">arXiv 2606.04819 found no inference in the dominant pool's miner software (May 30 to 31).</text>
+<text x="32" y="566" class="f">Sources: arXiv 2504.09971 (construction); pearlchain.live stats, block reward 2,287 PRL (2026-10-02 19:33 ET); @WeinsteinOmri on X (overhead);</text>
+<text x="32" y="584" class="f">arXiv 2606.04819 (usefulness gap). Simplified schematic, not a protocol specification.</text>
+</svg>
