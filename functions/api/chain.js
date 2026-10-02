@@ -46,24 +46,37 @@ async function ethGas() {
 
 async function solEpoch() {
   var payload = JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getEpochInfo" });
-  var data = await fetchJson("https://api.mainnet-beta.solana.com", {
-    method: "POST",
-    headers: { "content-type": "application/json", Accept: "application/json" },
-    body: payload,
-  });
-  var result = data && data.result;
-  if (!result || !Number.isFinite(result.epoch)) throw new Error("sol shape");
-  var slots = Number(result.slotsInEpoch) || 0;
-  var index = Number(result.slotIndex) || 0;
-  return {
-    unavailable: false,
-    epoch: result.epoch,
-    slot: result.absoluteSlot,
-    progress: slots ? Math.round((index / slots) * 1000) / 10 : null,
-    source: "Solana public mainnet RPC",
-    source_url: "https://api.mainnet-beta.solana.com",
-    credit: "Epoch from the public Solana RPC. Not affiliated.",
+  var urls = [
+    "https://api.mainnet-beta.solana.com",
+    "https://solana-rpc.publicnode.com",
+  ];
+  var last = "none";
+  var headers = {
+    "content-type": "application/json",
+    Accept: "application/json",
+    "User-Agent": "alpha.kurult.ai/1.0 (research desk; keyless)",
   };
+  for (var i = 0; i < urls.length; i++) {
+    try {
+      var data = await fetchJson(urls[i], { method: "POST", headers: headers, body: payload });
+      var result = data && data.result;
+      if (!result || !Number.isFinite(result.epoch)) throw new Error("sol shape");
+      var slots = Number(result.slotsInEpoch) || 0;
+      var index = Number(result.slotIndex) || 0;
+      return {
+        unavailable: false,
+        epoch: result.epoch,
+        slot: result.absoluteSlot,
+        progress: slots ? Math.round((index / slots) * 1000) / 10 : null,
+        source: "Solana public RPC",
+        source_url: urls[i],
+        credit: "Epoch from a public Solana RPC. Not affiliated.",
+      };
+    } catch (err) {
+      last = String(err && err.message ? err.message : err);
+    }
+  }
+  return { unavailable: true, detail: last };
 }
 
 async function pearlStats() {
