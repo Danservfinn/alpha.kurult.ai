@@ -107,8 +107,8 @@
   }
 
   function backOff(host) {
-    var prev = hostWait[host] || 30000;
-    var wait = Math.min(Math.max(prev * 2, 60000), 600000);
+    var prev = hostWait[host] || 7500;
+    var wait = Math.min(Math.max(prev * 2, 15000), 120000);
     hostWait[host] = wait;
     hostNext[host] = Date.now() + wait;
   }
@@ -611,6 +611,10 @@
   function chartSaved(key) {
     var live = state.chart[key];
     if (live && live.series && live.series.length) return live;
+    var allCharts = load("alpha.charts.v1");
+    if (allCharts && allCharts[key] && allCharts[key].series && allCharts[key].series.length) {
+      return { at: allCharts[key].at, series: allCharts[key].series };
+    }
     var stored = load("alpha.chart.v1");
     if (stored && stored.key === key && stored.series && stored.series.length) {
       return { at: stored.at, series: stored.series };
@@ -631,17 +635,18 @@
       if (held) {
         state.chart[key] = held;
         paintChart(sym, tf, held.series, true);
-      } else {
-        paintChart(sym, tf, [], true);
+        return;
       }
-      return;
+      // No cache for this key: try anyway; a blocked host is better than no chart.
     }
     try {
       var data = await getJson(chartUrl(sym, tf));
       var series = normalizeSeries(tf, data);
       if (!series.length) throw new Error("empty");
       state.chart[key] = { at: Date.now(), series: series };
-      save("alpha.chart.v1", { key: key, at: Date.now(), series: series });
+      var allCharts = load("alpha.charts.v1") || {};
+      allCharts[key] = { at: Date.now(), series: series };
+      try { localStorage.setItem("alpha.charts.v1", JSON.stringify(allCharts)); } catch (e) {}
       paintChart(sym, tf, series, false);
     } catch (err) {
       var saved = chartSaved(key);
@@ -926,6 +931,14 @@
     var storedChart = load("alpha.chart.v1");
     if (storedChart && storedChart.key && storedChart.series) {
       state.chart[storedChart.key] = { at: storedChart.at, series: storedChart.series };
+    }
+    var allCharts = load("alpha.charts.v1");
+    if (allCharts) {
+      Object.keys(allCharts).forEach(function (k) {
+        if (allCharts[k] && allCharts[k].series && allCharts[k].series.length && !state.chart[k]) {
+          state.chart[k] = { at: allCharts[k].at, series: allCharts[k].series };
+        }
+      });
     }
     state.chain = load("alpha.chain.v1");
     if (state.ticker) paintTicker(state.ticker, true);
