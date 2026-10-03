@@ -813,7 +813,7 @@ a:hover { background: var(--yellow); color: #000; text-decoration: none; }
 .notice .sheet { padding-block: .55rem; display: flex; flex-wrap: wrap; gap: .6rem; align-items: baseline; min-width: 0; }
 .notice-mark { color: var(--down); font-weight: 700; flex: none; }
 
-main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
+main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; grid-template-columns: minmax(0, 1fr); }
 
 /* Panels ------------------------------------------------------------------ */
 .panel { border: 1px solid var(--edge); background: var(--panel); }
@@ -952,8 +952,10 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
 
 .prose { padding: 1.15rem 1.15rem 1.4rem; min-width: 0; overflow-wrap: break-word; }
 .table-wrap { min-width: 0; max-width: 100%; overflow-x: clip; }
+figure, table, pre { max-width: 100%; }
 .prose table {
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
   font-size: .78rem;
@@ -1024,7 +1026,7 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
   color: var(--data);
 }
 .prose pre code { background: none; padding: 0; font-size: inherit; color: inherit; }
-.prose figure { margin: 2.2em 0; width: min(48rem, calc(100vw - 2 * var(--gutter))); max-width: none; }
+.prose figure { margin: 2.2em 0; width: 100%; max-width: 100%; }
 .prose figure a { display: block; text-decoration: none; }
 .prose figure img {
   display: block;
@@ -1058,7 +1060,7 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; }
   font-size: .74rem;
   padding-top: .2em;
 }
-.source-table a { color: var(--text); text-decoration: none; }
+.source-table a { color: var(--text); text-decoration: none; overflow-wrap: anywhere; }
 .source-url {
   grid-column: 2;
   display: none;
