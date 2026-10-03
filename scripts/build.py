@@ -117,7 +117,7 @@ def parse_frontmatter(block: str, name: str) -> dict:
         if key == "keys":
             if value:
                 raise BuildError(f"{name}: keys must be a list")
-            meta[key], i = parse_pair_list(lines, i + 1, name, ("label", "value"), "keys")
+            meta[key], i = parse_pair_list(lines, i + 1, name, ("label", "value", "note"), "keys")
             continue
         meta[key] = unquote(value)
         i += 1
@@ -570,13 +570,19 @@ def render_tearsheet(article: Article) -> str:
         parts.append(f'  <p class="callstrip">{ticker}{esc(article.call)}</p>')
     if article.position:
         parts.append(f'  <p class="position-box">{esc(article.position)}</p>')
-    cells = "".join(
-        f"<div><dt>{esc(str(item.get('label', '')).strip())}</dt><dd>{esc(str(item.get('value', '')).strip())}</dd></div>"
-        for item in article.keys
-        if isinstance(item, dict) and str(item.get("label", "")).strip() and str(item.get("value", "")).strip()
-    )
-    if cells:
-        parts.append(f'  <dl class="keystrip">{cells}</dl>')
+    cell_bits: list[str] = []
+    for item in article.keys:
+        if not isinstance(item, dict):
+            continue
+        label = str(item.get("label", "")).strip()
+        value = str(item.get("value", "")).strip()
+        if not label or not value:
+            continue
+        note = str(item.get("note", "")).strip()
+        note_html = f'<span class="key-note">{esc(note)}</span>' if note else ""
+        cell_bits.append(f"<div><dt>{esc(label)}</dt><dd>{esc(value)}</dd>{note_html}</div>")
+    if cell_bits:
+        parts.append(f'  <dl class="keystrip">{"".join(cell_bits)}</dl>')
     if not parts:
         return ""
     return "\n".join(parts) + "\n"
@@ -1137,6 +1143,30 @@ figure, table, pre { max-width: 100%; }
   .panel-head { padding: .4rem .7rem; }
   .entry { padding: .65rem .7rem; }
   .source-table li { padding-inline: .7rem; grid-template-columns: 2.2rem minmax(0, 1fr); }
+}
+
+/* Phone fold: key numbers sit under the call and above the position box.
+   Desktop source order (call, position, keys) is unchanged above 700px. */
+@media (max-width: 700px) {
+  .article-head { display: flex; flex-direction: column; min-width: 0; }
+  .article-head .callstrip { order: 1; margin-bottom: .3rem; }
+  .article-head .keystrip { order: 2; margin-bottom: .3rem; }
+  .article-head .position-box { order: 3; }
+  .article-head .article-title { order: 4; }
+  .article-head .article-lede { order: 5; }
+  .keystrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .keystrip div {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: .28rem;
+    padding: .12rem .28rem;
+  }
+  .keystrip dd { order: 1; font-size: .7rem; line-height: 1.1; }
+  .keystrip dt { order: 2; font-size: .52rem; line-height: 1.1; letter-spacing: .02em; overflow-wrap: anywhere; min-width: 0; }
+  .keystrip .key-note { display: none; }
 }
 
 @media print {
