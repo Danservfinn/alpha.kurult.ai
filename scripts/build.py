@@ -1016,13 +1016,18 @@ a:hover { background: var(--yellow); color: #000; text-decoration: none; }
 .ticker { border-block: 1px solid var(--edge); background: #000; overflow-x: clip; }
 .ticker-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: .25rem 1.1rem;
   padding-block: .5rem;
   font-size: .72rem;
   letter-spacing: .10em;
   text-transform: uppercase;
+  /* One line always, scrollable on narrow screens. Height never depends on
+     the fetched numbers, so live prices cannot shift the page below. */
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.ticker-row::-webkit-scrollbar { display: none; }
 .tick { color: var(--data); white-space: nowrap; }
 .tick-sym { color: var(--amber); }
 .tick-up { color: var(--up); }
