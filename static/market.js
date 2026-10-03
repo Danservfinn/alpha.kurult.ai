@@ -17,6 +17,10 @@
   var hostWait = {};
   var hostNext = {};
   var lastTicker = 0;
+  var lastChips = 0;
+  var lastMarkets = 0;
+  var lastChain = 0;
+  var pollIds = [];
   var state = { ticker: null, chips: {}, markets: null, chain: null, chart: {} };
 
   function esc(value) {
@@ -46,6 +50,26 @@
         minute: "2-digit",
         hour12: false
       }).format(new Date(ms)) + " ET";
+    } catch (err) {
+      return "";
+    }
+  }
+
+  function etStamp(ms) {
+    try {
+      var bag = {};
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/New_York",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      }).formatToParts(new Date(ms)).forEach(function (part) {
+        bag[part.type] = part.value;
+      });
+      if (!bag.month || !bag.day || !bag.hour || !bag.minute) return "";
+      return bag.month + " " + bag.day + ", " + bag.hour + ":" + bag.minute + " ET";
     } catch (err) {
       return "";
     }
@@ -87,6 +111,11 @@
     var wait = Math.min(Math.max(prev * 2, 60000), 600000);
     hostWait[host] = wait;
     hostNext[host] = Date.now() + wait;
+  }
+
+  function clearBackOff(host) {
+    delete hostWait[host];
+    delete hostNext[host];
   }
 
   function limitedFailure(url, err) {
@@ -165,12 +194,15 @@
         if (res.status >= 500) backOff(host);
         throw new Error(String(res.status));
       }
+      var body;
       try {
-        return await res.json();
+        body = await res.json();
       } catch (err) {
         if (isCoinGecko(url) || err.name === "TypeError") backOff(host);
         throw err;
       }
+      clearBackOff(host);
+      return body;
     } finally {
       clearTimeout(timer);
     }
@@ -201,7 +233,9 @@
         if (res.status >= 500) backOff(host);
         throw new Error(String(res.status));
       }
-      return await res.text();
+      var text = await res.text();
+      clearBackOff(host);
+      return text;
     } finally {
       clearTimeout(timer);
     }
@@ -245,10 +279,11 @@
   }
 
   function paintTicker(payload, stale) {
-    if (!payload) return;
+    var root = document.getElementById("ticker");
+    if (!root || !payload) return;
     Object.keys(IDS).forEach(function (sym) {
       var row = payload[sym];
-      var node = document.querySelector('[data-symbol="' + sym + '"]');
+      var node = root.querySelector('[data-symbol="' + sym + '"]');
       if (!node) return;
       var px = node.querySelector(".tick-px");
       var chg = node.querySelector(".tick-chg");
@@ -272,8 +307,8 @@
     });
     var badge = document.getElementById("ticker-state");
     if (badge) {
-      var when = payload && payload.as_of ? etClock(payload.as_of) : "";
-      badge.textContent = stale ? ("stale" + (when ? " " + when : "")) : ("agg " + when);
+      var when = payload && payload.as_of ? (stale ? etStamp(payload.as_of) : etClock(payload.as_of)) : "";
+      badge.textContent = stale ? ("stale" + (when ? " as of " + when : "")) : ("agg " + when);
       badge.className = "tick tick-state" + (stale ? " tick-stale" : "");
     }
   }
@@ -283,6 +318,7 @@
   }
 
   async function pullTicker(force) {
+    if (document.hidden || !document.getElementById("ticker")) return;
     if (!force && Date.now() - lastTicker < TICKER_MS) return;
     if (hostBlocked(hostOf(CG))) {
       var held = tickerSaved();
@@ -452,6 +488,8 @@
   }
 
   async function pullChips() {
+    if (document.hidden || !document.getElementById("chips")) return;
+    lastChips = Date.now();
     await Promise.all([pullTreasury(), pullSofr(), pullEcb(), pullGlobal(), pullFng()]);
     save("alpha.chips.v1", state.chips);
     paintChips();
@@ -525,7 +563,7 @@
       parts.push('<polyline fill="none" stroke="#f1bd59" stroke-width="1.6" points="' + points + '"/>');
     }
     var last = series[series.length - 1];
-    parts.push('<text x="' + (w - padR + 6) + '" y="' + Math.max(12, y(last.c)).toFixed(1) + '" fill="#ffffff" font-size="12" font-family="ui-monospace, Menlo, Consolas, monospace">' + esc(fmtPx(last.c)) + '</text>');
+    parts.push('<text x="' + (w - padR + 6) + '" y="' + Math.max(12, y(last.c)).toFixed(1) + '" fill="#ffffff" font-size="12" font-family="ui-monospace, monospace">' + esc(fmtPx(last.c)) + '</text>');
     var label = tf === "4H" ? "4H aggregated OHLC" : tf + " aggregated price";
     return '<svg class="chart-svg" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="' + esc(label) + '">' + parts.join("") + '</svg>';
   }
@@ -558,8 +596,8 @@
     }
     if (badge) {
       var last = series.length ? series[series.length - 1] : null;
-      var when = last ? (etDate(last.t) + " " + etClock(last.t)) : "";
-      badge.textContent = stale ? ("stale" + (when ? " " + when : "")) : "aggregated";
+      var when = last ? etStamp(last.t) : "";
+      badge.textContent = stale ? ("stale" + (when ? " as of " + when : "")) : "aggregated";
     }
     if (readout && series.length) {
       var row = series[series.length - 1];
@@ -581,6 +619,7 @@
   }
 
   async function pullChart(sym, tf, force) {
+    if (document.hidden || !document.getElementById("chart-panel")) return;
     var key = sym + ":" + tf;
     var cached = state.chart[key];
     if (!force && cached && Date.now() - cached.at < CHART_TTL) {
@@ -675,7 +714,7 @@
       '<div><h3 class="mkt-title">Losers</h3>' + head + losers.map(rowHtml).join("") + "</tbody></table></div>" +
       '<div><h3 class="mkt-title">Volume</h3>' + head + volume.map(rowHtml).join("") + "</tbody></table></div></div>" +
       '<p class="src-foot">Prices, movers, volume, BTC.D, and total cap: <a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a>. Aggregated, not one exchange.' +
-      (pack.stale ? " Stale" + (pack.at ? " as of " + etClock(pack.at) : "") + "." : "") + "</p>";
+      (pack.stale ? " Stale" + (pack.at ? " as of " + etStamp(pack.at) : "") + "." : "") + "</p>";
     if (badge) badge.textContent = pack.stale ? "stale" : "agg";
   }
 
@@ -687,6 +726,8 @@
   }
 
   async function pullMarkets() {
+    if (document.hidden || !document.getElementById("markets-body")) return;
+    lastMarkets = Date.now();
     if (hostBlocked(hostOf(CG))) {
       var held = marketsSaved();
       if (held) {
@@ -796,6 +837,8 @@
   }
 
   async function pullChain() {
+    if (document.hidden || !document.getElementById("chain-panel")) return;
+    lastChain = Date.now();
     var scope = (document.getElementById("chain-panel") || {}).getAttribute ? document.getElementById("chain-panel").getAttribute("data-chain") : "all";
     var btc = scope === "all" || scope === "BTC" ? await pullBtc() : null;
     var proxy = scope === "PRL" || scope === "all" || scope === "ETH" || scope === "SOL" ? await pullChainProxy() : null;
@@ -842,6 +885,37 @@
     paintChain(scope || "all");
   }
 
+  function stopPolls() {
+    pollIds.forEach(function (id) { clearInterval(id); });
+    pollIds = [];
+  }
+
+  function startPolls() {
+    stopPolls();
+    if (document.hidden) return;
+    if (document.getElementById("ticker")) {
+      pollIds.push(setInterval(function () { pullTicker(false); }, TICKER_MS));
+    }
+    if (document.getElementById("chips")) {
+      pollIds.push(setInterval(pullChips, CHIPS_MS));
+    }
+    if (document.getElementById("markets-body")) {
+      pollIds.push(setInterval(pullMarkets, MARKETS_MS));
+    }
+    if (document.getElementById("chain-panel")) {
+      pollIds.push(setInterval(pullChain, CHAIN_MS));
+    }
+  }
+
+  function resumeShown() {
+    if (document.hidden) return;
+    if (document.getElementById("ticker")) pullTicker(false);
+    if (document.getElementById("chips") && Date.now() - lastChips >= CHIPS_MS) pullChips();
+    if (document.getElementById("markets-body") && Date.now() - lastMarkets >= MARKETS_MS) pullMarkets();
+    if (document.getElementById("chart-panel")) pullChart(selectedSymbol(), selectedTf(), false);
+    if (document.getElementById("chain-panel") && Date.now() - lastChain >= CHAIN_MS) pullChain();
+  }
+
   function boot() {
     state.ticker = load("alpha.ticker.v1");
     state.chips = load("alpha.chips.v1") || {};
@@ -860,17 +934,23 @@
     var chainPanel = document.getElementById("chain-panel");
     if (chainPanel && state.chain) paintChain(chainPanel.getAttribute("data-chain") || "all");
     bindChart();
-    pullTicker(true);
-    pullChips();
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) {
+        stopPolls();
+        return;
+      }
+      resumeShown();
+      startPolls();
+    });
+    if (document.hidden) return;
+    if (document.getElementById("ticker")) pullTicker(true);
+    if (document.getElementById("chips")) pullChips();
     if (document.getElementById("markets-body")) setTimeout(pullMarkets, 1500);
     if (document.getElementById("chart-panel")) {
       setTimeout(function () { pullChart(selectedSymbol(), selectedTf(), false); }, 3000);
     }
     if (document.getElementById("chain-panel")) pullChain();
-    setInterval(function () { pullTicker(false); }, TICKER_MS);
-    setInterval(pullChips, CHIPS_MS);
-    if (document.getElementById("markets-body")) setInterval(pullMarkets, MARKETS_MS);
-    if (document.getElementById("chain-panel")) setInterval(pullChain, CHAIN_MS);
+    startPolls();
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);

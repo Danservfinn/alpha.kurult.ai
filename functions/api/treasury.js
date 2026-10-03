@@ -1,8 +1,10 @@
 /**
  * Treasury daily par yields. US government work. No key.
- * Hardcoded upstream. Not an open proxy.
+ * The year comes from the clock. January falls back one year if the file is empty.
  */
-var TREASURY_URL = "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value=2026";
+function treasuryUrl(year) {
+  return "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value=" + year;
+}
 
 function field(block, tag) {
   var nullish = new RegExp("<d:" + tag + "[^>]*m:null=\"true\"", "i");
@@ -42,11 +44,11 @@ function parseYields(xml) {
   return rows.length ? rows[rows.length - 1] : null;
 }
 
-async function fetchUpstream() {
+async function fetchYear(year) {
   var wait = 400;
   var last = 0;
   for (var attempt = 0; attempt < 3; attempt++) {
-    var res = await fetch(TREASURY_URL, {
+    var res = await fetch(treasuryUrl(year), {
       headers: {
         Accept: "application/xml, text/xml, */*",
         "User-Agent": "alpha.kurult.ai/1.0 (research desk; keyless)",
@@ -66,6 +68,16 @@ async function fetchUpstream() {
     }
   }
   throw new Error("upstream " + last);
+}
+
+async function fetchUpstream() {
+  var now = new Date();
+  var latest = await fetchYear(now.getFullYear());
+  if (!latest && now.getMonth() === 0) {
+    latest = await fetchYear(now.getFullYear() - 1);
+  }
+  if (!latest) throw new Error("empty");
+  return latest;
 }
 
 function jsonResponse(body, status, cacheControl) {
