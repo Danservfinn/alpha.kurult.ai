@@ -279,9 +279,10 @@
   }
 
   function paintTicker(payload, stale) {
+    var ids = coinMap();
     var root = document.getElementById("ticker");
     if (!root || !payload) return;
-    Object.keys(IDS).forEach(function (sym) {
+    Object.keys(ids).forEach(function (sym) {
       var row = payload[sym];
       var node = root.querySelector('[data-symbol="' + sym + '"]');
       if (!node) return;
@@ -329,12 +330,14 @@
       return;
     }
     lastTicker = Date.now();
-    var url = CG + "/simple/price?ids=bitcoin,ethereum,solana,pearl-2&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true";
+    var ids = coinMap();
+    var idList = Object.keys(ids).map(function (sym) { return ids[sym]; }).join(",");
+    var url = CG + "/simple/price?ids=" + idList + "&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true";
     try {
       var data = await getJson(url);
       var payload = { as_of: Date.now() };
-      Object.keys(IDS).forEach(function (sym) {
-        var row = data[IDS[sym]];
+      Object.keys(ids).forEach(function (sym) {
+        var row = data[ids[sym]];
         if (!row || !Number.isFinite(row.usd)) {
           payload[sym] = { na: true };
           return;
@@ -349,7 +352,7 @@
       state.ticker = payload;
       save("alpha.ticker.v1", payload);
       paintTicker(payload, false);
-      var bits = Object.keys(IDS).map(function (sym) {
+      var bits = Object.keys(ids).map(function (sym) {
         var row = payload[sym];
         return row && !row.na ? sym + " " + fmtPx(row.price) : sym + " n/a";
       });
@@ -912,7 +915,6 @@
     if (document.getElementById("ticker")) pullTicker(false);
     if (document.getElementById("chips") && Date.now() - lastChips >= CHIPS_MS) pullChips();
     if (document.getElementById("markets-body") && Date.now() - lastMarkets >= MARKETS_MS) pullMarkets();
-    if (document.getElementById("chart-panel")) pullChart(selectedSymbol(), selectedTf(), false);
     if (document.getElementById("chain-panel") && Date.now() - lastChain >= CHAIN_MS) pullChain();
   }
 
@@ -933,7 +935,6 @@
     paintMarkets();
     var chainPanel = document.getElementById("chain-panel");
     if (chainPanel && state.chain) paintChain(chainPanel.getAttribute("data-chain") || "all");
-    bindChart();
     document.addEventListener("visibilitychange", function () {
       if (document.hidden) {
         stopPolls();
@@ -946,12 +947,77 @@
     if (document.getElementById("ticker")) pullTicker(true);
     if (document.getElementById("chips")) pullChips();
     if (document.getElementById("markets-body")) setTimeout(pullMarkets, 1500);
-    if (document.getElementById("chart-panel")) {
-      setTimeout(function () { pullChart(selectedSymbol(), selectedTf(), false); }, 3000);
-    }
     if (document.getElementById("chain-panel")) pullChain();
     startPolls();
   }
+
+  function readSecurities() {
+    var node = document.getElementById("alpha-securities");
+    if (!node) return [];
+    try {
+      var data = JSON.parse(node.textContent);
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function coinMap() {
+    var map = {};
+    readSecurities().forEach(function (row) {
+      if (row && row.sym && row.cg && row.chart === "crypto") map[row.sym] = row.cg;
+    });
+    return Object.keys(map).length ? map : IDS;
+  }
+
+  window.AlphaDesk = {
+    getJson: getJson,
+    load: load,
+    save: save,
+    etDate: etDate,
+    etClock: etClock,
+    etStamp: etStamp,
+    hostBlocked: hostBlocked,
+    hostOf: hostOf,
+    fmtPx: fmtPx,
+    fmtPct: fmtPct,
+    fmtCompact: fmtCompact,
+    CG: CG,
+    CHART_TTL: CHART_TTL,
+    coinMap: coinMap,
+    securities: readSecurities
+  };
+
+  document.addEventListener("click", function (event) {
+    var link = event.target.closest("a[data-asset]");
+    if (!link) return;
+    var panel = document.getElementById("chart-panel");
+    if (!panel || panel.getAttribute("data-locked") === "true") return;
+    var sym = link.getAttribute("data-asset");
+    var row = readSecurities().filter(function (item) { return item.sym === sym; })[0];
+    if (!row || row.chart !== "crypto") return;
+    event.preventDefault();
+    window.dispatchEvent(new CustomEvent("alpha-asset", { detail: { symbol: sym } }));
+  });
+
+  window.addEventListener("alpha-asset", function (event) {
+    var sym = event.detail && event.detail.symbol;
+    if (!sym) return;
+    var row = readSecurities().filter(function (item) { return item.sym === sym; })[0];
+    var panel = document.getElementById("chain-panel");
+    if (panel && row && row.chain) {
+      panel.setAttribute("data-chain", row.chain);
+      pullChain();
+    }
+    document.querySelectorAll("[data-asset]").forEach(function (el) {
+      if (el.getAttribute("data-asset") === sym) el.setAttribute("aria-current", "true");
+      else el.removeAttribute("aria-current");
+    });
+    var ticks = document.querySelectorAll("#ticker [data-symbol]");
+    Array.prototype.forEach.call(ticks, function (el) {
+      el.classList.toggle("tick-on", el.getAttribute("data-symbol") === sym);
+    });
+  });
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
