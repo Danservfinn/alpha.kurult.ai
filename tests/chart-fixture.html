@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chart interaction fixture</title>
+<style>
+  body { margin: 0; background: #000; }
+  .chart-plot { height: 420px; width: 640px; }
+  .seg-btn { min-height: 40px; }
+</style>
+</head>
+<body>
+<section class="desk-chart" id="chart-panel" data-symbol="BTC" data-cg="bitcoin" data-name="Bitcoin" data-lazy="false" data-locked="true" data-home="false">
+  <p class="chart-head"><span class="chart-name">Bitcoin</span> <span class="chart-ticker">BTC</span> <span class="chart-last"></span> <span class="chart-asof"></span></p>
+  <div class="chart-toolbar">
+    <button type="button" class="seg-btn" data-range="1D" aria-pressed="false">1D</button>
+    <button type="button" class="seg-btn" data-range="1Y" aria-pressed="true">1Y</button>
+    <button type="button" class="seg-btn is-blocked" data-range="5Y" disabled>5Y</button>
+    <button type="button" class="seg-btn" data-type="line" aria-pressed="true">Line</button>
+    <button type="button" class="seg-btn" data-type="candle" aria-pressed="false">Candles</button>
+    <button type="button" class="seg-btn" data-type="bar" aria-pressed="false">Bars</button>
+    <button type="button" class="seg-btn" data-ma="50" aria-pressed="false">MA 50</button>
+    <button type="button" class="seg-btn" data-ma="200" aria-pressed="false">MA 200</button>
+    <button type="button" class="seg-btn" data-log="1" aria-pressed="false">Log</button>
+    <button type="button" class="seg-btn" data-reset>Reset</button>
+  </div>
+  <p class="chart-legend" id="chart-legend"></p>
+  <div class="chart-plot" tabindex="0"></div>
+  <p class="chart-volume-label">24h volume (rolling)</p>
+  <p class="chart-status" id="chart-status"></p>
+  <span data-bar-size></span>
+</section>
+<script>
+window.__fetches = [];
+window.fetch = function (url) {
+  var href = String(url);
+  window.__fetches.push(href);
+  var now = Date.UTC(2026, 0, 1);
+  var prices = [];
+  var volumes = [];
+  var ohlc = [];
+  for (var i = 0; i < 40; i++) {
+    var t = now + i * 86400000;
+    var px = 100 + i;
+    prices.push([t, px]);
+    volumes.push([t, 1000 + i * 10]);
+    ohlc.push([t, px - 1, px + 2, px - 2, px]);
+  }
+  var body = href.indexOf("/ohlc") >= 0 ? ohlc : { prices: prices, total_volumes: volumes, market_caps: volumes };
+  return Promise.resolve({
+    ok: true,
+    json: function () { return Promise.resolve(body); }
+  });
+};
+</script>
+<script src="/static/desk-logic.js"></script>
+<script src="/static/vendor/lightweight-charts-5.2.1.js"></script>
+<script src="/static/chart.js"></script>
+</body>
+</html>
