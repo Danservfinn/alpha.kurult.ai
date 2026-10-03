@@ -56,4 +56,3 @@ for a_, _ in pay.most_common(2):
     print("payee", a_[-4:], "sent/mined %", round(100 * d["totalSent"] / d["totalMined"], 2))
 k = next(p for p in pools["directory"] if p["id"] == "kryptex")
 print("pools 24h kryptex", k["blocks24h"], "of", pools["concentration"]["blocks"], round(k["share24h"], 1))
-bb = J(PC, "blockbook_status_*.json"); print("blockbook height", bb["blockbook"]["bestHeight"])

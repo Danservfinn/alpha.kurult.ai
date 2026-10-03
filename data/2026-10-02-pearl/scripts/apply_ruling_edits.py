@@ -1,5 +1,15 @@
 import sys
 p = sys.argv[1]; s = open(p, encoding="utf-8").read()
+# Temujin ruling (2026-10-02 19:54 ET): the third-party indexer status endpoint cited in e14e2165 is not usable
+# on the public site, so its frontmatter entry (lines 18-19) and its one-sentence height check are dropped.
+L = s.split("\n")
+assert L[17].startswith('  - label: "Pearl Research Labs, official ') and L[18].startswith("    url: https://"), L[17:19]
+del L[17:19]
+s = "\n".join(L)
+_i = s.index("Sources: the pearlchain.live keyless API, fetched 11:45 ET.") + len("Sources: the pearlchain.live keyless API, fetched 11:45 ET.")
+_k = s.index(" Wallet classifications", _i)
+assert "122,270" in s[_i:_k] and _k - _i < 80, s[_i:_k]
+s = s[:_i] + s[_k:]
 R = [
 # sources
 ('''  - label: "pearlchain.live explorer API, address rankings"
@@ -29,8 +39,8 @@ R = [
  '''Lighter lists an active PRL perp (market 4097, created Sep 29 08:33 ET) with a 33.33% minimum initial margin, so up to 3x (Lighter API orderBooks and orderBookDetails, 19:33 ET).'''),
 (''' Margin.Trade has offered 3x PRL perps since June.''', ''),
 # on-chain
-('''Sources: the pearlchain.live keyless API, fetched 11:45 ET. The official Blockbook reported the same height, 122,270.''',
- '''Sources: the pearlchain.live keyless API, fetched 19:33 to 19:36 ET (stats, charts, address rankings and detail, pools, and a crawl of the last 200 blocks). The official Blockbook (19:36 ET) reported the same height, 122,400.'''),
+('''Sources: the pearlchain.live keyless API, fetched 11:45 ET.''',
+ '''Sources: the pearlchain.live keyless API, fetched 19:33 to 19:36 ET (stats, charts, address rankings and detail, pools, and a crawl of the last 200 blocks).'''),
 ('''about 43.7 EH/s (unconfirmed). It comes from pearlchain.live at 11:45 ET, which labels it "difficulty-derived ... not measured computation".''',
  '''about 42.2 EH/s (unconfirmed). It comes from pearlchain.live stats at 19:33 ET, which calls it a "Difficulty-derived consensus estimate" that is "not measured computation".'''),
 ('''15.83% minted, about 332.4M PRL (unconfirmed; explorer and CoinGecko, matching the emission formula). The block reward is 2,288 PRL. The explorer's address total of 342.9M''',
@@ -82,7 +92,7 @@ R = [
 - A post-level archive of X post counts (dropped from this version).'''),
 # line 232
 ('''Raw pulls and scripts are archived with the research notes. Data provided by CoinGecko.''',
- '''Saved with this note, each with its ET fetch time and a sha256 manifest: raw CoinGecko pulls (market_chart, coins/pearl-2 and tickers), raw pearlchain.live explorer pulls (stats, charts, address rankings and detail, pools, and a 200-block coinbase crawl), the Pearl Blockbook status, the Lighter order-book pulls, and the scripts that derive the figures and draw the charts. Other sources (X posts, GitHub, Together AI, CoinPaprika, GeckoTerminal, Ethplorer, DexScreener, papers) are cited by link with their read time and are not archived here. Data provided by CoinGecko.'''),
+ '''Saved with this note, each with its ET fetch time and a sha256 manifest: raw CoinGecko pulls (market_chart, coins/pearl-2 and tickers), raw pearlchain.live explorer pulls (stats, charts, address rankings and detail, pools, and a 200-block coinbase crawl), the Lighter order-book pulls, and the scripts that derive the figures and draw the charts. Other sources (X posts, GitHub, Together AI, CoinPaprika, GeckoTerminal, Ethplorer, DexScreener, papers) are cited by link with their read time and are not archived here. Data provided by CoinGecko.'''),
 ]
 for a, b in R:
     n = s.count(a)
