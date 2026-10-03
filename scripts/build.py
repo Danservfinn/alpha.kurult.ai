@@ -503,6 +503,27 @@ def article_asset(article: Article) -> str | None:
     return ASSET_BY_SLUG.get(article.dir_name)
 
 
+def chip_placeholders() -> str:
+    """Reserve the macro row so market.js can fill values without moving the source list."""
+    rows = (
+        ("UST10Y", "Source: U.S. Treasury"),
+        ("UST2Y", "Source: U.S. Treasury"),
+        ("SOFR", "Source: Federal Reserve Bank of New York"),
+        ("EURUSD", "Source: ECB statistics"),
+        ("BTC.D", "Source: CoinGecko"),
+        ("TOTAL", "Source: CoinGecko"),
+        ("F&G", "Source: alternative.me"),
+    )
+    return "".join(
+        f'<span class="chip" role="listitem" tabindex="0" title="{esc(source)}" data-chip="{esc(cid)}">'
+        f'<span class="chip-id">{esc(cid)}</span>'
+        f'<span class="chip-px">…</span>'
+        f'<span class="chip-asof">n/a</span>'
+        f"</span>"
+        for cid, source in rows
+    )
+
+
 def ticker_html() -> str:
     ticks = "\n    ".join(
         f'<span class="tick" data-symbol="{sym}"><span class="tick-sym">{sym}</span> '
@@ -520,7 +541,7 @@ def ticker_html() -> str:
   <a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a>
   <span class="credit-note">Aggregated price, not one exchange. Not a quote. Updates at most once a minute.</span>
 </p>
-<div class="chips sheet" id="chips" role="list" aria-label="Macro readings"></div>
+<div class="chips sheet" id="chips" role="list" aria-label="Macro readings">{chip_placeholders()}</div>
 <ul class="src-list sheet">
   <li>UST10Y and UST2Y: <a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve" rel="noopener">U.S. Department of the Treasury</a>.</li>
   <li>SOFR: <a href="https://www.newyorkfed.org/markets/reference-rates/sofr" rel="noopener">Federal Reserve Bank of New York</a>. The SOFR data is subject to the Terms of Use posted at newyorkfed.org. The New York Fed is not responsible for publication of SOFR by alpha.kurult.ai, does not endorse this republication, and has no liability for your use.</li>
@@ -1018,15 +1039,29 @@ a:hover { background: var(--yellow); color: #000; text-decoration: none; }
 .credit { margin: .45rem auto 0; font-size: .75rem; color: var(--text-dim); }
 .credit a { color: var(--amber); }
 .credit-note { display: block; margin-top: .15rem; }
-.chips { display: flex; flex-wrap: wrap; gap: .4rem; padding-block: .7rem .2rem; }
+.chips {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .4rem;
+  padding-block: .7rem .2rem;
+}
+@media (min-width: 900px) {
+  .chips { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+}
 .chip {
   display: grid;
   gap: .05rem;
-  min-width: 5.5rem;
+  min-width: 0;
+  min-height: 3.6rem;
   padding: .35rem .5rem;
   border: 1px solid var(--edge);
   background: #000;
   color: var(--text);
+}
+.chip-id, .chip-px, .chip-asof {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .chip-id { color: var(--amber); font-size: .68rem; letter-spacing: .08em; }
 .chip-px { font-size: .84rem; }

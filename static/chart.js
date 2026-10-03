@@ -174,6 +174,12 @@
       });
       var logBtn = panel.querySelector("[data-log]");
       if (logBtn) logBtn.setAttribute("aria-pressed", state.log ? "true" : "false");
+      var vsBtc = panel.querySelector("[data-vs-btc]");
+      if (vsBtc) vsBtc.setAttribute("aria-pressed", state.cmp.indexOf("BTC") >= 0 ? "true" : "false");
+      panel.querySelectorAll("[data-cmp]").forEach(function (btn) {
+        var on = state.cmp.indexOf(btn.getAttribute("data-cmp")) >= 0;
+        btn.setAttribute("aria-pressed", on ? "true" : "false");
+      });
       var spec = logic.rangeSpec(state.range);
       if (barNode) barNode.textContent = logic.barLabel(spec, state.type);
     }
@@ -199,6 +205,26 @@
       }
     }
 
+    function valueAt(points, time) {
+      if (!points || !points.length) return null;
+      var row = null;
+      var i;
+      for (i = 0; i < points.length; i++) {
+        if (time == null || points[i].time <= time) row = points[i];
+        else break;
+      }
+      return row;
+    }
+
+    function maLegend(period, pts, time, cover) {
+      if (!pts || !pts.length) return cover.note;
+      var row = valueAt(pts, time);
+      var value = row && Number.isFinite(row.value) ? desk().fmtPx(row.value) : "n/a yet";
+      var label = "MA " + period + " (computed) " + value;
+      if (cover && cover.partial) label += ". Partial coverage: defined after " + period + " daily closes.";
+      return label;
+    }
+
     function legendHtml(point, active) {
       if (!pack) return "";
       var spec = logic.rangeSpec(state.range);
@@ -216,7 +242,8 @@
       if (vol != null) bits.push("24h volume " + desk().fmtPx(vol));
       state.ma.forEach(function (period) {
         var cover = logic.maCoverage(pack.daily.length, Number(period));
-        bits.push(cover.note);
+        var pts = logic.sma(pack.daily, Number(period));
+        bits.push(maLegend(Number(period), pts, point ? point.time : null, cover));
       });
       if (state.cmp.length) {
         var primary = pack.line[0];

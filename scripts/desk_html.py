@@ -161,7 +161,7 @@ def chart_panel(row: dict, securities: list[dict], locked: bool, lazy: bool, hom
     </div>
     <div class="compare-row" hidden>
       <p>Compare, rebased to 100. Max 4 extra series.</p>
-      <div class="seg" role="group" aria-label="Compare">{"".join(chips)}<button type="button" class="seg-btn" data-vs-btc>vs BTC</button></div>
+      <div class="seg" role="group" aria-label="Compare">{"".join(chips)}<button type="button" class="seg-btn" data-vs-btc aria-pressed="false">vs BTC</button></div>
       <label class="compare-add">Add <input type="search" data-compare-add placeholder="BTC" aria-label="Add a licensed asset"></label>
     </div>
     <p class="chart-legend" id="chart-legend"></p>
