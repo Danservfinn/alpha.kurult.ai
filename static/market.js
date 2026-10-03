@@ -635,6 +635,14 @@
     return null;
   }
 
+  var chartChain = Promise.resolve();
+  function queueChart(sym, tf, force) {
+    chartChain = chartChain.then(function () {
+      return pullChart(sym, tf, force).catch(function () {});
+    });
+    return chartChain;
+  }
+
   async function pullChart(sym, tf, force) {
     if (document.hidden || !document.getElementById("chart-panel")) return;
     var key = sym + ":" + tf;
@@ -675,9 +683,9 @@
       if (saved) {
         state.chart[key] = saved;
         paintChart(sym, tf, saved.series, true);
-      } else if (err && err.limited && !force) {
-        // rate-limited before this chart ever loaded: retry once after the host cooldown
-        setTimeout(function () { pullChart(sym, tf, true); }, 20000);
+      } else if (!force) {
+        // this chart never loaded (rate limit, blip): retry once after a pause
+        setTimeout(function () { pullChart(sym, tf, true); }, 15000);
         paintChart(sym, tf, [], true);
       } else {
         paintChart(sym, tf, [], true);
@@ -986,7 +994,7 @@
     if (document.getElementById("chips")) pullChips();
     if (document.getElementById("markets-body")) setTimeout(pullMarkets, 1500);
     if (document.getElementById("chart-panel")) {
-      setTimeout(function () { pullChart(selectedSymbol(), selectedTf(), false); }, 3000);
+      setTimeout(function () { queueChart(selectedSymbol(), selectedTf(), false); }, 3000);
     }
     if (document.getElementById("chain-panel")) pullChain();
     startPolls();
