@@ -179,19 +179,32 @@ a:hover { background: var(--yellow); color: #000; text-decoration: none; }
 /* Ticker bar -------------------------------------------------------------- */
 .ticker { border-block: 1px solid var(--edge); background: #000; overflow-x: clip; }
 .ticker-row {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: .25rem 1.1rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Command chip is taller than a price. Three rows are reserved so a
+     fetched price cannot add a line and push the source list. */
+  grid-template-rows: 1.75rem 1.4rem 1.4rem;
+  gap: .15rem .55rem;
   padding-block: .5rem;
   font-size: .72rem;
-  letter-spacing: .10em;
+  letter-spacing: .02em;
   text-transform: uppercase;
-  /* One line always, scrollable on narrow screens. Height never depends on
-     the fetched numbers, so live prices cannot shift the page below. */
-  overflow-x: auto;
-  scrollbar-width: none;
+  align-items: center;
+  overflow: hidden;
 }
-.ticker-row::-webkit-scrollbar { display: none; }
+.ticker-row .tick { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+@media (min-width: 900px) {
+  .ticker-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: .25rem 1.1rem;
+    letter-spacing: .10em;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .ticker-row::-webkit-scrollbar { display: none; }
+  .ticker-row .tick { overflow: visible; text-overflow: clip; min-width: auto; }
+}
 .tick { color: var(--data); white-space: nowrap; }
 .tick-sym { color: var(--amber); }
 .tick-up { color: var(--up); }
