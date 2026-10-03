@@ -425,9 +425,65 @@
         timeScale: { borderColor: "#1a2a55", timeVisible: true, secondsVisible: false },
         handleScroll: { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
         handleScale: { mouseWheel: true, pinch: true, axisPressedMouseMove: true },
-        kineticScroll: { touch: true, mouse: false }
+        kineticScroll: { touch: false, mouse: false }
       });
+      plot.style.touchAction = "pan-y";
+      var touch = { active: false, armed: false, x: 0, y: 0, timer: 0 };
+      function clearTouchTimer() {
+        if (touch.timer) {
+          clearTimeout(touch.timer);
+          touch.timer = 0;
+        }
+      }
+      function showHoldCrosshair(x, y) {
+        if (!chart || !priceSeries) return;
+        var rect = plot.getBoundingClientRect();
+        var time = chart.timeScale().coordinateToTime(x - rect.left);
+        var price = priceSeries.coordinateToPrice ? priceSeries.coordinateToPrice(y - rect.top) : null;
+        if (time == null || price == null) return;
+        chart.setCrosshairPosition(price, time, priceSeries);
+      }
+      plot.addEventListener("touchstart", function (event) {
+        if (!event.touches || event.touches.length !== 1) return;
+        var p = event.touches[0];
+        touch.active = true;
+        touch.armed = false;
+        touch.x = p.clientX;
+        touch.y = p.clientY;
+        clearTouchTimer();
+        if (chart) chart.clearCrosshairPosition();
+        touch.timer = setTimeout(function () {
+          touch.armed = true;
+          showHoldCrosshair(touch.x, touch.y);
+        }, 320);
+      }, { passive: true });
+      plot.addEventListener("touchmove", function (event) {
+        if (!touch.active || !event.touches || !event.touches.length) return;
+        var p = event.touches[0];
+        var dx = p.clientX - touch.x;
+        var dy = p.clientY - touch.y;
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        clearTouchTimer();
+        if (Math.abs(dy) > Math.abs(dx)) {
+          touch.armed = false;
+          if (chart) chart.clearCrosshairPosition();
+          return;
+        }
+        touch.armed = true;
+      }, { passive: true });
+      function endTouch() {
+        touch.active = false;
+        touch.armed = false;
+        clearTouchTimer();
+      }
+      plot.addEventListener("touchend", endTouch, { passive: true });
+      plot.addEventListener("touchcancel", endTouch, { passive: true });
       chart.subscribeCrosshairMove(function (param) {
+        if (touch.active && !touch.armed) {
+          paintLegend(null, false);
+          if (chart) chart.clearCrosshairPosition();
+          return;
+        }
         if (!pack || !param || !param.time) {
           paintLegend(null, false);
           return;

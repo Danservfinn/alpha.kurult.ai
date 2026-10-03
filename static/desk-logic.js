@@ -382,6 +382,31 @@
     return best || (rows && rows[0]) || null;
   }
 
+  function resolveQuery(index, query, assets) {
+    var list = assets || (index && index.assets) || [];
+    var cmd = parseCommand(query, list);
+    if (cmd && cmd.kind === "unlicensed") {
+      return { action: "stay", title: "No licensed data for " + cmd.symbol, href: "" };
+    }
+    if (cmd && cmd.href) return { action: "go", href: cmd.href, title: cmd.code || "" };
+    var rows = suggest(index || {}, query);
+    var picked = null;
+    rows.forEach(function (row) {
+      if (row.kind === "empty") return;
+      if (!picked || row.score > picked.score) picked = row;
+    });
+    if (!picked) {
+      var empty = rows[0] || { title: "No results", href: "" };
+      return { action: "stay", title: empty.title, href: "" };
+    }
+    return { action: "go", href: picked.href, title: picked.title };
+  }
+
+  function escapeStep(hasQuery) {
+    if (hasQuery) return { clear: true, close: false };
+    return { clear: false, close: true };
+  }
+
   function groupRank(name) {
     return GROUP_ORDER[name] == null ? 9 : GROUP_ORDER[name];
   }
@@ -408,6 +433,8 @@
     parseCommand: parseCommand,
     suggest: suggest,
     bestRow: bestRow,
+    resolveQuery: resolveQuery,
+    escapeStep: escapeStep,
     groupRank: groupRank,
     assetBySym: assetBySym
   };

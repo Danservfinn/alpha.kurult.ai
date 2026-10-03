@@ -605,6 +605,15 @@ def script_tags(market_chrome: bool, chart: bool, lazy_chart: bool) -> str:
     return "\n".join(tags)
 
 
+def asset_jump(securities: list[dict]) -> str:
+    opts = ['<option value="">Asset</option>']
+    for row in securities:
+        opts.append(
+            '<option value="%s">%s</option>' % (esc(desk_html.sym_path(row["sym"])), esc(row["sym"]))
+        )
+    return '<select class="asset-jump" aria-label="Asset">%s</select>' % "".join(opts)
+
+
 def page(
     title: str,
     description: str,
@@ -619,6 +628,7 @@ def page(
     scripts = script_tags(market_chrome, chart, lazy_chart)
     securities = desk_html.securities_payload(SECURITIES)
     assets = desk_html.asset_links(SECURITIES)
+    jump = asset_jump(SECURITIES)
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -636,12 +646,15 @@ def page(
 <body class="{body_class}">
 <a class="skip" href="#main">Skip to content</a>
 <header class="masthead">
+  <input class="search-open" id="search-open" type="checkbox">
   <div class="sheet masthead-row">
     <a class="wordmark" href="/" aria-label="{esc(SITE_NAME)} home">
       <img class="mark" src="/mark.svg" alt="" width="22" height="22">
       <span class="wordmark-text">{esc(SITE_NAME)}</span>
     </a>
     <span class="kicker">{esc(SITE_KICKER)}</span>
+    <label class="search-toggle" for="search-open">Search</label>
+    {jump}
   </div>
   <form class="sheet desk-search" role="search" action="/search/" method="get">
     <label class="visually-hidden" for="q">Search notes and assets</label>
@@ -1536,9 +1549,10 @@ figure, table, pre { max-width: 100%; }
 /* Full-width desk grid. Mobile stays one column. */
 .desk-grid, .asset-layout, .article-layout { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
 .desk-chart-slot, .desk-markets, .desk-chain, .desk-intro, .desk-ledger, .asset-main, .asset-rail, .article-rail, .article { min-width: 0; }
-.chart-plot { height: 28rem; width: 100%; max-width: 100%; }
+.chart-plot { height: 28rem; width: 100%; max-width: 100%; touch-action: pan-y; }
+.chart-plot canvas, .chart-plot table, .chart-plot * { touch-action: pan-y !important; }
 .chart-toolbar, .seg, .fnkeys-row, .desk-search { max-width: 100%; }
-.chart-toolbar .seg-btn, .asset-link, .desk-search input, .desk-search button { min-height: 40px; min-width: 40px; }
+.chart-toolbar .seg-btn, .asset-link, .desk-search input, .desk-search button, .fnkey, .search-toggle, .asset-jump { min-height: 44px; min-width: 44px; }
 .desk-search { display: flex; flex-wrap: wrap; gap: .4rem; padding-block: .45rem; align-items: center; }
 .desk-search input { flex: 1 1 12rem; font: inherit; background: #000; color: var(--data); border: 1px solid var(--field); padding: .35rem .55rem; }
 .desk-search input:focus { background: var(--field); color: #000; }
@@ -1549,6 +1563,7 @@ figure, table, pre { max-width: 100%; }
 .chart-legend, .chart-last, .tick, .chip, .mkt { font-variant-numeric: tabular-nums; }
 .chart-legend { color: var(--data); min-height: 2.4rem; }
 .chart-volume-label, .range-block, .crumbs { color: var(--amber); font-size: .75rem; }
+.crumbs a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; padding-inline: .35rem; }
 .chart-head { color: var(--data); margin: 0 0 .4rem; }
 .chart-name, .chart-ticker { color: var(--amber); }
 .compare-row { border: 1px solid var(--edge-soft); padding: .45rem; margin: 0 0 .45rem; }
@@ -1574,12 +1589,78 @@ figure, table, pre { max-width: 100%; }
   .article-rail { grid-column: 3; grid-row: 1; }
 }
 @media (max-width: 700px) {
+  .article-layout { gap: 0; }
   .article-rail { display: contents; }
+  .article { display: contents; }
+  .article > .panel-head { order: 0; margin-inline: 1px; }
   .article-layout .callstrip { order: 1; }
   .article-layout .keystrip { order: 2; }
   .article-layout .position-box { order: 3; }
-  .article-layout .article { order: 4; }
-  .article-layout .desk-chart, .article-layout #chain-panel { order: 5; }
+  .article-head { order: 4; }
+  .prose { order: 5; }
+  .article-layout .desk-chart, .article-layout #chain-panel { order: 6; }
+  .page-article .callstrip,
+  .page-article .keystrip,
+  .page-article .position-box { margin-inline: calc(.9rem + 1px); }
+  .page-article .callstrip { margin-top: .3rem; }
+}
+.search-open {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+.search-toggle, .asset-jump { display: none; }
+.fnkey {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+.search-list [role="option"], #search-list [role="option"] { min-height: 44px; display: flex; align-items: center; }
+@media (max-width: 700px) {
+  .masthead { min-height: 77px; box-sizing: border-box; }
+  .masthead-row {
+    flex-direction: row;
+    align-items: center;
+    gap: .4rem;
+    padding-block: .4rem;
+  }
+  .kicker { display: none; }
+  .wordmark { min-width: 0; flex: 1 1 auto; }
+  .wordmark-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .search-toggle, .asset-jump { display: inline-flex; }
+  .search-toggle {
+    background: var(--key);
+    color: #000;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    border: 1px solid #000;
+    padding: 0 .55rem;
+    cursor: pointer;
+  }
+  .asset-jump {
+    font: inherit;
+    background: #000;
+    color: var(--data);
+    border: 1px solid var(--field);
+    max-width: 7.5rem;
+  }
+  .fnkeys { display: block; height: 47px; overflow: hidden; }
+  .fnkeys-row { flex-wrap: nowrap; padding-block: 1px; align-items: center; }
+  .fnkeys .asset-select { display: none; }
+  .fnkey { height: 44px; }
+  .desk-search { display: none; }
+  .search-open:checked ~ .desk-search { display: flex; }
+  .search-open:focus-visible + .masthead-row .search-toggle {
+    outline: 2px solid var(--yellow);
+    outline-offset: 2px;
+  }
 }
 """
 

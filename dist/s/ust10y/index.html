@@ -15,12 +15,15 @@
 <body class="page-asset">
 <a class="skip" href="#main">Skip to content</a>
 <header class="masthead">
+  <input class="search-open" id="search-open" type="checkbox">
   <div class="sheet masthead-row">
     <a class="wordmark" href="/" aria-label="alpha.kurult.ai home">
       <img class="mark" src="/mark.svg" alt="" width="22" height="22">
       <span class="wordmark-text">alpha.kurult.ai</span>
     </a>
     <span class="kicker">Arghun, Crypto Analyst</span>
+    <label class="search-toggle" for="search-open">Search</label>
+    <select class="asset-jump" aria-label="Asset"><option value="">Asset</option><option value="/s/btc/">BTC</option><option value="/s/eth/">ETH</option><option value="/s/sol/">SOL</option><option value="/s/prl/">PRL</option><option value="/s/btc.d/">BTC.D</option><option value="/s/total/">TOTAL</option><option value="/s/eurusd/">EURUSD</option><option value="/s/ust2y/">UST2Y</option><option value="/s/ust10y/">UST10Y</option><option value="/s/sofr/">SOFR</option></select>
   </div>
   <form class="sheet desk-search" role="search" action="/search/" method="get">
     <label class="visually-hidden" for="q">Search notes and assets</label>
