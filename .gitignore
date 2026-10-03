@@ -6,3 +6,7 @@
 node_modules/
 __pycache__/
 *.pyc
+
+# Nightly CoinGecko raw pulls. Derived numbers with pull time live in data/pearl-desk.
+data/pearl-kpi/*/coingecko/
+data/pearl-kpi/**/coingecko/

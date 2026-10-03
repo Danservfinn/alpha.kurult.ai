@@ -653,6 +653,14 @@ figure, table, pre { max-width: 100%; }
   .keystrip .key-note { display: none; }
 }
 
+.desk { margin: .6rem 0; }
+.desk-table { width: 100%; border-collapse: collapse; font-size: .72rem; }
+.desk-table th, .desk-table td { border-bottom: 1px solid var(--edge); text-align: left; padding: .28rem .35rem; vertical-align: top; }
+.desk-table th { color: var(--amber); font-weight: 500; }
+.draft-banner { color: var(--yellow); }
+.draft-pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .68rem; }
+.spark { display: inline-block; vertical-align: middle; }
+
 @media print {
   body { background: #fff; color: #000; }
   body::before, .ticker, .fnkeys { display: none; }

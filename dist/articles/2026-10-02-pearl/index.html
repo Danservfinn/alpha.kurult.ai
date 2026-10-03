@@ -56,7 +56,7 @@
 <p>All of the following are CoinGecko figures as of 11:45 ET (5-minute points in the saved market_chart days=1 pulls) unless stated.</p>
 <ul><li>Price $1.13. Market cap $374M (unconfirmed). FDV $2.36B (unconfirmed; price times the 2.1B max supply). From the coins/pearl-2 pull (18:41 ET): rank 132, ATH $1.76 on Sep 23 (01:19 ET), ATL $0.1399 on Jul 22 (21:44 ET), 30-day change +237%.</li><li>Price path (CoinGecko daily prices, labeled by their 00:00 UTC stamp): $0.509 on Jul 1, $0.230 on Jul 23 after the July exploit, $0.270 on Aug 10, $0.310 on Sep 1, $0.470 on Sep 11, $1.072 on Sep 19, $1.534 on Sep 28, then $1.125 intraday at 11:45 ET on Oct 2 (CoinGecko 5-minute point). Market cap was $66.2M to $79.0M through August (CoinGecko daily stamps at 00:00 UTC, Aug 2 to Sep 1, unconfirmed). That is broadly in line with the &quot;$70 to 80 million&quot; claim in the Sep 10 brezshares thesis.</li><li><strong>Venues:</strong> BigONE PRL/USDT $2.64M and SafeTrade PRL/USDT $1.99M of 24h volume, with null CoinGecko trust scores (coins/pearl-2/tickers, 19:23 ET). CoinPaprika (11:46 ET) lists SafeTrade only, at $1.81M. Uniswap WPRL/USDT has $397k of reserves and $165k of 24h volume (GeckoTerminal 11:50 ET). @headroomcapital measured about $5k to $8k of depth within ±2% on SafeTrade (X, unverified).</li><li><strong>Liquidity vs peers:</strong> PRL&#x27;s 24h volume-to-market-cap ratio was 0.011. That is the lowest in our comparison set (TAO 0.071, RENDER 0.056, ZEC 0.053, AKT 0.034). It is priced like a mid-cap and trades like a micro-cap.</li><li><strong>Behavior (CoinGecko daily prices at 00:00 UTC, Aug 20 to Oct 2, 43 daily log returns, pulled 18:44 to 18:55 ET):</strong> PRL returned +329% against BTC +22%, TAO +48% and RENDER +39%. Annualized volatility (standard deviation of daily log returns times the square root of 365) was 242%, versus 44% for BTC. Correlation of daily log returns with BTC was 0.24, with TAO 0.18 and with RENDER 0.05. PRL trades on its own flows.</li></ul>
 <figure class="figure"><a href="/assets/2026-10-02-pearl/01-relative-performance.svg"><img src="/assets/2026-10-02-pearl/01-relative-performance.svg" alt="Line chart of PRL, TAO, RENDER and BTC daily prices indexed to 100 on Aug 20" loading="lazy" decoding="async"></a><figcaption>PRL vs TAO, RENDER and BTC, indexed to 100 on Aug 20. Source: CoinGecko market_chart daily prices at 00:00 UTC, Aug 20 to Oct 2 (pulled 2026-10-02 18:45 to 18:55 ET). Data provided by CoinGecko.</figcaption></figure>
-<ul><li><strong>Derivatives:</strong> Lighter lists an active PRL perp (market 4097, created Sep 29 08:33 ET) with a 33.33% minimum initial margin, so up to 3x (Lighter API orderBooks and orderBookDetails, 19:33 ET). @0xThoor (Oct 2 04:12 ET) cites about 6.5% cumulative funding over about 4 days and &quot;OI on the perp at half a mil&quot; (X, unverified). On Hyperliquid, ticker-bot text quoted by @degennQuant (Sep 26) says the HIP-3 &quot;pearl-2:native ticker has been purchased for 554.89 HYPE ($51,016) by @entropyIO&quot; (X, unverified). A separate @HyperliquidNews post from Jun 29 concerns a spot &quot;$PRL&quot; ticker bought for 500 HYPE. It is a different event, and it may not even be Pearl. We found no confirmation that the HIP-3 market has launched. There is no Binance, OKX or Coinbase listing.</li></ul>
+<ul><li><strong>Derivatives:</strong> On Hyperliquid, ticker-bot text quoted by @degennQuant (Sep 26) says the HIP-3 &quot;pearl-2:native ticker has been purchased for 554.89 HYPE ($51,016) by @entropyIO&quot; (X, unverified). A separate @HyperliquidNews post from Jun 29 concerns a spot &quot;$PRL&quot; ticker bought for 500 HYPE. It is a different event, and it may not even be Pearl. We found no confirmation that the HIP-3 market has launched. There is no Binance, OKX or Coinbase listing.</li></ul>
 <h2>On-chain picture</h2>
 <p>Sources: the pearlchain.live keyless API, fetched 19:33 to 19:36 ET (stats, charts, address rankings and detail, pools, and a crawl of the last 200 blocks). Wallet classifications below are behavioral inferences, because no public labels exist.</p>
 <ul><li><strong>Hashrate used in this note:</strong> about 42.2 EH/s (unconfirmed). It comes from pearlchain.live stats at 19:33 ET, which calls it a &quot;Difficulty-derived consensus estimate&quot; that is &quot;not measured computation&quot;. All other hashrate figures below are explorer history samples or X claims, labeled as such.</li><li><strong>Supply:</strong> 15.84% minted, about 332.7M PRL (unconfirmed; explorer stats at 19:33 ET, and CoinGecko&#x27;s 332.6M circulating supply at 18:41 ET, matching the emission formula). The block reward is 2,287 PRL. The explorer&#x27;s address total of 343.1M is about 3% higher than this, and we could not reconcile the gap.</li><li><strong>Issuance:</strong> about 1.04M to 1.07M PRL per UTC day over Sep 29 to Oct 1 (unconfirmed; explorer blocksDaily). Oct 1 was 1,065,348 PRL. At the refreshed CoinGecko price of $1.11 (18:41 ET), Oct 1 issuance is worth about $1.18M. That is about 25% of CoinGecko&#x27;s 24h volume of $4.80M at the same timestamp. At current run rates, issuance is about 115% of supply per year.</li><li><strong>Dilution path</strong> (emission formula, unconfirmed): about 422M PRL around Jan 2, 2027, about 500M around Apr 2, 2027 and about 640M around Oct 2, 2027, at the 194 s target pace from height 122,400. Blocks have recently come faster than target (489 a day over the 30 UTC days to Oct 1, explorer blocksDaily), which would bring these dates forward by about one to five weeks. At today&#x27;s market cap of $369.1M (CoinGecko, 18:41 ET, unconfirmed), price would be about $0.88 at 422M supply and about $0.58 at 640M. Holding $1.11 at 640M supply needs about a $710M market cap (unconfirmed, derived).</li></ul>
@@ -91,10 +91,66 @@
 <figure class="figure"><a href="/assets/2026-10-02-pearl/06-scenario-fan.svg"><img src="/assets/2026-10-02-pearl/06-scenario-fan.svg" alt="Scenario fan chart of bear, base and bull price ranges at 3 and 12 months with probabilities" loading="lazy" decoding="async"></a><figcaption>Scenario fan, log scale. Source: Arghun scenario ranges and subjective probabilities (research only); midpoints are rounded geometric midpoints; spot $1.11 (CoinGecko coins/pearl-2, 2026-10-02 18:41 ET); flat-market-cap prices from the supply chart (unconfirmed).</figcaption></figure>
 <h2>Data we could not get</h2>
 <ul><li>Exchange, team and pool wallet labels.</li><li>A fee time series.</li><li>Coin-age and dormancy distribution. This needs our own node and indexer.</li><li>Order-book depth from SafeTrade and BigONE directly.</li><li>Hyperliquid HIP-3 launch status.</li><li>CoinMarketCap (not checked).</li><li>A post-level archive of X post counts (dropped from this version).</li></ul>
-<p>Saved with this note, each with its ET fetch time and a sha256 manifest: raw CoinGecko pulls (market_chart, coins/pearl-2 and tickers), raw pearlchain.live explorer pulls (stats, charts, address rankings and detail, pools, and a 200-block coinbase crawl), the Lighter order-book pulls, and the scripts that derive the figures and draw the charts. Other sources (X posts, GitHub, Together AI, CoinPaprika, GeckoTerminal, Ethplorer, DexScreener, papers) are cited by link with their read time and are not archived here. Data provided by CoinGecko.</p>
+<p>Saved with this note, each with its ET fetch time and a sha256 manifest: raw CoinGecko pulls (market_chart, coins/pearl-2 and tickers), raw pearlchain.live explorer pulls (stats, charts, address rankings and detail, pools, and a 200-block coinbase crawl), and the scripts that derive the figures and draw the charts. Other sources (X posts, GitHub, Together AI, CoinPaprika, GeckoTerminal, Ethplorer, DexScreener, papers) are cited by link with their read time and are not archived here. Data provided by CoinGecko.</p>
 <p>Research only. Not financial advice. Nothing here is an offer to buy, sell or hold any asset.</p>
   </div>
 </article>
+<section class="desk panel" aria-labelledby="scorecard-heading">
+  <div class="panel-head"><span id="scorecard-heading">Falsifier scorecard</span><span class="data">drafts only</span></div>
+  <p>A dated falsifier is graded by the nightly job into drafts/. Nothing here is copied into the ledger.</p>
+  <table class="desk-table">
+    <thead><tr><th>Id</th><th>Side</th><th>Due</th><th>Check</th><th>Text</th></tr></thead>
+    <tbody>
+<tr><td>fp8-overhead</td><td>bullish</td><td>no date</td><td>manual</td><td>FP8 live on mainnet with measured end-to-end overhead of 3% or less</td></tr><tr><td>inference-share</td><td>bullish</td><td>2026-12-01</td><td>manual</td><td>Within about 60 days, attestable data showing over 30% of hashrate doing paid inference</td></tr><tr><td>second-partner</td><td>bullish</td><td>no date</td><td>manual</td><td>A second named production duplex partner</td></tr><tr><td>hold-above-180</td><td>bullish</td><td>no date</td><td>price_hold</td><td>PRL holding above $1.80 for five daily closes after a Hyperliquid listing</td></tr><tr><td>fees-1pct</td><td>bullish</td><td>no date</td><td>fee_ratio</td><td>Fees above 1% of block rewards over 30 days</td></tr><tr><td>fp8-miss</td><td>bearish</td><td>2026-12-31</td><td>manual</td><td>FP8 not on mainnet by Dec 31, 2026</td></tr><tr><td>payee-50</td><td>bearish</td><td>no date</td><td>payee_share</td><td>A single payee above 50% over 1,000 blocks</td></tr><tr><td>tx-thin</td><td>bearish</td><td>no date</td><td>manual</td><td>Non-coinbase transactions under 10,000 per day while price holds</td></tr><tr><td>dormant-to-venues</td><td>bearish</td><td>no date</td><td>manual</td><td>Large dormant wallets moving to venues</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="desk panel" aria-labelledby="catalyst-heading">
+  <div class="panel-head"><span id="catalyst-heading">Catalyst calendar</span><span class="data">from the note</span></div>
+  <table class="desk-table">
+    <thead><tr><th>Due</th><th>Catalyst</th><th>Status</th><th>Window</th></tr></thead>
+    <tbody>
+<tr><td>undated</td><td>FP8 / Pearl-GEMM hardfork</td><td>open</td><td>Described as within weeks of 2026-10-02. No date.</td></tr><tr><td>undated</td><td>Hyperliquid HIP-3 perp launch</td><td>unconfirmed</td><td>Unconfirmed as of the 2026-10-02 note.</td></tr><tr><td>2026-12-01</td><td>Attestable paid-inference share over 30%</td><td>open</td><td>About 60 days from the 2026-10-02 note.</td></tr><tr><td>2026-12-31</td><td>FP8 on mainnet, or the bearish miss</td><td>open</td><td>Bearish confirmation date from the note.</td></tr><tr><td>undated</td><td>A tier-1 exchange listing</td><td>open</td><td>None confirmed.</td></tr><tr><td>undated</td><td>A second named production duplex partner, or Together endpoint clearly live</td><td>open</td><td>Open.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="desk panel" aria-labelledby="peers-heading">
+  <div class="panel-head"><span id="peers-heading">Peer table</span><span class="data">fixed rows</span></div>
+  <p>Rows are PRL, TAO, RENDER, AKT, ZEC, BTC. Columns are price, 24h volume over market cap, 30d realized vol computed by us, and issuance yield where we have a chain print. No third-party TVL feed. No revenue-multiple feed. Not advice.</p>
+  <table class="desk-table">
+    <thead><tr><th>Ticker</th><th>Price USD</th><th>Vol/MC</th><th>30d vol ann.</th><th>Issuance yield</th></tr></thead>
+    <tbody>
+<tr><td>PRL</td><td>1.11</td><td>0.0130</td><td>280.6%</td><td>115.3%</td></tr><tr><td>TAO</td><td>303.28</td><td>0.0914</td><td>107.7%</td><td>n/a</td></tr><tr><td>RENDER</td><td>1.90851</td><td>0.0666</td><td>81.2%</td><td>n/a</td></tr><tr><td>AKT</td><td>0.651893</td><td>0.0311</td><td>n/a</td><td>n/a <span class="key-note">No 365-day archive. 30d vol not computed. days=1 file used for the last print only.</span></td></tr><tr><td>ZEC</td><td>1,335.01</td><td>0.0463</td><td>n/a</td><td>n/a <span class="key-note">No 365-day archive. 30d vol not computed. days=1 file used for the last print only.</span></td></tr><tr><td>BTC</td><td>84,841.67</td><td>0.0268</td><td>41.1%</td><td>n/a</td></tr>
+    </tbody>
+  </table>
+  <p class="credit"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a></p>
+</section>
+
+<section class="desk panel" aria-labelledby="kpi-heading">
+  <div class="panel-head"><span id="kpi-heading">KPI archive</span><span class="data">2 prints</span></div>
+  <p>Baseline is the 2026-10-02 note archive. A second print is a nightly rerun. Chain cells keep a sha256 manifest. Price is a derived figure. Raw JSON does not back every print. CoinGecko raw JSON is not in this tree.</p>
+  <table class="desk-table">
+    <thead><tr><th>KPI</th><th>Latest</th><th>Sparkline</th><th>Since 2026-10-02 note</th></tr></thead>
+    <tbody>
+<tr><td>Height</td><td>122,711</td><td><svg class="spark" viewBox="0 0 120 28" width="120" height="28" role="img" aria-label="sparkline 2 points"><polyline fill="none" stroke="#f1bd59" stroke-width="1.5" points="2.0,26.0 118.0,2.0"/></svg></td><td>+0.25% since 2026-10-02 note</td></tr><tr><td>Hashrate EH/s</td><td>45.9429</td><td><svg class="spark" viewBox="0 0 120 28" width="120" height="28" role="img" aria-label="sparkline 2 points"><polyline fill="none" stroke="#f1bd59" stroke-width="1.5" points="2.0,26.0 118.0,2.0"/></svg></td><td>+8.92% since 2026-10-02 note</td></tr><tr><td>Supply M</td><td>333.39</td><td><svg class="spark" viewBox="0 0 120 28" width="120" height="28" role="img" aria-label="sparkline 2 points"><polyline fill="none" stroke="#f1bd59" stroke-width="1.5" points="2.0,26.0 118.0,2.0"/></svg></td><td>+0.21% since 2026-10-02 note</td></tr><tr><td>Fees PRL</td><td>7,198.22</td><td><svg class="spark" viewBox="0 0 120 28" width="120" height="28" role="img" aria-label="sparkline 2 points"><polyline fill="none" stroke="#f1bd59" stroke-width="1.5" points="2.0,26.0 118.0,2.0"/></svg></td><td>+0.07% since 2026-10-02 note</td></tr><tr><td>Price USD</td><td>1.031</td><td><svg class="spark" viewBox="0 0 120 28" width="120" height="28" role="img" aria-label="sparkline 2 points"><polyline fill="none" stroke="#f1bd59" stroke-width="1.5" points="2.0,2.0 118.0,26.0"/></svg></td><td>-7.12% since 2026-10-02 note</td></tr>
+    </tbody>
+  </table>
+  <p class="credit"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a> for the price cell.</p>
+</section>
+
+<section class="desk panel" aria-labelledby="alerts-heading">
+  <div class="panel-head"><span id="alerts-heading">Threshold alerts</span><span class="data">drafts only</span></div>
+  <p>Rule: price +/-10% vs the prior archived close.</p>
+  <table class="desk-table">
+    <thead><tr><th>Id</th><th>Status</th><th>Detail</th></tr></thead>
+    <tbody>
+<tr><td>price-move</td><td>clear</td><td>Move -7.12% vs prior close. Threshold +/-10%.</td></tr>
+    </tbody>
+  </table>
+  <p class="credit"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a> for the price-move cell.</p>
+</section>
 <section class="panel" id="chart-panel" data-symbols="PRL" data-default="PRL" data-locked="true" aria-labelledby="chart-heading">
   <div class="panel-head"><span id="chart-heading">Chart</span><span class="badge" id="chart-badge">aggregated</span></div>
   <div class="panel-body">
@@ -112,7 +168,7 @@
   <p class="src-foot chain-credit">Bitcoin figures come from <a href="https://mempool.space/" rel="noopener">mempool.space</a>, with <a href="https://blockstream.info/" rel="noopener">Blockstream</a> as fallback. alpha.kurult.ai is not affiliated with either. Ether gas and Solana epoch come from public RPCs through our cache. Pearl chain stats, when shown, come from pearlchain.live and are not an affiliation.</p>
 </section>
 <section class="sources panel" aria-labelledby="sources-heading">
-  <div class="panel-head"><span id="sources-heading">Sources</span><span class="data">44 ref</span></div>
+  <div class="panel-head"><span id="sources-heading">Sources</span><span class="data">42 ref</span></div>
   <ol class="source-table">
     <li><a href="https://api.coingecko.com/api/v3/coins/pearl-2/market_chart?vs_currency=usd&amp;days=1" rel="noopener">CoinGecko public API, market_chart days=1 (5-minute points) for pearl-2, bittensor, render-token, zcash and akash-network (pulled 2026-10-02 19:15 to 19:21 ET) and coins/pearl-2/tickers (pulled 19:23 ET)</a><span class="source-url">https://api.coingecko.com/api/v3/coins/pearl-2/market_chart?vs_currency=usd&amp;days=1</span></li>
     <li><a href="https://coinpaprika.com/coin/prl-pearl-1/" rel="noopener">CoinPaprika, Pearl (prl-pearl-1)</a><span class="source-url">https://coinpaprika.com/coin/prl-pearl-1/</span></li>
@@ -135,7 +191,6 @@
     <li><a href="https://etherscan.io/token/0x07696DcaB55E62cfef953666b29Fe1970518cB00" rel="noopener">Etherscan, WPRL token contract</a><span class="source-url">https://etherscan.io/token/0x07696DcaB55E62cfef953666b29Fe1970518cB00</span></li>
     <li><a href="https://ethplorer.io/address/0x07696dcab55e62cfef953666b29fe1970518cb00" rel="noopener">Ethplorer, WPRL token</a><span class="source-url">https://ethplorer.io/address/0x07696dcab55e62cfef953666b29fe1970518cb00</span></li>
     <li><a href="https://www.geckoterminal.com/eth/tokens/0x07696dcab55e62cfef953666b29fe1970518cb00" rel="noopener">GeckoTerminal, WPRL pools on Ethereum</a><span class="source-url">https://www.geckoterminal.com/eth/tokens/0x07696dcab55e62cfef953666b29fe1970518cb00</span></li>
-    <li><a href="https://mainnet.zklighter.elliot.ai/api/v1/orderBookDetails?market_id=4097" rel="noopener">Lighter API, orderBooks and orderBookDetails for the PRL perp (market 4097, pulled 2026-10-02 19:33 ET)</a><span class="source-url">https://mainnet.zklighter.elliot.ai/api/v1/orderBookDetails?market_id=4097</span></li>
     <li><a href="https://api.dexscreener.com/latest/dex/search?q=PRL" rel="noopener">DexScreener API, PRL ticker search</a><span class="source-url">https://api.dexscreener.com/latest/dex/search?q=PRL</span></li>
     <li><a href="https://x.com/brezshares/status/2098036517738570123" rel="noopener">X, @brezshares thesis announcement (Sep 10)</a><span class="source-url">https://x.com/brezshares/status/2098036517738570123</span></li>
     <li><a href="https://x.com/brezshares/status/2098035744598319569" rel="noopener">X, @brezshares long-form thesis article (Sep 10)</a><span class="source-url">https://x.com/brezshares/status/2098035744598319569</span></li>
@@ -144,7 +199,6 @@
     <li><a href="https://x.com/degennQuant/status/2103767539700703255" rel="noopener">X, @degennQuant quoting the HIP-3 ticker purchase (Sep 26)</a><span class="source-url">https://x.com/degennQuant/status/2103767539700703255</span></li>
     <li><a href="https://x.com/degennQuant/status/2104237506640347448" rel="noopener">X, @degennQuant hashrate 60.85 EH/s claim (Sep 27)</a><span class="source-url">https://x.com/degennQuant/status/2104237506640347448</span></li>
     <li><a href="https://x.com/HyperliquidNews/status/2071593056034296243" rel="noopener">X, @HyperliquidNews spot ticker post (Jun 29)</a><span class="source-url">https://x.com/HyperliquidNews/status/2071593056034296243</span></li>
-    <li><a href="https://x.com/0xThoor/status/2105933881966755924" rel="noopener">X, @0xThoor on Lighter funding and open interest (Oct 2)</a><span class="source-url">https://x.com/0xThoor/status/2105933881966755924</span></li>
     <li><a href="https://x.com/CryptoSGiants/status/2080368360039026992" rel="noopener">X, @CryptoSGiants on exploit hashrate (Jul 23)</a><span class="source-url">https://x.com/CryptoSGiants/status/2080368360039026992</span></li>
     <li><a href="https://x.com/headroomcapital/status/2103149745526956307" rel="noopener">X, @headroomcapital on venue concentration and depth</a><span class="source-url">https://x.com/headroomcapital/status/2103149745526956307</span></li>
     <li><a href="https://x.com/ValeriusLabs/status/2105359608831443070" rel="noopener">X, @ValeriusLabs on issuance vs volume</a><span class="source-url">https://x.com/ValeriusLabs/status/2105359608831443070</span></li>

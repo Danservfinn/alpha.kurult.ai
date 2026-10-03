@@ -1,0 +1,99 @@
+{
+  "schema": "pearl-desk-peers/v1",
+  "columns": [
+    "ticker",
+    "price_usd",
+    "as_of",
+    "vol_over_mc",
+    "realized_vol_30d_ann",
+    "issuance_yield"
+  ],
+  "excluded": [
+    "third-party TVL feed",
+    "revenue-multiple feed",
+    "MC/TVL",
+    "P/F",
+    "P/revenue"
+  ],
+  "credit": "Data provided by CoinGecko",
+  "rows": [
+    {
+      "ticker": "PRL",
+      "coin_id": "pearl-2",
+      "price_usd": 1.11,
+      "as_of": "CoinGecko coins/pearl-2, 2026-10-02 18:41 ET",
+      "vol_over_mc": 0.013004,
+      "realized_vol_30d_ann": 2.8059,
+      "issuance_yield": 1.1526,
+      "gap": null,
+      "credit": "Data provided by CoinGecko",
+      "vol_label": "30d realized vol, annualized, computed by us from CoinGecko daily prices. Not advice.",
+      "vol_mc_as_of": "CoinGecko coins/pearl-2, 2026-10-02 18:41 ET"
+    },
+    {
+      "ticker": "TAO",
+      "coin_id": "bittensor",
+      "price_usd": 303.280466,
+      "as_of": "2026-10-02 00:00 UTC daily stamp, file bittensor_market_chart_365_20261002T184655-0400.json",
+      "vol_over_mc": 0.091404,
+      "realized_vol_30d_ann": 1.0765,
+      "issuance_yield": null,
+      "gap": null,
+      "credit": "Data provided by CoinGecko",
+      "vol_label": "30d realized vol, annualized, computed by us from CoinGecko daily prices. Not advice.",
+      "vol_mc_as_of": "2026-10-02 22:45 UTC"
+    },
+    {
+      "ticker": "RENDER",
+      "coin_id": "render-token",
+      "price_usd": 1.908512,
+      "as_of": "2026-10-02 00:00 UTC daily stamp, file render-token_market_chart_365_20261002T185519-0400.json",
+      "vol_over_mc": 0.066601,
+      "realized_vol_30d_ann": 0.8116,
+      "issuance_yield": null,
+      "gap": null,
+      "credit": "Data provided by CoinGecko",
+      "vol_label": "30d realized vol, annualized, computed by us from CoinGecko daily prices. Not advice.",
+      "vol_mc_as_of": "2026-10-02 22:53 UTC"
+    },
+    {
+      "ticker": "AKT",
+      "coin_id": "akash-network",
+      "price_usd": 0.651893,
+      "as_of": "2026-10-02 00:00 UTC daily stamp, file akash-network_market_chart_1_20261002T192119-0400.json",
+      "vol_over_mc": 0.031119,
+      "realized_vol_30d_ann": null,
+      "issuance_yield": null,
+      "gap": "No 365-day archive. 30d vol not computed. days=1 file used for the last print only.",
+      "credit": "Data provided by CoinGecko",
+      "vol_label": "30d realized vol, annualized, computed by us from CoinGecko daily prices. Not advice.",
+      "vol_mc_as_of": "2026-10-02 23:19 UTC"
+    },
+    {
+      "ticker": "ZEC",
+      "coin_id": "zcash",
+      "price_usd": 1335.009052,
+      "as_of": "2026-10-02 00:00 UTC daily stamp, file zcash_market_chart_1_20261002T191949-0400.json",
+      "vol_over_mc": 0.046262,
+      "realized_vol_30d_ann": null,
+      "issuance_yield": null,
+      "gap": "No 365-day archive. 30d vol not computed. days=1 file used for the last print only.",
+      "credit": "Data provided by CoinGecko",
+      "vol_label": "30d realized vol, annualized, computed by us from CoinGecko daily prices. Not advice.",
+      "vol_mc_as_of": "2026-10-02 23:17 UTC"
+    },
+    {
+      "ticker": "BTC",
+      "coin_id": "bitcoin",
+      "price_usd": 84841.666344,
+      "as_of": "2026-10-02 00:00 UTC daily stamp, file bitcoin_market_chart_365_20261002T184530-0400.json",
+      "vol_over_mc": 0.026812,
+      "realized_vol_30d_ann": 0.4111,
+      "issuance_yield": null,
+      "gap": null,
+      "credit": "Data provided by CoinGecko",
+      "vol_label": "30d realized vol, annualized, computed by us from CoinGecko daily prices. Not advice.",
+      "vol_mc_as_of": "2026-10-02 22:43 UTC"
+    }
+  ]
+}
