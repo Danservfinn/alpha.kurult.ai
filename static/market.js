@@ -208,7 +208,20 @@
     }
   }
 
-  async function getText(url) {
+  async function getJsonForce(url, timeout) {
+    // like getJson but ignores host backoff (used for chart centerpiece)
+    var ctrl = new AbortController();
+    var timer = setTimeout(function () { ctrl.abort(); }, timeout || 12000);
+    try {
+      var res = await fetch(url, { headers: { Accept: "application/json" }, signal: ctrl.signal });
+      if (!res.ok) throw new Error(String(res.status));
+      return await res.json();
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+    async function getText(url) {
     var host = hostOf(url);
     if (hostBlocked(host)) {
       var blocked = new Error("backoff");
@@ -640,7 +653,16 @@
       // No cache for this key: try anyway; a blocked host is better than no chart.
     }
     try {
-      var data = await getJson(chartUrl(sym, tf));
+      var data;
+      try {
+        data = await getJson(chartUrl(sym, tf));
+      } catch (chartErr) {
+        if (chartErr && chartErr.limited && !force) {
+          data = await getJsonForce(chartUrl(sym, tf));
+        } else {
+          throw chartErr;
+        }
+      }
       var series = normalizeSeries(tf, data);
       if (!series.length) throw new Error("empty");
       state.chart[key] = { at: Date.now(), series: series };
@@ -653,6 +675,10 @@
       if (saved) {
         state.chart[key] = saved;
         paintChart(sym, tf, saved.series, true);
+      } else if (err && err.limited && !force) {
+        // rate-limited before this chart ever loaded: retry once after the host cooldown
+        setTimeout(function () { pullChart(sym, tf, true); }, 20000);
+        paintChart(sym, tf, [], true);
       } else {
         paintChart(sym, tf, [], true);
       }
