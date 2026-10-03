@@ -1,0 +1,42 @@
+{
+  "schema": "pearl-desk-series/v1",
+  "credit": "Data provided by CoinGecko",
+  "prints": [
+    {
+      "id": "2026-10-02-note",
+      "fetched_et": "2026-10-02T19:33:00-04:00",
+      "kpis": {
+        "source": "data/2026-10-02-pearl",
+        "gaps": [],
+        "height": 122400,
+        "hashrate_ehs": 42.1791,
+        "supply_m": 332.6836,
+        "fees_prl": 7193.3169,
+        "stats_file": "stats_20261002T193349-0400.json",
+        "issuance_oct1_prl": 1065347.5931804413,
+        "charts_file": "charts_20261002T193349-0400.json",
+        "price_usd": 1.11,
+        "market_cap_usd": 369132545,
+        "volume_24h_usd": 4800375,
+        "price_as_of": "CoinGecko coins/pearl-2, 2026-10-02 18:41 ET",
+        "coin_file": "pearl-2_coin_20261002T184405-0400.json"
+      }
+    },
+    {
+      "id": "20261003T133223-0400",
+      "fetched_et": "2026-10-03T13:35:15-04:00",
+      "kpis": {
+        "source": "data/pearl-kpi/20261003T133223-0400",
+        "gaps": [],
+        "height": 122711,
+        "hashrate_ehs": 45.9429,
+        "supply_m": 333.3947,
+        "fees_prl": 7198.2197,
+        "price_usd": 1.031,
+        "price_pulled_et": "2026-10-03T13:34:33-04:00",
+        "price_vendor_stamp": "2026-10-03T17:31:40.000Z",
+        "price_as_of": "CoinGecko coins/pearl-2, pulled 2026-10-03 13:34:33 -0400. Data provided by CoinGecko."
+      }
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "pearl-desk-alerts/v1",
+  "as_of": "2026-10-03T14:07:27-04:00",
+  "items": [
+    {
+      "id": "payee-50",
+      "status": "fired",
+      "reason": "Top payee share 50.8% over 1000 blocks. Threshold 50%.",
+      "share": 0.508,
+      "draft": true,
+      "blocks": 1000,
+      "crawl": "data/pearl-kpi/payee-1000-20261003/coinbase_crawl_121713-122712_20261003T133806-0400.jsonl"
+    },
+    {
+      "id": "price-move",
+      "status": "clear",
+      "reason": "Move -7.12% vs prior close. Threshold +/-10%.",
+      "pct": -7.1171,
+      "draft": false,
+      "credit": "Data provided by CoinGecko"
+    }
+  ],
+  "payee_crawl": "data/pearl-kpi/payee-1000-20261003/coinbase_crawl_121713-122712_20261003T133806-0400.jsonl"
+}

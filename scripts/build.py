@@ -17,6 +17,8 @@ import sys
 import traceback
 from pathlib import Path
 
+from desk_panels import desk_sections
+
 # --------------------------------------------------------------------------- #
 # Configuration
 # --------------------------------------------------------------------------- #
@@ -37,6 +39,7 @@ DISCLAIMER = (
     "Research only. Not financial advice. Nothing on this site is an offer "
     "to buy, sell, or hold any asset. No wallet. No comments."
 )
+DRAFT_BANNER = "DRAFT. Not published. No outside post. Research only. Not financial advice."
 
 FILENAME_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})-([a-z0-9]+(?:-[a-z0-9]+)*)\.md$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -119,6 +122,35 @@ def parse_frontmatter(block: str, name: str) -> dict:
                 raise BuildError(f"{name}: keys must be a list")
             meta[key], i = parse_pair_list(lines, i + 1, name, ("label", "value", "note"), "keys")
             continue
+        if key in ("falsifiers", "catalysts", "alerts"):
+            if value:
+                raise BuildError(f"{name}: {key} must be a list")
+            fields = {
+                "falsifiers": (
+                    "id",
+                    "side",
+                    "text",
+                    "due",
+                    "check",
+                    "threshold",
+                    "window_blocks",
+                    "window_days",
+                    "closes",
+                    "requires",
+                ),
+                "catalysts": ("id", "title", "due", "window", "status"),
+                "alerts": (
+                    "id",
+                    "kind",
+                    "threshold",
+                    "threshold_pct",
+                    "window_blocks",
+                    "versus",
+                    "baseline",
+                ),
+            }[key]
+            meta[key], i = parse_pair_list(lines, i + 1, name, fields, key)
+            continue
         meta[key] = unquote(value)
         i += 1
     return meta
@@ -173,6 +205,25 @@ def validate_desk(meta: dict, name: str) -> None:
         value = str(item.get("value", "")).strip()
         if not label or not value:
             raise BuildError(f"{name}: key {idx} needs label and value")
+    for list_key, required in (
+        ("falsifiers", ("id", "side", "text", "check")),
+        ("catalysts", ("id", "title", "status")),
+        ("alerts", ("id", "kind")),
+    ):
+        items = meta.get(list_key, None)
+        if items is None or items == "":
+            continue
+        if not isinstance(items, list):
+            raise BuildError(f"{name}: {list_key} must be a list")
+        for idx, item in enumerate(items, 1):
+            if not isinstance(item, dict):
+                raise BuildError(f"{name}: {list_key} {idx} must be a mapping")
+            for field in required:
+                if not str(item.get(field, "")).strip():
+                    raise BuildError(f"{name}: {list_key} {idx} needs {field}")
+            side = str(item.get("side", "")).strip()
+            if list_key == "falsifiers" and side not in ("bullish", "bearish"):
+                raise BuildError(f"{name}: falsifier {idx} side must be bullish or bearish")
 
 
 # --------------------------------------------------------------------------- #
@@ -692,6 +743,7 @@ def render_article(article: Article) -> str:
     mounts = ""
     if asset:
         mounts = chart_mount((asset,), asset, True) + "\n" + chain_mount(asset) + "\n"
+    panels = desk_sections(article.meta, ROOT)
     body = f"""<article class="article panel">
   <div class="panel-head"><span><a href="/">&laquo; Ledger</a></span><span class="data">{time_tag(article)}</span></div>
   <header class="article-head">
@@ -702,7 +754,7 @@ def render_article(article: Article) -> str:
 {article.body_html}
   </div>
 </article>
-{mounts}{render_sources(article)}"""
+{panels}{mounts}{render_sources(article)}"""
     return page(f"{article.title} | {SITE_NAME}", article.summary, article.path, body, "page-article", market_chrome=False)
 
 
@@ -1376,6 +1428,14 @@ figure, table, pre { max-width: 100%; }
   .keystrip .key-note { display: none; }
 }
 
+.desk { margin: .6rem 0; }
+.desk-table { width: 100%; border-collapse: collapse; font-size: .72rem; }
+.desk-table th, .desk-table td { border-bottom: 1px solid var(--edge); text-align: left; padding: .28rem .35rem; vertical-align: top; }
+.desk-table th { color: var(--amber); font-weight: 500; }
+.draft-banner { color: var(--yellow); }
+.draft-pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .68rem; }
+.spark { display: inline-block; vertical-align: middle; }
+
 @media print {
   body { background: #fff; color: #000; }
   body::before, .ticker, .fnkeys { display: none; }
@@ -1392,7 +1452,10 @@ figure, table, pre { max-width: 100%; }
 
 
 def render_robots() -> str:
-    return f"User-agent: *\nAllow: /\n\nSitemap: {SITE_URL}/sitemap.xml\n"
+    return (
+        "User-agent: *\nAllow: /\nDisallow: /drafts/\n\n"
+        f"Sitemap: {SITE_URL}/sitemap.xml\n"
+    )
 
 
 def render_llms(articles: list[Article]) -> str:
@@ -1460,6 +1523,9 @@ def build() -> None:
     write(DIST / "index.html", render_index(listed))
     for article in articles:
         write(DIST / "articles" / article.dir_name / "index.html", render_article(article))
+    # Grading notes and alert drafts stay in drafts/. They are not deploy pages.
+    # payee-50 is internal. It is not rendered on the public panel.
+    # robots Disallow is not a publish gate.
     write(DIST / "404.html", render_404())
     write(DIST / "styles.css", STYLES)
     market_js = ROOT / "static" / "market.js"

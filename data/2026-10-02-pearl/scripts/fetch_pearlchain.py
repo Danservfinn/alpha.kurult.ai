@@ -3,6 +3,7 @@
 Saves raw response bytes with ET timestamps in filenames; logs to fetch.log."""
 import json, time, urllib.request, datetime, hashlib, os, sys
 OUT = sys.argv[1] if len(sys.argv) > 1 else "."
+N = int(sys.argv[2]) if len(sys.argv) > 2 else 200
 BASE = "https://pearlchain.live/api/explorer"
 UA = {"User-Agent": "alpha.kurult.ai research (read-only)"}
 def now(): return datetime.datetime.now().astimezone()
@@ -26,9 +27,10 @@ save("charts", f"{BASE}/charts")
 save("addresses_page1_limit25", f"{BASE}/addresses?page=1&limit=25")
 save("pools", f"{BASE}/pools")
 tip = save("blocks_latest", f"{BASE}/blocks")["tipHeight"]
-# coinbase crawl: last 200 blocks ending at tip
+# coinbase crawl: last N blocks ending at tip
 t0 = now(); lines = []
-for h in range(tip - 199, tip + 1):
+start = tip - (N - 1)
+for h in range(start, tip + 1):
     u = f"{BASE}/block/{h}"; tb = now(); b = get(u)
     lines.append(json.dumps({"url": u, "fetched_et": tb.isoformat(), "body": b.decode()}))
     blk = json.loads(b)
@@ -37,8 +39,8 @@ for h in range(tip - 199, tip + 1):
     lines.append(json.dumps({"url": u2, "fetched_et": tt.isoformat(), "body": b2.decode()}))
     time.sleep(0.15)
 t1 = now()
-fn = f"coinbase_crawl_{tip-199}-{tip}_{t0.strftime('%Y%m%dT%H%M%S%z')}.jsonl"
+fn = f"coinbase_crawl_{start}-{tip}_{t0.strftime('%Y%m%dT%H%M%S%z')}.jsonl"
 data = ("\n".join(lines) + "\n").encode()
 open(os.path.join(OUT, fn), "wb").write(data)
-log.write(f"{t0.isoformat()}..{t1.isoformat()}\t{BASE}/block/<h> + /tx/<coinbase> for h={tip-199}..{tip}\t{fn}\t{len(data)}\t{hashlib.sha256(data).hexdigest()}\n")
+log.write(f"{t0.isoformat()}..{t1.isoformat()}\t{BASE}/block/<h> + /tx/<coinbase> for h={start}..{tip}\t{fn}\t{len(data)}\t{hashlib.sha256(data).hexdigest()}\n")
 print("done", tip, fn)
