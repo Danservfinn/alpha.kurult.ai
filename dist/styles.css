@@ -629,6 +629,30 @@ figure, table, pre { max-width: 100%; }
   .source-table li { padding-inline: .7rem; grid-template-columns: 2.2rem minmax(0, 1fr); }
 }
 
+/* Phone fold: key numbers sit under the call and above the position box.
+   Desktop source order (call, position, keys) is unchanged above 700px. */
+@media (max-width: 700px) {
+  .article-head { display: flex; flex-direction: column; min-width: 0; }
+  .article-head .callstrip { order: 1; margin-bottom: .3rem; }
+  .article-head .keystrip { order: 2; margin-bottom: .3rem; }
+  .article-head .position-box { order: 3; }
+  .article-head .article-title { order: 4; }
+  .article-head .article-lede { order: 5; }
+  .keystrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .keystrip div {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: .28rem;
+    padding: .12rem .28rem;
+  }
+  .keystrip dd { order: 1; font-size: .7rem; line-height: 1.1; }
+  .keystrip dt { order: 2; font-size: .52rem; line-height: 1.1; letter-spacing: .02em; overflow-wrap: anywhere; min-width: 0; }
+  .keystrip .key-note { display: none; }
+}
+
 @media print {
   body { background: #fff; color: #000; }
   body::before, .ticker, .fnkeys { display: none; }
