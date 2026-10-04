@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="792pt" height="460.8pt" viewBox="0 0 792 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-04T14:37:31.135605</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8 
+L 792 460.8 
+L 792 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 24.807273 148.528465 
+L 206.901818 148.528465 
+Q 210.403636 148.528465 210.403636 145.519415 
+L 210.403636 61.26602 
+Q 210.403636 58.25697 206.901818 58.25697 
+L 24.807273 58.25697 
+Q 21.305455 58.25697 21.305455 61.26602 
+L 21.305455 145.519415 
+Q 21.305455 148.528465 24.807273 148.528465 
+z
+" clip-path="url(#pa22930fee8)" style="fill: #d6e4f0; stroke: #333333; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 304.952727 148.528465 
+L 487.047273 148.528465 
+Q 490.549091 148.528465 490.549091 145.519415 
+L 490.549091 61.26602 
+Q 490.549091 58.25697 487.047273 58.25697 
+L 304.952727 58.25697 
+Q 301.450909 58.25697 301.450909 61.26602 
+L 301.450909 145.519415 
+Q 301.450909 148.528465 304.952727 148.528465 
+z
+" clip-path="url(#pa22930fee8)" style="fill: #d5f0dc; stroke: #333333; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 585.098182 148.528465 
+L 767.192727 148.528465 
+Q 770.694545 148.528465 770.694545 145.519415 
+L 770.694545 61.26602 
+Q 770.694545 58.25697 767.192727 58.25697 
+L 585.098182 58.25697 
+Q 581.596364 58.25697 581.596364 61.26602 
+L 581.596364 145.519415 
+Q 581.596364 148.528465 585.098182 148.528465 
+z
+" clip-path="url(#pa22930fee8)" style="fill: #fde7c6; stroke: #333333; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 304.952727 286.944757 
+L 487.047273 286.944757 
+Q 490.549091 286.944757 490.549091 283.935708 
+L 490.549091 199.682312 
+Q 490.549091 196.673262 487.047273 196.673262 
+L 304.952727 196.673262 
+Q 301.450909 196.673262 301.450909 199.682312 
+L 301.450909 283.935708 
+Q 301.450909 286.944757 304.952727 286.944757 
+z
+" clip-path="url(#pa22930fee8)" style="fill: #eeeeee; stroke: #333333; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 24.807273 286.944757 
+L 206.901818 286.944757 
+Q 210.403636 286.944757 210.403636 283.935708 
+L 210.403636 199.682312 
+Q 210.403636 196.673262 206.901818 196.673262 
+L 24.807273 196.673262 
+Q 21.305455 196.673262 21.305455 199.682312 
+L 21.305455 283.935708 
+Q 21.305455 286.944757 24.807273 286.944757 
+z
+" clip-path="url(#pa22930fee8)" style="fill: #f5d5d5; stroke: #333333; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 585.098182 286.944757 
+L 767.192727 286.944757 
+Q 770.694545 286.944757 770.694545 283.935708 
+L 770.694545 199.682312 
+Q 770.694545 196.673262 767.192727 196.673262 
+L 585.098182 196.673262 
+Q 581.596364 196.673262 581.596364 199.682312 
+L 581.596364 283.935708 
+Q 581.596364 286.944757 585.098182 286.944757 
+z
+" clip-path="url(#pa22930fee8)" style="fill: #f0f0d0; stroke: #333333; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 234.916364 407.306751 
+L 557.083636 407.306751 
+Q 560.585455 407.306751 560.585455 404.297701 
+L 560.585455 332.080505 
+Q 560.585455 329.071455 557.083636 329.071455 
+L 234.916364 329.071455 
+Q 231.414545 329.071455 231.414545 332.080505 
+L 231.414545 404.297701 
+Q 231.414545 407.306751 234.916364 407.306751 
+z
+" clip-path="url(#pa22930fee8)" style="fill: #e8e0f0; stroke: #333333; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(84.355795 91.067561)">SPACE segment</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(61.22267 100.669749)">Falcon 9 / Heavy (reusable)</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(70.38142 110.271936)">Dragon, Starship (dev)</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(54.00392 119.874124)">38 launches Q2 26, 28 internal</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(347.510625 91.067561)">CONNECTIVITY segment</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(332.93 100.669749)">Starlink: 12.0M subs, $66 ARPU</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(335.733125 110.271936)">Starshield (gov), Mobile (D2C)</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(327.376875 119.874124)">Q2 rev $4.29B, adj. EBITDA 60.5%</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(653.412955 91.067561)">AI segment</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(627.23358 100.669749)">xAI / Grok, X ads, Cursor</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(631.849205 110.271936)">Cloud leasing: 1.4 GW</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(617.370455 119.874124)">Q2 rev $2.56B, capex $15.8B</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(372.71375 229.483854)">CASH POOL</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(360.3025 239.086041)">OCF H1 26: $3.5B</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(345.151875 248.688229)">IPO ~$85.7B, notes $25B</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(329.10375 258.290416)">cash+securities $100.0B (Jun 30)</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(89.708295 229.484166)">Starship (V3)</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(70.833295 239.086354)">first orbit Sep 28 2026</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(60.50892 248.688541)">goal: full reuse, V3 Starlink,</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(61.592045 258.290729)">HLS Moon, orbital compute</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(654.63233 229.483854)">Customers</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(617.03608 239.086041)">Anthropic $1.25B/mo (90-day</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(611.420455 248.688229)">exit after ramp); Google (press);</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(635.899205 258.290416)">Grok / X subscribers</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(254.725 365.466447)">Equity holders: Musk 82.4% of votes; Class A float ~2.6B shares today</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(257.769375 375.068634)">+~2.75B unlockable by Dec 8 2026; ~6.4B Musk shares Jun 12 2027</text>
+   </g>
+   <g id="patch_9">
+    <path d="M 208.903651 103.392718 
+Q 255.927189 103.392718 301.609087 103.392718 
+" style="fill: none; stroke: #333333; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 297.609087 101.392718 
+L 301.609087 103.392718 
+L 297.609087 105.392718 
+" style="fill: none; stroke: #333333; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 7px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #333333" x="255.927273" y="96.170998" transform="rotate(-0 255.927273 96.170998)">launches satellites (capitalized)</text>
+   </g>
+   <g id="patch_10">
+    <path d="M 489.049106 103.392718 
+Q 536.072644 103.392718 581.754542 103.392718 
+" style="fill: none; stroke: #333333; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 577.754542 101.392718 
+L 581.754542 103.392718 
+L 577.754542 105.392718 
+" style="fill: none; stroke: #333333; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 7px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #333333" x="536.072727" y="96.170998" transform="rotate(-0 536.072727 96.170998)">spectrum, sats, cash</text>
+   </g>
+   <g id="patch_11">
+    <path d="M 396 147.519449 
+Q 396 172.599585 396 196.338081 
+" style="fill: none; stroke: #333333; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 398 192.338081 
+L 396 196.338081 
+L 394 192.338081 
+" style="fill: none; stroke: #333333; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 7px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #333333" x="396" y="165.379144" transform="rotate(-0 396 165.379144)">cash flow</text>
+   </g>
+   <g id="patch_12">
+    <path d="M 302.950894 241.80901 
+Q 255.927356 241.80901 210.245458 241.80901 
+" style="fill: none; stroke: #333333; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 214.245458 243.80901 
+L 210.245458 241.80901 
+L 214.245458 239.80901 
+" style="fill: none; stroke: #333333; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 7px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #333333" x="255.927273" y="234.58729" transform="rotate(-0 255.927273 234.58729)">R&amp;D ~$1.1B/qtr</text>
+   </g>
+   <g id="patch_13">
+    <path d="M 488.474589 240.407333 
+Q 536.07427 193.662698 582.716709 147.858109 
+" style="fill: none; stroke: #333333; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 578.461426 149.233815 
+L 582.716709 147.858109 
+L 581.264104 152.087759 
+" style="fill: none; stroke: #333333; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 7px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #333333" x="536.072727" y="186.442493" transform="rotate(-0 536.072727 186.442493)">capex</text>
+   </g>
+   <g id="patch_14">
+    <path d="M 676.145455 197.682279 
+Q 676.145455 172.602142 676.145455 148.863646 
+" style="fill: none; stroke: #333333; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 674.145455 152.863646 
+L 676.145455 148.863646 
+L 678.145455 152.863646 
+" style="fill: none; stroke: #333333; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 7px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #333333" x="676.145455" y="165.379144" transform="rotate(-0 676.145455 165.379144)">pays for compute</text>
+   </g>
+   <g id="patch_15">
+    <path d="M 115.854545 197.682279 
+Q 115.854545 172.602142 115.854545 148.863646 
+" style="fill: none; stroke: #333333; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 113.854545 152.863646 
+L 115.854545 148.863646 
+L 117.854545 152.863646 
+" style="fill: none; stroke: #333333; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 7px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #333333" x="115.854545" y="165.379144" transform="rotate(-0 115.854545 165.379144)">cheaper mass to orbit</text>
+   </g>
+   <g id="patch_16">
+    <path d="M 396 285.936843 
+Q 396 308.007449 396 328.736414 
+" style="fill: none; stroke: #333333; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 398 324.736414 
+L 396 328.736414 
+L 394 324.736414 
+" style="fill: none; stroke: #333333; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 7px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #333333" x="396" y="300.786387" transform="rotate(-0 396 300.786387)">dilution / supply</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle" x="396" y="19.157422" transform="rotate(-0 396 19.157422)">How SpaceX works: launch funds Starlink, Starlink cash plus IPO money funds AI compute and Starship</text>
+   </g>
+  </g>
+  <g id="text_17">
+   <text style="font-size: 6.3px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #555555" transform="translate(7.92 450.934277)">Source: SpaceX 424B4 (SEC acc. 0001628280-26-042639) and Q2 2026 8-K Ex. 99.1 (acc. 0001628280-26-052515), fetched 2026-10-02 19:09-19:10 ET; Starship orbit from @SpaceX status 2104653511883628569; lockups from 424B4; figures as</text>
+   <text style="font-size: 6.3px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #555555" transform="translate(7.92 458.496)">cited in the report. Research only, not financial advice.</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pa22930fee8">
+   <rect x="10.8" y="25.157422" width="770.4" height="397.194578"/>
+  </clipPath>
+ </defs>
+</svg>
