@@ -958,7 +958,6 @@ STYLES = """/* Terminal palette.
   --edge-soft: #1a2a55;
   --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", "DejaVu Sans Mono", monospace;
   --serif: Georgia, serif;
-  --measure: 72ch;
   --gutter: clamp(1rem, 3vw, 2rem);
 }
 
@@ -1398,7 +1397,7 @@ figure, table, pre { max-width: 100%; }
 }
 .prose td { color: var(--data); }
 .prose > * { margin-block: 0 1.1em; }
-.prose p, .prose li { color: var(--text); max-width: var(--measure); }
+.prose p, .prose li { color: var(--text); }
 .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
   color: var(--amber);
   font-weight: 700;
