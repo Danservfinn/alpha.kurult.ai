@@ -1508,6 +1508,7 @@ figure, table, pre { max-width: 100%; }
 .colophon-sep { color: var(--amber-dim); }
 .colophon { align-items: center; }
 .colophon a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; }
+.search-all a { display: flex; align-items: center; min-height: 44px; }
 
 /* Motion ------------------------------------------------------------------ */
 @keyframes rise {
