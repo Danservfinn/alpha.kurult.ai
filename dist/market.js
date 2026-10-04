@@ -107,8 +107,8 @@
   }
 
   function backOff(host) {
-    var prev = hostWait[host] || 30000;
-    var wait = Math.min(Math.max(prev * 2, 60000), 600000);
+    var prev = hostWait[host] || 7500;
+    var wait = Math.min(Math.max(prev * 2, 15000), 120000);
     hostWait[host] = wait;
     hostNext[host] = Date.now() + wait;
   }
@@ -208,7 +208,20 @@
     }
   }
 
-  async function getText(url) {
+  async function getJsonForce(url, timeout) {
+    // like getJson but ignores host backoff (used for chart centerpiece)
+    var ctrl = new AbortController();
+    var timer = setTimeout(function () { ctrl.abort(); }, timeout || 12000);
+    try {
+      var res = await fetch(url, { headers: { Accept: "application/json" }, signal: ctrl.signal });
+      if (!res.ok) throw new Error(String(res.status));
+      return await res.json();
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+    async function getText(url) {
     var host = hostOf(url);
     if (hostBlocked(host)) {
       var blocked = new Error("backoff");
@@ -279,10 +292,9 @@
   }
 
   function paintTicker(payload, stale) {
-    var ids = coinMap();
     var root = document.getElementById("ticker");
     if (!root || !payload) return;
-    Object.keys(ids).forEach(function (sym) {
+    Object.keys(IDS).forEach(function (sym) {
       var row = payload[sym];
       var node = root.querySelector('[data-symbol="' + sym + '"]');
       if (!node) return;
@@ -330,14 +342,12 @@
       return;
     }
     lastTicker = Date.now();
-    var ids = coinMap();
-    var idList = Object.keys(ids).map(function (sym) { return ids[sym]; }).join(",");
-    var url = CG + "/simple/price?ids=" + idList + "&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true";
+    var url = CG + "/simple/price?ids=bitcoin,ethereum,solana,pearl-2&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true";
     try {
       var data = await getJson(url);
       var payload = { as_of: Date.now() };
-      Object.keys(ids).forEach(function (sym) {
-        var row = data[ids[sym]];
+      Object.keys(IDS).forEach(function (sym) {
+        var row = data[IDS[sym]];
         if (!row || !Number.isFinite(row.usd)) {
           payload[sym] = { na: true };
           return;
@@ -352,7 +362,7 @@
       state.ticker = payload;
       save("alpha.ticker.v1", payload);
       paintTicker(payload, false);
-      var bits = Object.keys(ids).map(function (sym) {
+      var bits = Object.keys(IDS).map(function (sym) {
         var row = payload[sym];
         return row && !row.na ? sym + " " + fmtPx(row.price) : sym + " n/a";
       });
@@ -614,11 +624,23 @@
   function chartSaved(key) {
     var live = state.chart[key];
     if (live && live.series && live.series.length) return live;
+    var allCharts = load("alpha.charts.v1");
+    if (allCharts && allCharts[key] && allCharts[key].series && allCharts[key].series.length) {
+      return { at: allCharts[key].at, series: allCharts[key].series };
+    }
     var stored = load("alpha.chart.v1");
     if (stored && stored.key === key && stored.series && stored.series.length) {
       return { at: stored.at, series: stored.series };
     }
     return null;
+  }
+
+  var chartChain = Promise.resolve();
+  function queueChart(sym, tf, force) {
+    chartChain = chartChain.then(function () {
+      return pullChart(sym, tf, force).catch(function () {});
+    });
+    return chartChain;
   }
 
   async function pullChart(sym, tf, force) {
@@ -634,23 +656,37 @@
       if (held) {
         state.chart[key] = held;
         paintChart(sym, tf, held.series, true);
-      } else {
-        paintChart(sym, tf, [], true);
+        return;
       }
-      return;
+      // No cache for this key: try anyway; a blocked host is better than no chart.
     }
     try {
-      var data = await getJson(chartUrl(sym, tf));
+      var data;
+      try {
+        data = await getJson(chartUrl(sym, tf));
+      } catch (chartErr) {
+        if (chartErr && chartErr.limited && !force) {
+          data = await getJsonForce(chartUrl(sym, tf));
+        } else {
+          throw chartErr;
+        }
+      }
       var series = normalizeSeries(tf, data);
       if (!series.length) throw new Error("empty");
       state.chart[key] = { at: Date.now(), series: series };
-      save("alpha.chart.v1", { key: key, at: Date.now(), series: series });
+      var allCharts = load("alpha.charts.v1") || {};
+      allCharts[key] = { at: Date.now(), series: series };
+      try { localStorage.setItem("alpha.charts.v1", JSON.stringify(allCharts)); } catch (e) {}
       paintChart(sym, tf, series, false);
     } catch (err) {
       var saved = chartSaved(key);
       if (saved) {
         state.chart[key] = saved;
         paintChart(sym, tf, saved.series, true);
+      } else if (!force) {
+        // this chart never loaded (rate limit, blip): retry once after a pause
+        setTimeout(function () { pullChart(sym, tf, true); }, 15000);
+        paintChart(sym, tf, [], true);
       } else {
         paintChart(sym, tf, [], true);
       }
@@ -915,6 +951,7 @@
     if (document.getElementById("ticker")) pullTicker(false);
     if (document.getElementById("chips") && Date.now() - lastChips >= CHIPS_MS) pullChips();
     if (document.getElementById("markets-body") && Date.now() - lastMarkets >= MARKETS_MS) pullMarkets();
+    if (document.getElementById("chart-panel")) pullChart(selectedSymbol(), selectedTf(), false);
     if (document.getElementById("chain-panel") && Date.now() - lastChain >= CHAIN_MS) pullChain();
   }
 
@@ -929,12 +966,21 @@
     if (storedChart && storedChart.key && storedChart.series) {
       state.chart[storedChart.key] = { at: storedChart.at, series: storedChart.series };
     }
+    var allCharts = load("alpha.charts.v1");
+    if (allCharts) {
+      Object.keys(allCharts).forEach(function (k) {
+        if (allCharts[k] && allCharts[k].series && allCharts[k].series.length && !state.chart[k]) {
+          state.chart[k] = { at: allCharts[k].at, series: allCharts[k].series };
+        }
+      });
+    }
     state.chain = load("alpha.chain.v1");
     if (state.ticker) paintTicker(state.ticker, true);
     paintChips();
     paintMarkets();
     var chainPanel = document.getElementById("chain-panel");
     if (chainPanel && state.chain) paintChain(chainPanel.getAttribute("data-chain") || "all");
+    bindChart();
     document.addEventListener("visibilitychange", function () {
       if (document.hidden) {
         stopPolls();
@@ -947,77 +993,12 @@
     if (document.getElementById("ticker")) pullTicker(true);
     if (document.getElementById("chips")) pullChips();
     if (document.getElementById("markets-body")) setTimeout(pullMarkets, 1500);
+    if (document.getElementById("chart-panel")) {
+      setTimeout(function () { queueChart(selectedSymbol(), selectedTf(), false); }, 3000);
+    }
     if (document.getElementById("chain-panel")) pullChain();
     startPolls();
   }
-
-  function readSecurities() {
-    var node = document.getElementById("alpha-securities");
-    if (!node) return [];
-    try {
-      var data = JSON.parse(node.textContent);
-      return Array.isArray(data) ? data : [];
-    } catch (err) {
-      return [];
-    }
-  }
-
-  function coinMap() {
-    var map = {};
-    readSecurities().forEach(function (row) {
-      if (row && row.sym && row.cg && row.chart === "crypto") map[row.sym] = row.cg;
-    });
-    return Object.keys(map).length ? map : IDS;
-  }
-
-  window.AlphaDesk = {
-    getJson: getJson,
-    load: load,
-    save: save,
-    etDate: etDate,
-    etClock: etClock,
-    etStamp: etStamp,
-    hostBlocked: hostBlocked,
-    hostOf: hostOf,
-    fmtPx: fmtPx,
-    fmtPct: fmtPct,
-    fmtCompact: fmtCompact,
-    CG: CG,
-    CHART_TTL: CHART_TTL,
-    coinMap: coinMap,
-    securities: readSecurities
-  };
-
-  document.addEventListener("click", function (event) {
-    var link = event.target.closest("a[data-asset]");
-    if (!link) return;
-    var panel = document.getElementById("chart-panel");
-    if (!panel || panel.getAttribute("data-locked") === "true") return;
-    var sym = link.getAttribute("data-asset");
-    var row = readSecurities().filter(function (item) { return item.sym === sym; })[0];
-    if (!row || row.chart !== "crypto") return;
-    event.preventDefault();
-    window.dispatchEvent(new CustomEvent("alpha-asset", { detail: { symbol: sym } }));
-  });
-
-  window.addEventListener("alpha-asset", function (event) {
-    var sym = event.detail && event.detail.symbol;
-    if (!sym) return;
-    var row = readSecurities().filter(function (item) { return item.sym === sym; })[0];
-    var panel = document.getElementById("chain-panel");
-    if (panel && row && row.chain) {
-      panel.setAttribute("data-chain", row.chain);
-      pullChain();
-    }
-    document.querySelectorAll("[data-asset]").forEach(function (el) {
-      if (el.getAttribute("data-asset") === sym) el.setAttribute("aria-current", "true");
-      else el.removeAttribute("aria-current");
-    });
-    var ticks = document.querySelectorAll("#ticker [data-symbol]");
-    Array.prototype.forEach.call(ticks, function (el) {
-      el.classList.toggle("tick-on", el.getAttribute("data-symbol") === sym);
-    });
-  });
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
