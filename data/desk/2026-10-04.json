@@ -1,0 +1,118 @@
+{
+  "date": "2026-10-04",
+  "peers": [
+    {
+      "id": "pearl-2",
+      "label": "PRL",
+      "price": 1.032,
+      "market_cap": 345371148,
+      "volume": 2043594,
+      "vol_mc": 0.005917095309883847,
+      "change_24h": -3.43124
+    },
+    {
+      "id": "bittensor",
+      "label": "TAO",
+      "price": 302.56,
+      "market_cap": 3430831199,
+      "volume": 162191740,
+      "vol_mc": 0.047274765382591476,
+      "change_24h": 2.48606
+    },
+    {
+      "id": "render-token",
+      "label": "RENDER",
+      "price": 1.98,
+      "market_cap": 1028123465,
+      "volume": 42359675,
+      "vol_mc": 0.04120096120945941,
+      "change_24h": 0.25821
+    },
+    {
+      "id": "akash-network",
+      "label": "AKT",
+      "price": 0.789372,
+      "market_cap": 235573520,
+      "volume": 28406858,
+      "vol_mc": 0.12058595550128046,
+      "change_24h": 16.39874
+    },
+    {
+      "id": "zcash",
+      "label": "ZEC",
+      "price": 1332.83,
+      "market_cap": 22603501303,
+      "volume": 459132228,
+      "vol_mc": 0.020312438407011867,
+      "change_24h": 1.66065
+    },
+    {
+      "id": "bitcoin",
+      "label": "BTC",
+      "price": 85414,
+      "market_cap": 1716236883033,
+      "volume": 14544445825,
+      "vol_mc": 0.008474614412957082,
+      "change_24h": 0.75681
+    }
+  ],
+  "derivatives": {
+    "source": "lighter",
+    "market_id": 4097,
+    "symbol": "PRL",
+    "mark": 1.0488,
+    "index": 1.0436,
+    "basis": 0.004982752012265112,
+    "open_interest": 254509.81,
+    "last": 1.055,
+    "funding_rate": 0.00148,
+    "funding_exchange": "lighter"
+  },
+  "chain": {
+    "block_height": 123207,
+    "block_reward_pearl": 2282.6471893200905,
+    "network_hash_ps": 48721547576339190000,
+    "minted_pct": 15.929886622370649,
+    "hash_unit_note": "Difficulty-derived consensus estimate averaged over the stated window \u2014 not measured computation."
+  },
+  "github_tag": "pearl-wallet-v2.0.7",
+  "scorecard": [
+    {
+      "id": "fp8",
+      "text": "FP8 live on mainnet with measured end-to-end overhead of 3% or less",
+      "status": "uncheckable",
+      "detail": "no public series for this falsifier",
+      "due": "2026-12-01"
+    },
+    {
+      "id": "inference-30",
+      "text": "Within about 60 days, attestable data showing over 30% of hashrate doing paid inference",
+      "status": "uncheckable",
+      "detail": "no public series for this falsifier",
+      "due": "2026-12-01"
+    },
+    {
+      "id": "second-partner",
+      "text": "A second named production duplex partner",
+      "status": "uncheckable",
+      "detail": "no public series for this falsifier",
+      "due": "2026-12-01"
+    },
+    {
+      "id": "price-1.80",
+      "text": "PRL holding above $1.80 for five daily closes after a Hyperliquid listing",
+      "status": "pending",
+      "detail": "price 1.032 vs 1.8; 1/5 archived closes",
+      "due": "2026-12-01"
+    },
+    {
+      "id": "fees-1pct",
+      "text": "Fees above 1% of block rewards over 30 days",
+      "status": "uncheckable",
+      "detail": "no public series for this falsifier",
+      "due": "2026-11-01"
+    }
+  ],
+  "alerts": [],
+  "note": "MC/TVL and Token Terminal P/F are not in these free payloads. vol/MC is the comp column."
+}

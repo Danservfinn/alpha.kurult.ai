@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import datetime as dt
 import html
+import json
 import re
 import shutil
 import sys
@@ -118,6 +119,18 @@ def parse_frontmatter(block: str, name: str) -> dict:
             if value:
                 raise BuildError(f"{name}: keys must be a list")
             meta[key], i = parse_pair_list(lines, i + 1, name, ("label", "value", "note"), "keys")
+            continue
+        if key == "falsifiers":
+            if value:
+                raise BuildError(f"{name}: falsifiers must be a list")
+            meta[key], i = parse_pair_list(
+                lines, i + 1, name, ("id", "text", "metric", "op", "threshold", "window", "due"), "falsifiers"
+            )
+            continue
+        if key == "catalysts":
+            if value:
+                raise BuildError(f"{name}: catalysts must be a list")
+            meta[key], i = parse_pair_list(lines, i + 1, name, ("date", "text"), "catalysts")
             continue
         meta[key] = unquote(value)
         i += 1
@@ -427,6 +440,8 @@ class Article:
         self.call = opt_str(self.meta, "call", path.name)
         self.position = opt_str(self.meta, "position", path.name)
         self.keys = self.meta.get("keys") or []
+        self.falsifiers = self.meta.get("falsifiers") or []
+        self.catalysts = self.meta.get("catalysts") or []
         unlisted_raw = str(self.meta.get("unlisted", "")).strip().lower()
         self.unlisted = unlisted_raw in ("true", "1", "yes")
         check_images(body, path)
@@ -662,6 +677,71 @@ def render_sources(article: Article) -> str:
 </section>"""
 
 
+def render_desk(article: Article) -> str:
+    latest = ROOT / "data" / "desk" / "latest.json"
+    payload = {}
+    if latest.exists():
+        payload = json.loads(latest.read_text(encoding="utf-8"))
+    parts: list[str] = []
+    peers = payload.get("peers") or []
+    if peers:
+        rows = []
+        for peer in peers:
+            vol_mc = peer.get("vol_mc")
+            vol_s = f"{vol_mc:.3f}" if isinstance(vol_mc, float) else "n/a"
+            price = peer.get("price")
+            price_s = f"${price:,.4f}" if isinstance(price, (int, float)) and price < 10 else (
+                f"${price:,.2f}" if isinstance(price, (int, float)) else "n/a"
+            )
+            rows.append(f"<tr><td>{esc(peer.get('label') or '')}</td><td>{esc(price_s)}</td><td>{esc(vol_s)}</td></tr>")
+        parts.append(
+            "<section class=\"panel\"><div class=\"panel-head\"><span>Peer comp</span>"
+            f"<span class=\"data\">{esc(payload.get('date') or '')} vol/MC</span></div>"
+            "<table><thead><tr><th>Asset</th><th>Price</th><th>Vol/MC</th></tr></thead>"
+            f"<tbody>{''.join(rows)}</tbody></table>"
+            "<p class=\"key-note\">MC/TVL and Token Terminal P/F are not in the free payloads. Those columns stay blank.</p></section>"
+        )
+    deriv = payload.get("derivatives") or {}
+    if deriv:
+        basis = deriv.get("basis")
+        basis_s = f"{basis * 100:.2f}%" if isinstance(basis, float) else "n/a"
+        fund = deriv.get("funding_rate")
+        fund_s = "not in Lighter funding-rates for this market" if fund is None else str(fund)
+        parts.append(
+            "<section class=\"panel\"><div class=\"panel-head\"><span>Derivatives</span>"
+            f"<span class=\"data\">{esc(str(deriv.get('source') or ''))}</span></div>"
+            f"<p>PRL perp mark {esc(str(deriv.get('mark')))} index {esc(str(deriv.get('index')))} "
+            f"basis {esc(basis_s)} open interest {esc(str(deriv.get('open_interest')))}. "
+            f"Funding: {esc(fund_s)}.</p></section>"
+        )
+    if article.falsifiers:
+        bits = []
+        by_id = {item.get("id"): item for item in (payload.get("scorecard") or [])}
+        for item in article.falsifiers:
+            live = by_id.get(item.get("id")) or {}
+            status = live.get("status") or "unscored"
+            bits.append(
+                f"<li><strong>{esc(status)}</strong> {esc(item.get('text') or '')} "
+                f"<span class=\"key-note\">{esc(live.get('detail') or item.get('due') or '')}</span></li>"
+            )
+        parts.append(
+            "<section class=\"panel\"><div class=\"panel-head\"><span>Falsifier scorecard</span>"
+            "<span class=\"data\">holding until the date or the series exists</span></div>"
+            f"<ul>{''.join(bits)}</ul></section>"
+        )
+    if article.catalysts:
+        bits = []
+        for item in article.catalysts:
+            bits.append(f"<li>{esc(item.get('date') or 'undated')} {esc(item.get('text') or '')}</li>")
+        parts.append(
+            "<section class=\"panel\"><div class=\"panel-head\"><span>Catalysts</span></div>"
+            f"<ul>{''.join(bits)}</ul></section>"
+        )
+    if not parts:
+        return ""
+    return "\n".join(parts) + "\n"
+
+
 def render_tearsheet(article: Article) -> str:
     parts: list[str] = []
     if article.call:
@@ -702,7 +782,7 @@ def render_article(article: Article) -> str:
 {article.body_html}
   </div>
 </article>
-{mounts}{render_sources(article)}"""
+{render_desk(article)}{mounts}{render_sources(article)}"""
     return page(f"{article.title} | {SITE_NAME}", article.summary, article.path, body, "page-article", market_chrome=False)
 
 
