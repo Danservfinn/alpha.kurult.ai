@@ -9,7 +9,6 @@
   var CHAIN_MS = 60000;
   var CHART_TTL = 300000;
   var IDS = { BTC: "bitcoin", ETH: "ethereum", SOL: "solana", PRL: "pearl-2" };
-  var NAMES = { BTC: "Bitcoin", ETH: "Ether", SOL: "Solana", PRL: "Pearl" };
   var SKIP = {
     usdt: 1, usdc: 1, usds: 1, dai: 1, fdusd: 1, usde: 1, pyusd: 1, tusd: 1,
     usdd: 1, usd1: 1, wbtc: 1, weth: 1, steth: 1, wsteth: 1, weeth: 1, cbbtc: 1, wbt: 1
@@ -21,7 +20,7 @@
   var lastMarkets = 0;
   var lastChain = 0;
   var pollIds = [];
-  var state = { ticker: null, chips: {}, markets: null, chain: null, chart: {} };
+  var state = { ticker: null, chips: {}, markets: null, chain: null };
 
   function esc(value) {
     return String(value == null ? "" : value).replace(/[&<>"']/g, function (ch) {
@@ -221,7 +220,7 @@
     }
   }
 
-    async function getText(url) {
+  async function getText(url) {
     var host = hostOf(url);
     if (hostBlocked(host)) {
       var blocked = new Error("backoff");
@@ -292,9 +291,10 @@
   }
 
   function paintTicker(payload, stale) {
+    var ids = coinMap();
     var root = document.getElementById("ticker");
     if (!root || !payload) return;
-    Object.keys(IDS).forEach(function (sym) {
+    Object.keys(ids).forEach(function (sym) {
       var row = payload[sym];
       var node = root.querySelector('[data-symbol="' + sym + '"]');
       if (!node) return;
@@ -342,12 +342,14 @@
       return;
     }
     lastTicker = Date.now();
-    var url = CG + "/simple/price?ids=bitcoin,ethereum,solana,pearl-2&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true";
+    var ids = coinMap();
+    var idList = Object.keys(ids).map(function (sym) { return ids[sym]; }).join(",");
+    var url = CG + "/simple/price?ids=" + idList + "&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true";
     try {
       var data = await getJson(url);
       var payload = { as_of: Date.now() };
-      Object.keys(IDS).forEach(function (sym) {
-        var row = data[IDS[sym]];
+      Object.keys(ids).forEach(function (sym) {
+        var row = data[ids[sym]];
         if (!row || !Number.isFinite(row.usd)) {
           payload[sym] = { na: true };
           return;
@@ -362,7 +364,7 @@
       state.ticker = payload;
       save("alpha.ticker.v1", payload);
       paintTicker(payload, false);
-      var bits = Object.keys(IDS).map(function (sym) {
+      var bits = Object.keys(ids).map(function (sym) {
         var row = payload[sym];
         return row && !row.na ? sym + " " + fmtPx(row.price) : sym + " n/a";
       });
@@ -509,203 +511,13 @@
     paintMarkets();
   }
 
-  function chartUrl(sym, tf) {
-    var id = IDS[sym];
-    if (!id) return "";
-    if (tf === "4H") return CG + "/coins/" + id + "/ohlc?vs_currency=usd&days=14";
-    if (tf === "1D") return CG + "/coins/" + id + "/market_chart?vs_currency=usd&days=180";
-    return CG + "/coins/" + id + "/market_chart?vs_currency=usd&days=2";
-  }
-
-  function normalizeSeries(tf, data) {
-    if (tf === "4H" && Array.isArray(data)) {
-      return data.map(function (row) {
-        return { t: row[0], o: row[1], h: row[2], l: row[3], c: row[4] };
-      }).filter(function (row) {
-        return Number.isFinite(row.c);
-      });
-    }
-    var prices = data && data.prices;
-    if (!Array.isArray(prices)) return [];
-    return prices.map(function (row) {
-      return { t: row[0], c: row[1] };
-    }).filter(function (row) {
-      return Number.isFinite(row.c);
-    });
-  }
-
-  function svgChart(series, tf) {
-    if (!series.length) return '<p class="chart-empty">Chart unavailable.</p>';
-    var w = 640;
-    var h = 220;
-    var padL = 8;
-    var padR = 72;
-    var padT = 14;
-    var padB = 22;
-    var values = [];
-    series.forEach(function (row) {
-      values.push(row.h != null ? row.h : row.c);
-      values.push(row.l != null ? row.l : row.c);
-    });
-    var max = Math.max.apply(null, values);
-    var min = Math.min.apply(null, values);
-    var span = max - min || 1;
-    var innerW = w - padL - padR;
-    var innerH = h - padT - padB;
-    function y(price) {
-      return padT + ((max - price) / span) * innerH;
-    }
-    var parts = [];
-    if (series[0].o != null) {
-      var slot = innerW / series.length;
-      series.forEach(function (row, i) {
-        var x = padL + i * slot + slot / 2;
-        var up = row.c >= row.o;
-        var color = up ? "#39d441" : "#dc5d5e";
-        var top = y(Math.max(row.o, row.c));
-        var bot = y(Math.min(row.o, row.c));
-        var bw = Math.max(slot * 0.55, 1.2);
-        parts.push('<line x1="' + x.toFixed(1) + '" y1="' + y(row.h).toFixed(1) + '" x2="' + x.toFixed(1) + '" y2="' + y(row.l).toFixed(1) + '" stroke="' + color + '" stroke-width="1"/>');
-        parts.push('<rect x="' + (x - bw / 2).toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + Math.max(bot - top, 1).toFixed(1) + '" fill="' + color + '"/>');
-      });
-    } else {
-      var step = series.length > 1 ? innerW / (series.length - 1) : innerW;
-      var points = series.map(function (row, i) {
-        return (padL + i * step).toFixed(1) + "," + y(row.c).toFixed(1);
-      }).join(" ");
-      parts.push('<polyline fill="none" stroke="#f1bd59" stroke-width="1.6" points="' + points + '"/>');
-    }
-    var last = series[series.length - 1];
-    parts.push('<text x="' + (w - padR + 6) + '" y="' + Math.max(12, y(last.c)).toFixed(1) + '" fill="#ffffff" font-size="12" font-family="ui-monospace, monospace">' + esc(fmtPx(last.c)) + '</text>');
-    var label = tf === "4H" ? "4H aggregated OHLC" : tf + " aggregated price";
-    return '<svg class="chart-svg" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="' + esc(label) + '">' + parts.join("") + '</svg>';
-  }
-
-  function selectedSymbol() {
-    var panel = document.getElementById("chart-panel");
-    if (!panel) return "BTC";
-    var pressed = panel.querySelector('[data-symbol][aria-pressed="true"]');
-    return pressed ? pressed.getAttribute("data-symbol") : (panel.getAttribute("data-default") || "BTC");
-  }
-
-  function selectedTf() {
-    var panel = document.getElementById("chart-panel");
-    if (!panel) return "1D";
-    var pressed = panel.querySelector('[data-tf][aria-pressed="true"]');
-    return pressed ? pressed.getAttribute("data-tf") : "1D";
-  }
-
-  function paintChart(sym, tf, series, stale) {
-    var frame = document.getElementById("chart-frame");
-    var note = document.getElementById("chart-note");
-    var readout = document.getElementById("chart-readout");
-    var badge = document.getElementById("chart-badge");
-    if (!frame) return;
-    var kind = tf === "4H" ? "4-hour OHLC" : tf === "1D" ? "daily price" : "hourly price";
-    frame.innerHTML = svgChart(series, tf);
-    frame.setAttribute("aria-label", (NAMES[sym] || sym) + " " + kind);
-    if (note) {
-      note.textContent = (NAMES[sym] || sym) + " " + kind + ". Aggregated price, not one exchange." + (stale ? " Stale." : "");
-    }
-    if (badge) {
-      var last = series.length ? series[series.length - 1] : null;
-      var when = last ? etStamp(last.t) : "";
-      badge.textContent = stale ? ("stale" + (when ? " as of " + when : "")) : "aggregated";
-    }
-    if (readout && series.length) {
-      var row = series[series.length - 1];
-      var stamp = etDate(row.t) + " " + etClock(row.t);
-      readout.textContent = "Last " + fmtPx(row.c) + " at " + stamp + ". Data provided by CoinGecko." + (stale ? " Stale." : "");
-    } else if (readout) {
-      readout.textContent = "Chart unavailable.";
-    }
-  }
-
-  function chartSaved(key) {
-    var live = state.chart[key];
-    if (live && live.series && live.series.length) return live;
-    var allCharts = load("alpha.charts.v1");
-    if (allCharts && allCharts[key] && allCharts[key].series && allCharts[key].series.length) {
-      return { at: allCharts[key].at, series: allCharts[key].series };
-    }
-    var stored = load("alpha.chart.v1");
-    if (stored && stored.key === key && stored.series && stored.series.length) {
-      return { at: stored.at, series: stored.series };
-    }
-    return null;
-  }
-
+  // One CoinGecko chart pull at a time (the d8f4987 serialized queue).
+  // chart.js routes its market_chart and ohlc pulls through AlphaDesk.queueChart.
   var chartChain = Promise.resolve();
-  function queueChart(sym, tf, force) {
-    chartChain = chartChain.then(function () {
-      return pullChart(sym, tf, force).catch(function () {});
-    });
-    return chartChain;
-  }
-
-  async function pullChart(sym, tf, force) {
-    if (document.hidden || !document.getElementById("chart-panel")) return;
-    var key = sym + ":" + tf;
-    var cached = state.chart[key];
-    if (!force && cached && Date.now() - cached.at < CHART_TTL) {
-      paintChart(sym, tf, cached.series, false);
-      return;
-    }
-    if (hostBlocked(hostOf(CG))) {
-      var held = chartSaved(key);
-      if (held) {
-        state.chart[key] = held;
-        paintChart(sym, tf, held.series, true);
-        return;
-      }
-      // No cache for this key: try anyway; a blocked host is better than no chart.
-    }
-    try {
-      var data;
-      try {
-        data = await getJson(chartUrl(sym, tf));
-      } catch (chartErr) {
-        if (chartErr && chartErr.limited && !force) {
-          data = await getJsonForce(chartUrl(sym, tf));
-        } else {
-          throw chartErr;
-        }
-      }
-      var series = normalizeSeries(tf, data);
-      if (!series.length) throw new Error("empty");
-      state.chart[key] = { at: Date.now(), series: series };
-      var allCharts = load("alpha.charts.v1") || {};
-      allCharts[key] = { at: Date.now(), series: series };
-      try { localStorage.setItem("alpha.charts.v1", JSON.stringify(allCharts)); } catch (e) {}
-      paintChart(sym, tf, series, false);
-    } catch (err) {
-      var saved = chartSaved(key);
-      if (saved) {
-        state.chart[key] = saved;
-        paintChart(sym, tf, saved.series, true);
-      } else if (!force) {
-        // this chart never loaded (rate limit, blip): retry once after a pause
-        setTimeout(function () { pullChart(sym, tf, true); }, 15000);
-        paintChart(sym, tf, [], true);
-      } else {
-        paintChart(sym, tf, [], true);
-      }
-    }
-  }
-
-  function bindChart() {
-    var panel = document.getElementById("chart-panel");
-    if (!panel) return;
-    panel.addEventListener("click", function (event) {
-      var btn = event.target.closest("button");
-      if (!btn || !panel.contains(btn)) return;
-      var group = btn.parentElement;
-      if (!group) return;
-      Array.prototype.forEach.call(group.querySelectorAll("button"), function (peer) {
-        peer.setAttribute("aria-pressed", peer === btn ? "true" : "false");
-      });
-      pullChart(selectedSymbol(), selectedTf(), false);
-    });
+  function queueChart(task) {
+    var run = chartChain.then(task);
+    chartChain = run.catch(function () {});
+    return run;
   }
 
   function rowHtml(item) {
@@ -951,7 +763,6 @@
     if (document.getElementById("ticker")) pullTicker(false);
     if (document.getElementById("chips") && Date.now() - lastChips >= CHIPS_MS) pullChips();
     if (document.getElementById("markets-body") && Date.now() - lastMarkets >= MARKETS_MS) pullMarkets();
-    if (document.getElementById("chart-panel")) pullChart(selectedSymbol(), selectedTf(), false);
     if (document.getElementById("chain-panel") && Date.now() - lastChain >= CHAIN_MS) pullChain();
   }
 
@@ -962,25 +773,12 @@
     if (storedMarkets && storedMarkets.rows) {
       state.markets = { rows: storedMarkets.rows, stale: true, at: storedMarkets.at };
     }
-    var storedChart = load("alpha.chart.v1");
-    if (storedChart && storedChart.key && storedChart.series) {
-      state.chart[storedChart.key] = { at: storedChart.at, series: storedChart.series };
-    }
-    var allCharts = load("alpha.charts.v1");
-    if (allCharts) {
-      Object.keys(allCharts).forEach(function (k) {
-        if (allCharts[k] && allCharts[k].series && allCharts[k].series.length && !state.chart[k]) {
-          state.chart[k] = { at: allCharts[k].at, series: allCharts[k].series };
-        }
-      });
-    }
     state.chain = load("alpha.chain.v1");
     if (state.ticker) paintTicker(state.ticker, true);
     paintChips();
     paintMarkets();
     var chainPanel = document.getElementById("chain-panel");
     if (chainPanel && state.chain) paintChain(chainPanel.getAttribute("data-chain") || "all");
-    bindChart();
     document.addEventListener("visibilitychange", function () {
       if (document.hidden) {
         stopPolls();
@@ -993,12 +791,79 @@
     if (document.getElementById("ticker")) pullTicker(true);
     if (document.getElementById("chips")) pullChips();
     if (document.getElementById("markets-body")) setTimeout(pullMarkets, 1500);
-    if (document.getElementById("chart-panel")) {
-      setTimeout(function () { queueChart(selectedSymbol(), selectedTf(), false); }, 3000);
-    }
     if (document.getElementById("chain-panel")) pullChain();
     startPolls();
   }
+
+  function readSecurities() {
+    var node = document.getElementById("alpha-securities");
+    if (!node) return [];
+    try {
+      var data = JSON.parse(node.textContent);
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function coinMap() {
+    var map = {};
+    readSecurities().forEach(function (row) {
+      if (row && row.sym && row.cg && row.chart === "crypto") map[row.sym] = row.cg;
+    });
+    return Object.keys(map).length ? map : IDS;
+  }
+
+  window.AlphaDesk = {
+    getJson: getJson,
+    getJsonForce: getJsonForce,
+    queueChart: queueChart,
+    load: load,
+    save: save,
+    etDate: etDate,
+    etClock: etClock,
+    etStamp: etStamp,
+    hostBlocked: hostBlocked,
+    hostOf: hostOf,
+    fmtPx: fmtPx,
+    fmtPct: fmtPct,
+    fmtCompact: fmtCompact,
+    CG: CG,
+    CHART_TTL: CHART_TTL,
+    coinMap: coinMap,
+    securities: readSecurities
+  };
+
+  document.addEventListener("click", function (event) {
+    var link = event.target.closest("a[data-asset]");
+    if (!link) return;
+    var panel = document.getElementById("chart-panel");
+    if (!panel || panel.getAttribute("data-locked") === "true") return;
+    var sym = link.getAttribute("data-asset");
+    var row = readSecurities().filter(function (item) { return item.sym === sym; })[0];
+    if (!row || row.chart !== "crypto") return;
+    event.preventDefault();
+    window.dispatchEvent(new CustomEvent("alpha-asset", { detail: { symbol: sym } }));
+  });
+
+  window.addEventListener("alpha-asset", function (event) {
+    var sym = event.detail && event.detail.symbol;
+    if (!sym) return;
+    var row = readSecurities().filter(function (item) { return item.sym === sym; })[0];
+    var panel = document.getElementById("chain-panel");
+    if (panel && row && row.chain) {
+      panel.setAttribute("data-chain", row.chain);
+      pullChain();
+    }
+    document.querySelectorAll("[data-asset]").forEach(function (el) {
+      if (el.getAttribute("data-asset") === sym) el.setAttribute("aria-current", "true");
+      else el.removeAttribute("aria-current");
+    });
+    var ticks = document.querySelectorAll("#ticker [data-symbol]");
+    Array.prototype.forEach.call(ticks, function (el) {
+      el.classList.toggle("tick-on", el.getAttribute("data-symbol") === sym);
+    });
+  });
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();

@@ -64,7 +64,7 @@
       "vol_over_mc": 0.031119,
       "realized_vol_30d_ann": null,
       "issuance_yield": null,
-      "gap": "No 365-day archive. 30d vol not computed. days=1 file used for the last print only.",
+      "gap": "365-day history not available. 30d vol not computed. Last print only.",
       "credit": "Data provided by CoinGecko",
       "vol_label": "30d realized vol, annualized, computed by us from CoinGecko daily prices. Not advice.",
       "vol_mc_as_of": "2026-10-02 23:19 UTC"
@@ -77,7 +77,7 @@
       "vol_over_mc": 0.046262,
       "realized_vol_30d_ann": null,
       "issuance_yield": null,
-      "gap": "No 365-day archive. 30d vol not computed. days=1 file used for the last print only.",
+      "gap": "365-day history not available. 30d vol not computed. Last print only.",
       "credit": "Data provided by CoinGecko",
       "vol_label": "30d realized vol, annualized, computed by us from CoinGecko daily prices. Not advice.",
       "vol_mc_as_of": "2026-10-02 23:17 UTC"

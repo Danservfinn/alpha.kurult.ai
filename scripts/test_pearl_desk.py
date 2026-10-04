@@ -108,6 +108,62 @@ class PeerTests(unittest.TestCase):
         self.assertFalse(desk.DISPLAY_LIGHTER)
 
 
+class PeerFallbackTests(unittest.TestCase):
+    """CoinGecko raws are not committed. A rerun must keep the committed peer rows."""
+
+    def test_missing_raws_keep_committed_rows(self):
+        import pearl_nightly as nightly
+
+        committed = nightly.committed_peer_rows()
+        self.assertEqual(sorted(committed), sorted(t for t, _ in nightly.PEERS))
+        with tempfile.TemporaryDirectory() as tmp:
+            empty = Path(tmp)
+            for ticker, coin_id in nightly.PEERS:
+                row = nightly.peer_row_from_chart(ticker, coin_id, note_data=empty, committed=committed)
+                self.assertEqual(row, committed[ticker])
+                self.assertIsNotNone(row["price_usd"], ticker)
+            self.assertEqual(list(empty.rglob("*")), [], "fallback must not write raws")
+
+    def test_default_committed_rows_are_read_from_peers_json(self):
+        import pearl_nightly as nightly
+
+        with tempfile.TemporaryDirectory() as tmp:
+            row = nightly.peer_row_from_chart("BTC", "bitcoin", note_data=Path(tmp))
+        self.assertIsNotNone(row["price_usd"])
+        self.assertEqual(row["credit"], desk.CREDIT)
+
+    def test_no_raws_and_no_committed_row_is_labeled(self):
+        import pearl_nightly as nightly
+
+        with tempfile.TemporaryDirectory() as tmp:
+            row = nightly.peer_row_from_chart("ZEC", "zcash", note_data=Path(tmp), committed={})
+        self.assertIsNone(row["price_usd"])
+        self.assertEqual(row["gap"], "No CoinGecko price on hand.")
+
+    def test_gap_text_names_no_archive_or_file(self):
+        import pearl_nightly as nightly
+
+        peers = json.loads((nightly.DESK / "peers.json").read_text(encoding="utf-8"))
+        texts = [nightly.NO_HISTORY_GAP] + [r.get("gap") or "" for r in peers["rows"]]
+        for text in texts:
+            self.assertNotIn("archive", text.lower())
+            self.assertNotIn("file", text.lower())
+        self.assertEqual(sum(1 for r in peers["rows"] if r.get("gap") == nightly.NO_HISTORY_GAP), 2)
+
+
+class CronExcludeTests(unittest.TestCase):
+    def test_is_excluded_drafts_test(self):
+        import pearl_cron
+
+        self.assertTrue(pearl_cron.is_excluded("drafts/test"))
+        self.assertTrue(pearl_cron.is_excluded("drafts/test/2026-10-01-test-dated.md"))
+        self.assertTrue(pearl_cron.is_excluded("./drafts/test/x.md"))
+        self.assertTrue(pearl_cron.is_excluded("data/pearl-kpi/stamp/coingecko/pearl-2_coin.json"))
+        self.assertFalse(pearl_cron.is_excluded("drafts/2026-10-03-payee-50.md"))
+        self.assertFalse(pearl_cron.is_excluded("drafts/testing.md"))
+        self.assertFalse(pearl_cron.is_excluded("data/pearl-kpi/stamp/pearlchain/stats.json"))
+
+
 class SeriesTests(unittest.TestCase):
     def test_delta_is_versus_the_note_not_the_prior_print(self):
         one = [{"id": "2026-10-02-note", "kpis": {"price_usd": 1.11}}]

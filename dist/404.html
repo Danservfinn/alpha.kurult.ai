@@ -15,17 +15,29 @@
 <body class="page-404">
 <a class="skip" href="#main">Skip to content</a>
 <header class="masthead">
+  <input class="search-open" id="search-open" type="checkbox">
   <div class="sheet masthead-row">
     <a class="wordmark" href="/" aria-label="alpha.kurult.ai home">
       <img class="mark" src="/mark.svg" alt="" width="22" height="22">
       <span class="wordmark-text">alpha.kurult.ai</span>
     </a>
     <span class="kicker">Arghun, Crypto Analyst</span>
+    <label class="search-toggle" for="search-open">Search</label>
+    <select class="asset-jump" aria-label="Asset"><option value="">Asset</option><option value="/s/btc/">BTC</option><option value="/s/eth/">ETH</option><option value="/s/sol/">SOL</option><option value="/s/prl/">PRL</option><option value="/s/btc.d/">BTC.D</option><option value="/s/total/">TOTAL</option><option value="/s/eurusd/">EURUSD</option><option value="/s/ust2y/">UST2Y</option><option value="/s/ust10y/">UST10Y</option><option value="/s/sofr/">SOFR</option></select>
   </div>
+  <form class="sheet desk-search" role="search" action="/search/" method="get">
+    <label class="visually-hidden" for="q">Search notes and assets</label>
+    <input id="q" name="q" type="search" role="combobox" aria-expanded="false" aria-controls="search-list" aria-autocomplete="list" placeholder="Search notes and assets, e.g. pearl" autocomplete="off">
+    <button type="submit">Search</button>
+    <ul id="search-list" role="listbox" hidden></ul>
+    <p id="search-live" class="visually-hidden" aria-live="polite"></p>
+  </form>
 </header>
 <nav class="fnkeys" aria-label="Function keys">
   <div class="sheet fnkeys-row">
     <a class="fnkey" href="/">F1 LEDGER</a>
+    <a class="fnkey" href="/help/">HELP</a>
+    <nav class="asset-select seg" aria-label="Asset"><a class="seg-btn asset-link" href="/s/btc/" data-asset="BTC">BTC</a><a class="seg-btn asset-link" href="/s/eth/" data-asset="ETH">ETH</a><a class="seg-btn asset-link" href="/s/sol/" data-asset="SOL">SOL</a><a class="seg-btn asset-link" href="/s/prl/" data-asset="PRL">PRL</a><a class="seg-btn asset-link" href="/s/btc.d/" data-asset="BTC.D">BTC.D</a><a class="seg-btn asset-link" href="/s/total/" data-asset="TOTAL">TOTAL</a><a class="seg-btn asset-link" href="/s/eurusd/" data-asset="EURUSD">EURUSD</a><a class="seg-btn asset-link" href="/s/ust2y/" data-asset="UST2Y">UST2Y</a><a class="seg-btn asset-link" href="/s/ust10y/" data-asset="UST10Y">UST10Y</a><a class="seg-btn asset-link" href="/s/sofr/" data-asset="SOFR">SOFR</a></nav>
   </div>
 </nav>
 <div class="ticker" id="ticker" role="region" aria-label="Aggregated prices">
@@ -42,7 +54,7 @@
   <a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a>
   <span class="credit-note">Aggregated price, not one exchange. Not a quote. Updates at most once a minute.</span>
 </p>
-<div class="chips sheet" id="chips" role="list" aria-label="Macro readings"></div>
+<div class="chips sheet" id="chips" role="list" aria-label="Macro readings"><span class="chip" role="listitem" tabindex="0" title="Source: U.S. Treasury" data-chip="UST10Y"><span class="chip-id">UST10Y</span><span class="chip-px">…</span><span class="chip-asof">n/a</span></span><span class="chip" role="listitem" tabindex="0" title="Source: U.S. Treasury" data-chip="UST2Y"><span class="chip-id">UST2Y</span><span class="chip-px">…</span><span class="chip-asof">n/a</span></span><span class="chip" role="listitem" tabindex="0" title="Source: Federal Reserve Bank of New York" data-chip="SOFR"><span class="chip-id">SOFR</span><span class="chip-px">…</span><span class="chip-asof">n/a</span></span><span class="chip" role="listitem" tabindex="0" title="Source: ECB statistics" data-chip="EURUSD"><span class="chip-id">EURUSD</span><span class="chip-px">…</span><span class="chip-asof">n/a</span></span><span class="chip" role="listitem" tabindex="0" title="Source: CoinGecko" data-chip="BTC.D"><span class="chip-id">BTC.D</span><span class="chip-px">…</span><span class="chip-asof">n/a</span></span><span class="chip" role="listitem" tabindex="0" title="Source: CoinGecko" data-chip="TOTAL"><span class="chip-id">TOTAL</span><span class="chip-px">…</span><span class="chip-asof">n/a</span></span><span class="chip" role="listitem" tabindex="0" title="Source: alternative.me" data-chip="F&amp;G"><span class="chip-id">F&amp;G</span><span class="chip-px">…</span><span class="chip-asof">n/a</span></span></div>
 <ul class="src-list sheet">
   <li>UST10Y and UST2Y: <a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve" rel="noopener">U.S. Department of the Treasury</a>.</li>
   <li>SOFR: <a href="https://www.newyorkfed.org/markets/reference-rates/sofr" rel="noopener">Federal Reserve Bank of New York</a>. The SOFR data is subject to the Terms of Use posted at newyorkfed.org. The New York Fed is not responsible for publication of SOFR by alpha.kurult.ai, does not endorse this republication, and has no liability for your use.</li>
@@ -67,10 +79,17 @@
 <footer class="colophon sheet">
   <span>alpha.kurult.ai</span>
   <span class="colophon-sep" aria-hidden="true">|</span>
-  <span>No wallet. No comments. No analytics. No third-party scripts.</span>
-  <span class="colophon-sep" aria-hidden="true">|</span>
   <span class="colophon-credit"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a></span>
+  <span class="colophon-sep" aria-hidden="true">|</span>
+  <a href="/help/">Help</a>
+  <span class="colophon-sep" aria-hidden="true">|</span>
+  <a href="/help/#credits">Credits</a>
+  <span class="colophon-sep" aria-hidden="true">|</span>
+  <span>No wallet. No comments. No analytics. No third-party script host.</span>
 </footer>
+<script type="application/json" id="alpha-securities">[{"sym":"BTC","name":"Bitcoin","class":"Crypto","cg":"bitcoin","chart":"crypto","chain":"BTC","path":"/s/btc/"},{"sym":"ETH","name":"Ether","class":"Crypto","cg":"ethereum","chart":"crypto","chain":"ETH","path":"/s/eth/"},{"sym":"SOL","name":"Solana","class":"Crypto","cg":"solana","chart":"crypto","chain":"SOL","path":"/s/sol/"},{"sym":"PRL","name":"Pearl","class":"Crypto","cg":"pearl-2","chart":"crypto","chain":"PRL","path":"/s/prl/"},{"sym":"BTC.D","name":"Bitcoin dominance","class":"Index","cg":"","chart":"index","chain":"","path":"/s/btc.d/"},{"sym":"TOTAL","name":"Total crypto cap","class":"Index","cg":"","chart":"index","chain":"","path":"/s/total/"},{"sym":"EURUSD","name":"Euro reference rate","class":"Crncy","cg":"","chart":"rate","chain":"","path":"/s/eurusd/"},{"sym":"UST2Y","name":"Treasury par yield, 2 year","class":"Govt","cg":"","chart":"rate","chain":"","path":"/s/ust2y/"},{"sym":"UST10Y","name":"Treasury par yield, 10 year","class":"Govt","cg":"","chart":"rate","chain":"","path":"/s/ust10y/"},{"sym":"SOFR","name":"SOFR","class":"M-Mkt","cg":"","chart":"rate","chain":"","path":"/s/sofr/"}]</script>
+<script src="/desk-logic.js" defer></script>
+<script src="/search.js" defer></script>
 <script src="/market.js" defer></script>
 </body>
 </html>

@@ -10,13 +10,17 @@ Last line of output is BUILD_OK or BUILD_FAIL.
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
 import html
+import json
 import re
 import shutil
 import sys
 import traceback
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import desk_html
 from desk_panels import desk_sections
 
 # --------------------------------------------------------------------------- #
@@ -480,6 +484,7 @@ class Article:
         self.keys = self.meta.get("keys") or []
         unlisted_raw = str(self.meta.get("unlisted", "")).strip().lower()
         self.unlisted = unlisted_raw in ("true", "1", "yes")
+        self.body_text = body
         check_images(body, path)
         self.body_html = render_markdown(body, path.name)
         if not self.body_html.strip():
@@ -517,7 +522,28 @@ def time_tag(article: Article) -> str:
 
 
 ASSET_BY_SLUG = {"2026-10-02-pearl": "PRL"}
-HOME_SYMBOLS = ("BTC", "ETH", "SOL", "PRL")
+SECURITIES = [
+    {"sym": "BTC", "name": "Bitcoin", "class": "Crypto", "cg": "bitcoin", "chart": "crypto", "chain": "BTC", "credit": desk_html.CREDIT, "credit_url": desk_html.CREDIT_URL},
+    {"sym": "ETH", "name": "Ether", "class": "Crypto", "cg": "ethereum", "chart": "crypto", "chain": "ETH", "credit": desk_html.CREDIT, "credit_url": desk_html.CREDIT_URL},
+    {"sym": "SOL", "name": "Solana", "class": "Crypto", "cg": "solana", "chart": "crypto", "chain": "SOL", "credit": desk_html.CREDIT, "credit_url": desk_html.CREDIT_URL},
+    {"sym": "PRL", "name": "Pearl", "class": "Crypto", "cg": "pearl-2", "chart": "crypto", "chain": "PRL", "credit": desk_html.CREDIT, "credit_url": desk_html.CREDIT_URL},
+    {"sym": "BTC.D", "name": "Bitcoin dominance", "class": "Index", "cg": "", "chart": "index", "chain": "", "credit": desk_html.CREDIT, "credit_url": desk_html.CREDIT_URL},
+    {"sym": "TOTAL", "name": "Total crypto cap", "class": "Index", "cg": "", "chart": "index", "chain": "", "credit": desk_html.CREDIT, "credit_url": desk_html.CREDIT_URL},
+    {"sym": "EURUSD", "name": "Euro reference rate", "class": "Crncy", "cg": "", "chart": "rate", "chain": "", "credit": "Source: ECB statistics", "credit_url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"},
+    {"sym": "UST2Y", "name": "Treasury par yield, 2 year", "class": "Govt", "cg": "", "chart": "rate", "chain": "", "credit": "U.S. Department of the Treasury", "credit_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve"},
+    {"sym": "UST10Y", "name": "Treasury par yield, 10 year", "class": "Govt", "cg": "", "chart": "rate", "chain": "", "credit": "U.S. Department of the Treasury", "credit_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve"},
+    {"sym": "SOFR", "name": "SOFR", "class": "M-Mkt", "cg": "", "chart": "rate", "chain": "", "credit": "Federal Reserve Bank of New York. The SOFR data is subject to the Terms of Use posted at newyorkfed.org.", "credit_url": "https://www.newyorkfed.org/markets/reference-rates/sofr"},
+]
+HOME_SYMBOLS = tuple(row["sym"] for row in SECURITIES if row["chart"] == "crypto")
+VENDOR_SHA = "e21cc5caa0226ef30bd8549c50b9ef926615f2a4ee6b4e486353477a55f598cf"
+
+
+def security_by_sym(sym: str) -> dict | None:
+    want = sym.upper()
+    for row in SECURITIES:
+        if row["sym"] == want:
+            return row
+    return None
 
 
 def article_asset(article: Article) -> str | None:
@@ -525,6 +551,27 @@ def article_asset(article: Article) -> str | None:
     if re.fullmatch(r"[A-Z0-9]{2,8}", raw):
         return raw
     return ASSET_BY_SLUG.get(article.dir_name)
+
+
+def chip_placeholders() -> str:
+    """Reserve the macro row so market.js can fill values without moving the source list."""
+    rows = (
+        ("UST10Y", "Source: U.S. Treasury"),
+        ("UST2Y", "Source: U.S. Treasury"),
+        ("SOFR", "Source: Federal Reserve Bank of New York"),
+        ("EURUSD", "Source: ECB statistics"),
+        ("BTC.D", "Source: CoinGecko"),
+        ("TOTAL", "Source: CoinGecko"),
+        ("F&G", "Source: alternative.me"),
+    )
+    return "".join(
+        f'<span class="chip" role="listitem" tabindex="0" title="{esc(source)}" data-chip="{esc(cid)}">'
+        f'<span class="chip-id">{esc(cid)}</span>'
+        f'<span class="chip-px">…</span>'
+        f'<span class="chip-asof">n/a</span>'
+        f"</span>"
+        for cid, source in rows
+    )
 
 
 def ticker_html() -> str:
@@ -544,7 +591,7 @@ def ticker_html() -> str:
   <a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a>
   <span class="credit-note">Aggregated price, not one exchange. Not a quote. Updates at most once a minute.</span>
 </p>
-<div class="chips sheet" id="chips" role="list" aria-label="Macro readings"></div>
+<div class="chips sheet" id="chips" role="list" aria-label="Macro readings">{chip_placeholders()}</div>
 <ul class="src-list sheet">
   <li>UST10Y and UST2Y: <a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve" rel="noopener">U.S. Department of the Treasury</a>.</li>
   <li>SOFR: <a href="https://www.newyorkfed.org/markets/reference-rates/sofr" rel="noopener">Federal Reserve Bank of New York</a>. The SOFR data is subject to the Terms of Use posted at newyorkfed.org. The New York Fed is not responsible for publication of SOFR by alpha.kurult.ai, does not endorse this republication, and has no liability for your use.</li>
@@ -594,8 +641,44 @@ def chain_mount(scope: str) -> str:
 </section>"""
 
 
-def page(title: str, description: str, path: str, body: str, body_class: str, market_chrome: bool = True) -> str:
+def script_tags(market_chrome: bool, chart: bool, lazy_chart: bool) -> str:
+    tags = [
+        '<script src="/desk-logic.js" defer></script>',
+        '<script src="/search.js" defer></script>',
+    ]
+    if market_chrome:
+        tags.append('<script src="/market.js" defer></script>')
+    if chart and not lazy_chart:
+        tags.append('<script src="/vendor/lightweight-charts-5.2.1.js" defer></script>')
+    if chart:
+        tags.append('<script src="/chart.js" defer></script>')
+    return "\n".join(tags)
+
+
+def asset_jump(securities: list[dict]) -> str:
+    opts = ['<option value="">Asset</option>']
+    for row in securities:
+        opts.append(
+            '<option value="%s">%s</option>' % (esc(desk_html.sym_path(row["sym"])), esc(row["sym"]))
+        )
+    return '<select class="asset-jump" aria-label="Asset">%s</select>' % "".join(opts)
+
+
+def page(
+    title: str,
+    description: str,
+    path: str,
+    body: str,
+    body_class: str,
+    market_chrome: bool = True,
+    chart: bool = False,
+    lazy_chart: bool = False,
+) -> str:
     chrome = ticker_html() if market_chrome else ""
+    scripts = script_tags(market_chrome, chart, lazy_chart)
+    securities = desk_html.securities_payload(SECURITIES)
+    assets = desk_html.asset_links(SECURITIES)
+    jump = asset_jump(SECURITIES)
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -613,17 +696,29 @@ def page(title: str, description: str, path: str, body: str, body_class: str, ma
 <body class="{body_class}">
 <a class="skip" href="#main">Skip to content</a>
 <header class="masthead">
+  <input class="search-open" id="search-open" type="checkbox">
   <div class="sheet masthead-row">
     <a class="wordmark" href="/" aria-label="{esc(SITE_NAME)} home">
       <img class="mark" src="/mark.svg" alt="" width="22" height="22">
       <span class="wordmark-text">{esc(SITE_NAME)}</span>
     </a>
     <span class="kicker">{esc(SITE_KICKER)}</span>
+    <label class="search-toggle" for="search-open">Search</label>
+    {jump}
   </div>
+  <form class="sheet desk-search" role="search" action="/search/" method="get">
+    <label class="visually-hidden" for="q">Search notes and assets</label>
+    <input id="q" name="q" type="search" role="combobox" aria-expanded="false" aria-controls="search-list" aria-autocomplete="list" placeholder="Search notes and assets, e.g. pearl" autocomplete="off">
+    <button type="submit">Search</button>
+    <ul id="search-list" role="listbox" hidden></ul>
+    <p id="search-live" class="visually-hidden" aria-live="polite"></p>
+  </form>
 </header>
 <nav class="fnkeys" aria-label="Function keys">
   <div class="sheet fnkeys-row">
     <a class="fnkey" href="/">F1 LEDGER</a>
+    <a class="fnkey" href="/help/">HELP</a>
+    {assets}
   </div>
 </nav>
 {chrome}
@@ -636,11 +731,16 @@ def page(title: str, description: str, path: str, body: str, body_class: str, ma
 <footer class="colophon sheet">
   <span>{esc(SITE_NAME)}</span>
   <span class="colophon-sep" aria-hidden="true">|</span>
-  <span>No wallet. No comments. No analytics. No third-party scripts.</span>
+  <span class="colophon-credit"><a href="{desk_html.CREDIT_URL}" rel="noopener">{desk_html.CREDIT}</a></span>
   <span class="colophon-sep" aria-hidden="true">|</span>
-  <span class="colophon-credit"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a></span>
+  <a href="/help/">Help</a>
+  <span class="colophon-sep" aria-hidden="true">|</span>
+  <a href="/help/#credits">Credits</a>
+  <span class="colophon-sep" aria-hidden="true">|</span>
+  <span>No wallet. No comments. No analytics. No third-party script host.</span>
 </footer>
-<script src="/market.js" defer></script>
+<script type="application/json" id="alpha-securities">{securities}</script>
+{scripts}
 </body>
 </html>
 """
@@ -682,23 +782,25 @@ def render_index(articles: list[Article]) -> str:
         ledger_core = f'<ol class="ledger" reversed>\n{entries}\n  </ol>'
     else:
         ledger_core = '<p class="empty">No entries filed.</p>'
-    body = f"""{chart_mount(HOME_SYMBOLS, "BTC", False)}
-<div class="desk-split">
-{markets_mount()}
-{chain_mount("all")}
-</div>
-<section class="panel">
-  <div class="panel-head"><span>Alpha desk</span><span class="data">{esc(count)}</span></div>
-  <div class="panel-body">
-    <h1 class="command-title">{esc(SITE_NAME)}</h1>
-    <p class="command-lede">{esc(SITE_TAGLINE)}</p>
-  </div>
-</section>
-<section class="panel" aria-label="Article ledger">
-  <div class="panel-head"><span>Ledger</span><span class="data">{esc(count)}</span></div>
+    btc = security_by_sym("BTC")
+    chart = desk_html.chart_panel(btc, SECURITIES, locked=False, lazy=True, home=True) if btc else ""
+    body = f"""<div class="desk-grid">
+  <div class="desk-chart-slot">{chart}</div>
+  <div class="desk-markets">{markets_mount()}</div>
+  <div class="desk-chain">{chain_mount("all")}</div>
+  <section class="panel desk-intro">
+    <div class="panel-head"><span>Alpha desk</span><span class="data">{esc(count)}</span></div>
+    <div class="panel-body">
+      <h1 class="command-title">{esc(SITE_NAME)}</h1>
+      <p class="command-lede">{esc(SITE_TAGLINE)}</p>
+    </div>
+  </section>
+  <section class="panel desk-ledger" id="ledger" aria-label="Article ledger">
+    <div class="panel-head"><span>Ledger</span><span class="data">{esc(count)}</span></div>
 {ledger_core}
-</section>"""
-    return page(SITE_NAME, SITE_TAGLINE, "/", body, "page-index")
+  </section>
+</div>"""
+    return page(SITE_NAME, SITE_TAGLINE, "/", body, "page-index", chart=True, lazy_chart=True)
 
 
 def render_sources(article: Article) -> str:
@@ -742,22 +844,44 @@ def render_tearsheet(article: Article) -> str:
 
 def render_article(article: Article) -> str:
     asset = article_asset(article)
-    mounts = ""
-    if asset:
-        mounts = chart_mount((asset,), asset, True) + "\n" + chain_mount(asset) + "\n"
+    row = security_by_sym(asset) if asset else None
+    rail_bits = [render_tearsheet(article)]
+    chart = False
+    if row and row.get("chart") == "crypto":
+        rail_bits.append(desk_html.chart_panel(row, SECURITIES, locked=True, lazy=False, home=False))
+        rail_bits.append(chain_mount(asset or ""))
+        chart = True
+    elif asset:
+        rail_bits.append(chain_mount(asset))
+    rail = "\n".join(bit for bit in rail_bits if bit)
     panels = desk_sections(article.meta, ROOT)
-    body = f"""<article class="article panel">
-  <div class="panel-head"><span><a href="/">&laquo; Ledger</a></span><span class="data">{time_tag(article)}</span></div>
-  <header class="article-head">
-{render_tearsheet(article)}    <h1 class="article-title">{esc(article.title)}</h1>
-    <p class="article-lede">{esc(article.summary)}</p>
-  </header>
-  <div class="prose">
+    desk = f'\n  <div class="article-desk">\n{panels}\n  </div>' if panels else ""
+    body = f"""<div class="article-layout">
+  <aside class="article-rail">
+{rail}
+  </aside>
+  <article class="article panel">
+    <div class="panel-head"><span><a href="/">&laquo; Ledger</a></span><span class="data">{time_tag(article)}</span></div>
+    <header class="article-head">
+      <h1 class="article-title">{esc(article.title)}</h1>
+      <p class="article-lede">{esc(article.summary)}</p>
+    </header>
+    <div class="prose">
 {article.body_html}
-  </div>
-</article>
-{panels}{mounts}{render_sources(article)}"""
-    return page(f"{article.title} | {SITE_NAME}", article.summary, article.path, body, "page-article", market_chrome=False)
+    </div>
+  </article>{desk}
+</div>
+{render_sources(article)}"""
+    return page(
+        f"{article.title} | {SITE_NAME}",
+        article.summary,
+        article.path,
+        body,
+        "page-article",
+        market_chrome=False,
+        chart=chart,
+        lazy_chart=False,
+    )
 
 
 def render_404() -> str:
@@ -826,10 +950,13 @@ STYLES = """/* Terminal palette.
   --blue: #001060;
   --up: #39d441;
   --down: #dc5d5e;
+  --go: #39d441;
+  --stop: #c0132a;
+  --field: #f1bd59;
   --rule: #507098;
   --edge: #507098;
   --edge-soft: #1a2a55;
-  --mono: ui-monospace, monospace;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", "DejaVu Sans Mono", monospace;
   --serif: Georgia, serif;
   --measure: 72ch;
   --gutter: clamp(1rem, 3vw, 2rem);
@@ -882,7 +1009,7 @@ a:hover { background: var(--yellow); color: #000; text-decoration: none; }
 :focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
 .fnkey:focus-visible, .skip:focus-visible { outline-color: var(--yellow); }
 
-.sheet { width: 100%; max-width: 76rem; margin-inline: auto; padding-inline: var(--gutter); }
+.sheet { width: 100%; max-width: none; margin-inline: 0; padding-inline: var(--gutter); }
 
 .skip {
   position: absolute;
@@ -919,6 +1046,10 @@ a:hover { background: var(--yellow); color: #000; text-decoration: none; }
   letter-spacing: .04em;
   color: var(--amber);
   font-size: 1rem;
+  /* 44px tap target; the negative margin keeps the masthead height unchanged. */
+  min-height: 44px;
+  margin-block: -9px;
+  box-sizing: border-box;
 }
 .wordmark:hover { background: var(--yellow); color: #000; }
 .mark { width: 22px; height: 22px; display: block; flex: none; }
@@ -953,13 +1084,31 @@ a:hover { background: var(--yellow); color: #000; text-decoration: none; }
 /* Ticker bar -------------------------------------------------------------- */
 .ticker { border-block: 1px solid var(--edge); background: #000; overflow-x: clip; }
 .ticker-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .25rem 1.1rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Command chip is taller than a price. Three rows are reserved so a
+     fetched price cannot add a line and push the source list. */
+  grid-template-rows: 1.75rem 1.4rem 1.4rem;
+  gap: .15rem .55rem;
   padding-block: .5rem;
   font-size: .72rem;
-  letter-spacing: .10em;
+  letter-spacing: .02em;
   text-transform: uppercase;
+  align-items: center;
+  overflow: hidden;
+}
+.ticker-row .tick { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+@media (min-width: 900px) {
+  .ticker-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: .25rem 1.1rem;
+    letter-spacing: .10em;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .ticker-row::-webkit-scrollbar { display: none; }
+  .ticker-row .tick { overflow: visible; text-overflow: clip; min-width: auto; }
 }
 .tick { color: var(--data); white-space: nowrap; }
 .tick-sym { color: var(--amber); }
@@ -977,15 +1126,29 @@ a:hover { background: var(--yellow); color: #000; text-decoration: none; }
 .credit { margin: .45rem auto 0; font-size: .75rem; color: var(--text-dim); }
 .credit a { color: var(--amber); }
 .credit-note { display: block; margin-top: .15rem; }
-.chips { display: flex; flex-wrap: wrap; gap: .4rem; padding-block: .7rem .2rem; }
+.chips {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .4rem;
+  padding-block: .7rem .2rem;
+}
+@media (min-width: 900px) {
+  .chips { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+}
 .chip {
   display: grid;
   gap: .05rem;
-  min-width: 5.5rem;
+  min-width: 0;
+  min-height: 3.6rem;
   padding: .35rem .5rem;
   border: 1px solid var(--edge);
   background: #000;
   color: var(--text);
+}
+.chip-id, .chip-px, .chip-asof {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .chip-id { color: var(--amber); font-size: .68rem; letter-spacing: .08em; }
 .chip-px { font-size: .84rem; }
@@ -1029,7 +1192,7 @@ a:hover { background: var(--yellow); color: #000; text-decoration: none; }
   cursor: pointer;
 }
 .seg-btn[aria-pressed="true"] { color: #000; background: var(--amber); border-color: var(--amber); }
-.seg-btn:disabled { opacity: 1; color: #000; background: var(--amber); }
+.seg-btn:disabled, .seg-btn.is-blocked { opacity: 1; color: var(--amber); background: #000; border-style: dashed; cursor: not-allowed; }
 .seg-btn:focus-visible, .chip:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
 .chart-note, .chart-readout, .src-foot, .breadth, .macro-line {
   color: var(--text-dim);
@@ -1079,6 +1242,9 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; grid-t
   color: var(--amber);
 }
 .panel-head a { color: var(--amber); text-decoration: none; }
+/* 44px tap target for head links such as the Ledger breadcrumb; the negative
+   margin keeps the head height, so the phone fold does not move. */
+.panel-head a { display: inline-flex; align-items: center; min-height: 44px; margin-block: -16px; vertical-align: middle; }
 .panel-head a:hover { background: var(--yellow); color: #000; }
 .panel-head .data, .panel-head time { color: var(--data); letter-spacing: .06em; text-transform: none; }
 .panel-body { padding: 1.1rem 1.15rem 1.25rem; min-width: 0; }
@@ -1340,6 +1506,8 @@ figure, table, pre { max-width: 100%; }
   gap: .5rem .8rem;
 }
 .colophon-sep { color: var(--amber-dim); }
+.colophon { align-items: center; }
+.colophon a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; }
 
 /* Motion ------------------------------------------------------------------ */
 @keyframes rise {
@@ -1446,6 +1614,126 @@ figure, table, pre { max-width: 100%; }
   a { color: #000; background: none; }
   .source-url { display: block; color: #000; }
 }
+
+/* Full-width desk grid. Mobile stays one column. */
+.desk-grid, .asset-layout, .article-layout { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
+.desk-chart-slot, .desk-markets, .desk-chain, .desk-intro, .desk-ledger, .asset-main, .asset-rail, .article-rail, .article, .article-desk { min-width: 0; }
+.chart-plot { height: 28rem; width: 100%; max-width: 100%; touch-action: pan-y; }
+.chart-plot canvas, .chart-plot table, .chart-plot * { touch-action: pan-y !important; }
+.chart-toolbar, .seg, .fnkeys-row, .desk-search { max-width: 100%; }
+.chart-toolbar .seg-btn, .asset-link, .desk-search input, .desk-search button, .fnkey, .search-toggle, .asset-jump { min-height: 44px; min-width: 44px; }
+.desk-search { display: flex; flex-wrap: wrap; gap: .4rem; padding-block: .45rem; align-items: center; }
+.desk-search input { flex: 1 1 12rem; font: inherit; background: #000; color: var(--data); border: 1px solid var(--field); padding: .35rem .55rem; }
+.desk-search input:focus { background: var(--field); color: #000; }
+.desk-search button { font: inherit; background: var(--go); color: #000; border: 1px solid #000; padding: .35rem .7rem; cursor: pointer; }
+.search-list, #search-list { list-style: none; margin: 0; padding: 0; width: 100%; background: #000; border: 1px solid var(--edge); }
+.search-list [role="option"], #search-list [role="option"] { padding: .45rem .55rem; cursor: pointer; }
+.search-group { color: var(--amber); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; padding: .35rem .55rem; }
+.chart-legend, .chart-last, .tick, .chip, .mkt { font-variant-numeric: tabular-nums; }
+.chart-legend { color: var(--data); min-height: 2.4rem; }
+.chart-volume-label, .range-block, .crumbs { color: var(--amber); font-size: .75rem; }
+.crumbs a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; padding-inline: .35rem; }
+.chart-head { color: var(--data); margin: 0 0 .4rem; }
+.chart-name, .chart-ticker { color: var(--amber); }
+.compare-row { border: 1px solid var(--edge-soft); padding: .45rem; margin: 0 0 .45rem; }
+.tick-on { outline: 1px solid var(--amber); }
+@media (max-width: 40rem) { .chart-plot { height: 18rem; } }
+@media (min-width: 48rem) {
+  .desk-grid, .asset-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .desk-chart-slot, .desk-intro, .desk-ledger { grid-column: 1 / -1; }
+  .ledger { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .article-layout { grid-template-columns: minmax(0, 1fr) minmax(16rem, 24rem); align-items: start; }
+  .article { grid-column: 1; grid-row: 1; }
+  .article-rail { grid-column: 2; grid-row: 1 / span 2; }
+  .article-desk { grid-column: 1; grid-row: 2; }
+}
+@media (min-width: 90rem) {
+  .desk-grid, .asset-layout { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .desk-chart-slot { grid-column: span 2; }
+  .desk-intro, .desk-ledger { grid-column: 1 / -1; }
+  .ledger { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .asset-main { grid-column: span 1; grid-row: 1; }
+  .asset-rail { grid-column: span 3; grid-row: 1; }
+  .article-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(18rem, 26rem); }
+  .article { grid-column: 1 / span 2; grid-row: 1; }
+  .article-rail { grid-column: 3; grid-row: 1 / span 2; }
+  .article-desk { grid-column: 1 / span 2; grid-row: 2; }
+}
+@media (max-width: 700px) {
+  .article-layout { gap: 0; }
+  .article-rail { display: contents; }
+  .article { display: contents; }
+  .article > .panel-head { order: 0; margin-inline: 1px; }
+  .article-layout .callstrip { order: 1; }
+  .article-layout .keystrip { order: 2; }
+  .article-layout .position-box { order: 3; }
+  .article-head { order: 4; }
+  .prose { order: 5; }
+  .article-desk { order: 6; }
+  .article-layout .desk-chart, .article-layout #chain-panel { order: 7; }
+  .page-article .callstrip,
+  .page-article .keystrip,
+  .page-article .position-box { margin-inline: calc(.9rem + 1px); }
+  .page-article .callstrip { margin-top: .3rem; }
+}
+.search-open {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+.search-toggle, .asset-jump { display: none; }
+.fnkey {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+.search-list [role="option"], #search-list [role="option"] { min-height: 44px; display: flex; align-items: center; }
+@media (max-width: 700px) {
+  .masthead { min-height: 77px; box-sizing: border-box; }
+  .masthead-row {
+    flex-direction: row;
+    align-items: center;
+    gap: .4rem;
+    padding-block: .4rem;
+  }
+  .kicker { display: none; }
+  .wordmark { min-width: 0; flex: 1 1 auto; }
+  .wordmark-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .search-toggle, .asset-jump { display: inline-flex; }
+  .search-toggle {
+    background: var(--key);
+    color: #000;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    border: 1px solid #000;
+    padding: 0 .55rem;
+    cursor: pointer;
+  }
+  .asset-jump {
+    font: inherit;
+    background: #000;
+    color: var(--data);
+    border: 1px solid var(--field);
+    max-width: 7.5rem;
+  }
+  .fnkeys { display: block; height: 47px; overflow: hidden; }
+  .fnkeys-row { flex-wrap: nowrap; padding-block: 1px; align-items: center; }
+  .fnkeys .asset-select { display: none; }
+  .fnkey { height: 44px; }
+  .desk-search { display: none; }
+  .search-open:checked ~ .desk-search { display: flex; }
+  .search-open:focus-visible + .masthead-row .search-toggle {
+    outline: 2px solid var(--yellow);
+    outline-offset: 2px;
+  }
+}
 """
 
 # --------------------------------------------------------------------------- #
@@ -1468,7 +1756,7 @@ def render_llms(articles: list[Article]) -> str:
         "",
         DISCLAIMER,
         "",
-        "One first-party script draws market panels from public sources. No third-party script host. No wallet. No comments. No analytics.",
+        "First-party scripts only. No third-party script host. No wallet. No comments. No analytics.",
         "",
         "## Articles",
         "",
@@ -1485,7 +1773,8 @@ def render_sitemap(articles: list[Article]) -> str:
         return f"  <url>\n    <loc>{esc(loc)}</loc>\n    <lastmod>{lastmod}</lastmod>\n  </url>"
 
     newest = articles[0].date.isoformat() if articles else dt.date.today().isoformat()
-    entries = [url(SITE_URL + "/", newest)]
+    entries = [url(SITE_URL + "/", newest), url(SITE_URL + "/help/", newest), url(SITE_URL + "/search/", newest)]
+    entries += [url(SITE_URL + desk_html.sym_path(row["sym"]), newest) for row in SECURITIES]
     entries += [url(a.url, a.date.isoformat()) for a in articles]
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -1501,9 +1790,22 @@ def render_sitemap(articles: list[Article]) -> str:
 
 
 def write(path: Path, content: str) -> None:
+    if "\u2014" in content:
+        raise BuildError(f"em dash in {path}")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
     print(f"  wrote {path.relative_to(ROOT)}")
+
+
+def copy_shipped(src: Path, dest: Path) -> None:
+    if not src.is_file():
+        raise BuildError(f"missing {src}")
+    text = src.read_bytes()
+    if b"\xe2\x80\x94" in text and src.suffix in {".js", ".css", ".html", ".py"}:
+        raise BuildError(f"em dash in {src}")
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(src, dest)
+    print(f"  copied {dest.relative_to(ROOT)}")
 
 
 def reset_dist() -> None:
@@ -1528,13 +1830,43 @@ def build() -> None:
     # Grading notes and alert drafts stay in drafts/. They are not deploy pages.
     # payee-50 is internal. It is not rendered on the public panel.
     # robots Disallow is not a publish gate.
+    notice_path = ROOT / "static" / "vendor" / "NOTICE-lightweight-charts"
+    if not notice_path.is_file():
+        raise BuildError("missing chart library NOTICE")
+    notice = notice_path.read_text(encoding="utf-8")
+    write(DIST / "help" / "index.html", page("Help | " + SITE_NAME, "Codes, sources, and credits.", "/help/", desk_html.render_help(notice), "page-help", market_chrome=False))
+    index = desk_html.search_index(listed, SECURITIES)
+    write(DIST / "search" / "index.html", page("Search | " + SITE_NAME, "Search notes and assets.", "/search/", desk_html.render_search_page(index), "page-search"))
+    write(DIST / "search.json", json.dumps(index, indent=2) + "\n")
+    for row in SECURITIES:
+        chain = chain_mount(row["chain"]) if row.get("chain") else ""
+        asset_body = desk_html.render_asset_body(row, listed, SECURITIES, chain)
+        has_chart = row.get("chart") == "crypto"
+        write(
+            DIST / "s" / row["sym"].lower() / "index.html",
+            page(
+                f"{row['sym']} | {SITE_NAME}",
+                f"{row['name']}. {row['credit']}",
+                desk_html.sym_path(row["sym"]),
+                asset_body,
+                "page-asset",
+                chart=has_chart,
+            ),
+        )
     write(DIST / "404.html", render_404())
     write(DIST / "styles.css", STYLES)
-    market_js = ROOT / "static" / "market.js"
-    if not market_js.is_file():
-        raise BuildError("missing static/market.js")
-    shutil.copyfile(market_js, DIST / "market.js")
-    print("  copied market.js")
+    for name in ("market.js", "desk-logic.js", "search.js", "chart.js"):
+        copy_shipped(ROOT / "static" / name, DIST / name)
+    vendor_src = ROOT / "static" / "vendor" / "lightweight-charts-5.2.1.js"
+    vendor_sha = hashlib.sha256(vendor_src.read_bytes()).hexdigest()
+    publish = (ROOT / "PUBLISH.md").read_text(encoding="utf-8")
+    if vendor_sha != VENDOR_SHA or vendor_sha not in publish:
+        raise BuildError(f"chart library sha mismatch: {vendor_sha}")
+    vendor_dest = DIST / "vendor"
+    vendor_dest.mkdir(parents=True)
+    copy_shipped(vendor_src, vendor_dest / "lightweight-charts-5.2.1.js")
+    copy_shipped(ROOT / "static" / "vendor" / "LICENSE-lightweight-charts", vendor_dest / "LICENSE-lightweight-charts")
+    copy_shipped(notice_path, vendor_dest / "NOTICE-lightweight-charts")
     write(DIST / "robots.txt", render_robots())
     write(DIST / "llms.txt", render_llms(listed))
     write(DIST / "sitemap.xml", render_sitemap(listed))

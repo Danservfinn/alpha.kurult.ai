@@ -44,4 +44,13 @@ After Temujin approves the live cutover, and only then: deploy the production br
 
 ## What this host is not
 
-No analytics. No wallet connect. No comments. No production `.env`. One first-party script, `/market.js`, draws the market panels. No third-party script host. Pages Functions in `functions/` cache the Treasury yield XML and the chain RPC calls. They are not copied into `dist/`.
+No analytics. No wallet connect. No comments. No production `.env`. First-party scripts only, served from this host. No third-party script host. Pages Functions in `functions/` cache the Treasury yield XML and the chain RPC calls. They are not copied into `dist/`.
+
+## Chart library
+
+`lightweight-charts` 5.2.1 standalone production build.
+sha256: e21cc5caa0226ef30bd8549c50b9ef926615f2a4ee6b4e486353477a55f598cf
+Path: `static/vendor/lightweight-charts-5.2.1.js`
+License: Apache-2.0, file `static/vendor/LICENSE-lightweight-charts`.
+Notice: `static/vendor/NOTICE-lightweight-charts`.
+The builder rejects a sha mismatch.

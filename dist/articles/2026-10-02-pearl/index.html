@@ -15,17 +15,29 @@
 <body class="page-article">
 <a class="skip" href="#main">Skip to content</a>
 <header class="masthead">
+  <input class="search-open" id="search-open" type="checkbox">
   <div class="sheet masthead-row">
     <a class="wordmark" href="/" aria-label="alpha.kurult.ai home">
       <img class="mark" src="/mark.svg" alt="" width="22" height="22">
       <span class="wordmark-text">alpha.kurult.ai</span>
     </a>
     <span class="kicker">Arghun, Crypto Analyst</span>
+    <label class="search-toggle" for="search-open">Search</label>
+    <select class="asset-jump" aria-label="Asset"><option value="">Asset</option><option value="/s/btc/">BTC</option><option value="/s/eth/">ETH</option><option value="/s/sol/">SOL</option><option value="/s/prl/">PRL</option><option value="/s/btc.d/">BTC.D</option><option value="/s/total/">TOTAL</option><option value="/s/eurusd/">EURUSD</option><option value="/s/ust2y/">UST2Y</option><option value="/s/ust10y/">UST10Y</option><option value="/s/sofr/">SOFR</option></select>
   </div>
+  <form class="sheet desk-search" role="search" action="/search/" method="get">
+    <label class="visually-hidden" for="q">Search notes and assets</label>
+    <input id="q" name="q" type="search" role="combobox" aria-expanded="false" aria-controls="search-list" aria-autocomplete="list" placeholder="Search notes and assets, e.g. pearl" autocomplete="off">
+    <button type="submit">Search</button>
+    <ul id="search-list" role="listbox" hidden></ul>
+    <p id="search-live" class="visually-hidden" aria-live="polite"></p>
+  </form>
 </header>
 <nav class="fnkeys" aria-label="Function keys">
   <div class="sheet fnkeys-row">
     <a class="fnkey" href="/">F1 LEDGER</a>
+    <a class="fnkey" href="/help/">HELP</a>
+    <nav class="asset-select seg" aria-label="Asset"><a class="seg-btn asset-link" href="/s/btc/" data-asset="BTC">BTC</a><a class="seg-btn asset-link" href="/s/eth/" data-asset="ETH">ETH</a><a class="seg-btn asset-link" href="/s/sol/" data-asset="SOL">SOL</a><a class="seg-btn asset-link" href="/s/prl/" data-asset="PRL">PRL</a><a class="seg-btn asset-link" href="/s/btc.d/" data-asset="BTC.D">BTC.D</a><a class="seg-btn asset-link" href="/s/total/" data-asset="TOTAL">TOTAL</a><a class="seg-btn asset-link" href="/s/eurusd/" data-asset="EURUSD">EURUSD</a><a class="seg-btn asset-link" href="/s/ust2y/" data-asset="UST2Y">UST2Y</a><a class="seg-btn asset-link" href="/s/ust10y/" data-asset="UST10Y">UST10Y</a><a class="seg-btn asset-link" href="/s/sofr/" data-asset="SOFR">SOFR</a></nav>
   </div>
 </nav>
 
@@ -33,16 +45,51 @@
   <div class="sheet"><span class="notice-mark" aria-hidden="true">!</span>Research only. Not financial advice. Nothing on this site is an offer to buy, sell, or hold any asset. No wallet. No comments.</div>
 </aside>
 <main id="main" class="sheet">
-<article class="article panel">
-  <div class="panel-head"><span><a href="/">&laquo; Ledger</a></span><span class="data"><time datetime="2026-10-02">02 Oct 2026</time></span></div>
-  <header class="article-head">
+<div class="article-layout">
+  <aside class="article-rail">
   <p class="callstrip"><strong>PRL.</strong> Our research view at about $1.11 is avoid an outright long (medium conviction).</p>
   <p class="position-box">Research only. Not financial advice. Bullish falsifiers: FP8 live on mainnet with measured end-to-end overhead of 3% or less, and within about 60 days attestable data showing over 30% of hashrate doing paid inference. A second named production duplex partner. PRL holding above $1.80 for five daily closes after a Hyperliquid listing. Fees above 1% of block rewards over 30 days.</p>
   <dl class="keystrip"><div><dt>Price</dt><dd>$1.11</dd></div><div><dt>From Sep 28 high</dt><dd>-28%</dd></div><div><dt>Top payout address</dt><dd>52.5%</dd></div><div><dt>Top 10 / 100 holders</dt><dd>15.2% / 43.8%</dd></div><div><dt>Supply +3m / +12m</dt><dd>+27% / +92%</dd></div><div><dt>Oct 1 issuance</dt><dd>1.07M PRL</dd></div></dl>
-    <h1 class="article-title">Pearl (PRL): real proof-of-useful-work tech, a token priced ahead of its usage</h1>
-    <p class="article-lede">Deep dive on Pearl, the matrix-multiplication proof-of-work chain: on-chain data, holder and pool concentration, emissions, liquidity, the hype cycle on X, and bear/base/bull scenarios. Research only.</p>
-  </header>
-  <div class="prose">
+
+<section class="panel desk-chart" id="chart-panel" data-symbol="PRL" data-cg="pearl-2" data-name="Pearl" data-lazy="false" data-locked="true" data-home="false" aria-labelledby="chart-heading">
+  <div class="panel-head"><span id="chart-heading">Chart</span><span class="badge" id="chart-badge">aggregated</span></div>
+  <div class="panel-body">
+    <p class="chart-head"><span class="chart-name">Pearl</span> <span class="chart-ticker">PRL</span> <span class="chart-last">…</span> <span class="chart-asof"></span></p>
+    <div class="chart-toolbar">
+      <div class="seg" role="group" aria-label="Range"><button type="button" class="seg-btn" data-range="1D" aria-pressed="false">1D</button><button type="button" class="seg-btn" data-range="5D" aria-pressed="false">5D</button><button type="button" class="seg-btn" data-range="1M" aria-pressed="false">1M</button><button type="button" class="seg-btn" data-range="3M" aria-pressed="false">3M</button><button type="button" class="seg-btn" data-range="6M" aria-pressed="false">6M</button><button type="button" class="seg-btn" data-range="YTD" aria-pressed="false">YTD</button><button type="button" class="seg-btn" data-range="1Y" aria-pressed="true">1Y</button><button type="button" class="seg-btn is-blocked" data-range="5Y" disabled aria-describedby="range-block">5Y</button><button type="button" class="seg-btn is-blocked" data-range="Max" disabled aria-describedby="range-block">Max</button></div>
+      <p class="range-block" id="range-block">Needs more than 1 year of licensed history</p>
+      <div class="seg" role="group" aria-label="Type"><button type="button" class="seg-btn" data-type="line" aria-pressed="true">Line</button><button type="button" class="seg-btn" data-type="candle" aria-pressed="false">Candles</button><button type="button" class="seg-btn" data-type="bar" aria-pressed="false">Bars</button></div>
+      <div class="seg" role="group" aria-label="Studies"><button type="button" class="seg-btn" data-ma="50" aria-pressed="false">MA 50</button><button type="button" class="seg-btn" data-ma="200" aria-pressed="false">MA 200</button></div>
+      <div class="seg" role="group" aria-label="Scale"><button type="button" class="seg-btn" data-log="1" aria-pressed="false">Log</button></div>
+      <button type="button" class="seg-btn" data-compare-toggle aria-expanded="false">Compare</button>
+      <button type="button" class="seg-btn" data-reset>Reset</button>
+    </div>
+    <div class="compare-row" hidden>
+      <p>Compare, rebased to 100. Max 4 extra series.</p>
+      <div class="seg" role="group" aria-label="Compare"><button type="button" class="seg-btn" data-cmp="BTC" aria-pressed="false">BTC</button><button type="button" class="seg-btn" data-cmp="ETH" aria-pressed="false">ETH</button><button type="button" class="seg-btn" data-cmp="SOL" aria-pressed="false">SOL</button><button type="button" class="seg-btn" data-vs-btc aria-pressed="false">vs BTC</button></div>
+      <label class="compare-add">Add <input type="search" data-compare-add placeholder="BTC" aria-label="Add a licensed asset"></label>
+    </div>
+    <p class="chart-legend" id="chart-legend"></p>
+    <div class="chart-plot" tabindex="0" role="img" aria-label="Pearl price chart"><p class="chart-empty">Loading chart.</p></div>
+    <p class="chart-volume-label">24h volume (rolling)</p>
+    <p class="src-foot chart-foot"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a> <span data-bar-size></span> <span>Aggregated price, not one exchange.</span> <a href="/help/#credits">Chart library credit</a></p>
+    <p class="chart-status" id="chart-status" aria-live="polite"></p>
+    <noscript><p class="noscript">This chart needs JavaScript. <a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a>. Notes and sources stay available without it.</p></noscript>
+  </div>
+</section>
+<section class="panel" id="chain-panel" data-chain="PRL" aria-labelledby="chain-heading">
+  <div class="panel-head"><span id="chain-heading">On-chain</span><span class="badge" id="chain-badge">…</span></div>
+  <div class="panel-body" id="chain-body"><p class="chart-empty">Loading chain stats.</p></div>
+  <p class="src-foot chain-credit">Bitcoin figures come from <a href="https://mempool.space/" rel="noopener">mempool.space</a>, with <a href="https://blockstream.info/" rel="noopener">Blockstream</a> as fallback. alpha.kurult.ai is not affiliated with either. Ether gas and Solana epoch come from public RPCs through our cache. Pearl chain stats, when shown, come from pearlchain.live and are not an affiliation.</p>
+</section>
+  </aside>
+  <article class="article panel">
+    <div class="panel-head"><span><a href="/">&laquo; Ledger</a></span><span class="data"><time datetime="2026-10-02">02 Oct 2026</time></span></div>
+    <header class="article-head">
+      <h1 class="article-title">Pearl (PRL): real proof-of-useful-work tech, a token priced ahead of its usage</h1>
+      <p class="article-lede">Deep dive on Pearl, the matrix-multiplication proof-of-work chain: on-chain data, holder and pool concentration, emissions, liquidity, the hype cycle on X, and bear/base/bull scenarios. Research only.</p>
+    </header>
+    <div class="prose">
 <p>Research only. Not financial advice. All times are ET (UTC-4). <strong>Labeling rule for this note:</strong> every hashrate, supply and market cap figure is marked <em>unconfirmed</em>. Each still carries its source, but none of them has been independently confirmed. Hashrate is an explorer estimate derived from difficulty. Supply comes from an explorer and an aggregator, cross-checked against the emission formula. Market cap is an aggregator figure on thin venues. <strong>Charts and diagrams:</strong> charts 01 to 07 are drawn only from raw API pulls: CoinGecko (pulled 18:44 to 19:23 ET, not republished here) and the pearlchain.live explorer (pulled 19:33 to 19:36 ET, saved with this note). Each caption names its source and fetch time (ET). Diagrams are simplified schematics; their CoinGecko and pearlchain.live figures come from the same pulls.</p>
 <p><strong>Price line (refreshed):</strong> PRL $1.11 on CoinGecko (coins/pearl-2, last updated 2026-10-02 18:41 ET), 24h change -5.1%, 24h volume $4.80M. The latest market_chart point (18:49 ET) read $1.081. Market cap $369.1M (CoinGecko, 18:41 ET, unconfirmed). Fully diluted value is about $2.33B at the 2.1B max supply (derived, unconfirmed).</p>
 <h2>The call in one paragraph</h2>
@@ -93,8 +140,9 @@
 <ul><li>Exchange, team and pool wallet labels.</li><li>A fee time series.</li><li>Coin-age and dormancy distribution. This needs our own node and indexer.</li><li>Order-book depth from SafeTrade and BigONE directly.</li><li>Hyperliquid HIP-3 launch status.</li><li>CoinMarketCap (not checked).</li><li>A post-level archive of X post counts (dropped from this version).</li></ul>
 <p>Market figures were pulled from CoinGecko (market_chart, coins/pearl-2 and tickers) on 2026-10-02 at the ET times stated; those raw CoinGecko pulls are not republished here. Saved with this note, each with its ET fetch time and a sha256 manifest: raw pearlchain.live explorer pulls (stats, charts, address rankings and detail, pools, and a 200-block coinbase crawl), and the scripts that derive the figures and draw the charts. Other sources (X posts, GitHub, Together AI, CoinPaprika, GeckoTerminal, Ethplorer, DexScreener, papers) are cited by link with their read time and are not archived here. Data provided by CoinGecko.</p>
 <p>Research only. Not financial advice. Nothing here is an offer to buy, sell or hold any asset.</p>
-  </div>
-</article>
+    </div>
+  </article>
+  <div class="article-desk">
 <section class="desk panel" aria-labelledby="scorecard-heading">
   <div class="panel-head"><span id="scorecard-heading">Falsifier scorecard</span><span class="data">drafts only</span></div>
   <p>A dated falsifier is graded by the nightly job into drafts/. Nothing here is copied into the ledger.</p>
@@ -122,7 +170,7 @@
   <table class="desk-table">
     <thead><tr><th>Ticker</th><th>Price USD</th><th>Vol/MC</th><th>30d vol ann.</th><th>Issuance yield</th></tr></thead>
     <tbody>
-<tr><td>PRL</td><td>1.11</td><td>0.0130</td><td>280.6%</td><td>115.3%</td></tr><tr><td>TAO</td><td>303.28</td><td>0.0914</td><td>107.7%</td><td>n/a</td></tr><tr><td>RENDER</td><td>1.90851</td><td>0.0666</td><td>81.2%</td><td>n/a</td></tr><tr><td>AKT</td><td>0.651893</td><td>0.0311</td><td>n/a</td><td>n/a <span class="key-note">No 365-day archive. 30d vol not computed. days=1 file used for the last print only.</span></td></tr><tr><td>ZEC</td><td>1,335.01</td><td>0.0463</td><td>n/a</td><td>n/a <span class="key-note">No 365-day archive. 30d vol not computed. days=1 file used for the last print only.</span></td></tr><tr><td>BTC</td><td>84,841.67</td><td>0.0268</td><td>41.1%</td><td>n/a</td></tr>
+<tr><td>PRL</td><td>1.11</td><td>0.0130</td><td>280.6%</td><td>115.3%</td></tr><tr><td>TAO</td><td>303.28</td><td>0.0914</td><td>107.7%</td><td>n/a</td></tr><tr><td>RENDER</td><td>1.90851</td><td>0.0666</td><td>81.2%</td><td>n/a</td></tr><tr><td>AKT</td><td>0.651893</td><td>0.0311</td><td>n/a</td><td>n/a <span class="key-note">365-day history not available. 30d vol not computed. Last print only.</span></td></tr><tr><td>ZEC</td><td>1,335.01</td><td>0.0463</td><td>n/a</td><td>n/a <span class="key-note">365-day history not available. 30d vol not computed. Last print only.</span></td></tr><tr><td>BTC</td><td>84,841.67</td><td>0.0268</td><td>41.1%</td><td>n/a</td></tr>
     </tbody>
   </table>
   <p class="credit"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a></p>
@@ -151,22 +199,9 @@
   </table>
   <p class="credit"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a> for the price-move cell.</p>
 </section>
-<section class="panel" id="chart-panel" data-symbols="PRL" data-default="PRL" data-locked="true" aria-labelledby="chart-heading">
-  <div class="panel-head"><span id="chart-heading">Chart</span><span class="badge" id="chart-badge">aggregated</span></div>
-  <div class="panel-body">
-    <div class="seg" role="group" aria-label="Asset"><button type="button" class="seg-btn" data-symbol="PRL" aria-pressed="true">PRL</button></div>
-    <div class="seg" role="group" aria-label="Timeframe"><button type="button" class="seg-btn" data-tf="1H" aria-pressed="false">1H</button><button type="button" class="seg-btn" data-tf="4H" aria-pressed="false">4H</button><button type="button" class="seg-btn" data-tf="1D" aria-pressed="true">1D</button></div>
-    <p class="chart-note" id="chart-note">Aggregated price, not one exchange. 1H is hourly, 4H is 4-hour OHLC, 1D is daily. Weekly is not offered.</p>
-    <div class="chart-frame" id="chart-frame"><p class="chart-empty">Loading chart.</p></div>
-    <p class="chart-readout" id="chart-readout"></p>
-    <p class="src-foot"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a></p>
+
   </div>
-</section>
-<section class="panel" id="chain-panel" data-chain="PRL" aria-labelledby="chain-heading">
-  <div class="panel-head"><span id="chain-heading">On-chain</span><span class="badge" id="chain-badge">…</span></div>
-  <div class="panel-body" id="chain-body"><p class="chart-empty">Loading chain stats.</p></div>
-  <p class="src-foot chain-credit">Bitcoin figures come from <a href="https://mempool.space/" rel="noopener">mempool.space</a>, with <a href="https://blockstream.info/" rel="noopener">Blockstream</a> as fallback. alpha.kurult.ai is not affiliated with either. Ether gas and Solana epoch come from public RPCs through our cache. Pearl chain stats, when shown, come from pearlchain.live and are not an affiliation.</p>
-</section>
+</div>
 <section class="sources panel" aria-labelledby="sources-heading">
   <div class="panel-head"><span id="sources-heading">Sources</span><span class="data">42 ref</span></div>
   <ol class="source-table">
@@ -218,10 +253,18 @@
 <footer class="colophon sheet">
   <span>alpha.kurult.ai</span>
   <span class="colophon-sep" aria-hidden="true">|</span>
-  <span>No wallet. No comments. No analytics. No third-party scripts.</span>
-  <span class="colophon-sep" aria-hidden="true">|</span>
   <span class="colophon-credit"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a></span>
+  <span class="colophon-sep" aria-hidden="true">|</span>
+  <a href="/help/">Help</a>
+  <span class="colophon-sep" aria-hidden="true">|</span>
+  <a href="/help/#credits">Credits</a>
+  <span class="colophon-sep" aria-hidden="true">|</span>
+  <span>No wallet. No comments. No analytics. No third-party script host.</span>
 </footer>
-<script src="/market.js" defer></script>
+<script type="application/json" id="alpha-securities">[{"sym":"BTC","name":"Bitcoin","class":"Crypto","cg":"bitcoin","chart":"crypto","chain":"BTC","path":"/s/btc/"},{"sym":"ETH","name":"Ether","class":"Crypto","cg":"ethereum","chart":"crypto","chain":"ETH","path":"/s/eth/"},{"sym":"SOL","name":"Solana","class":"Crypto","cg":"solana","chart":"crypto","chain":"SOL","path":"/s/sol/"},{"sym":"PRL","name":"Pearl","class":"Crypto","cg":"pearl-2","chart":"crypto","chain":"PRL","path":"/s/prl/"},{"sym":"BTC.D","name":"Bitcoin dominance","class":"Index","cg":"","chart":"index","chain":"","path":"/s/btc.d/"},{"sym":"TOTAL","name":"Total crypto cap","class":"Index","cg":"","chart":"index","chain":"","path":"/s/total/"},{"sym":"EURUSD","name":"Euro reference rate","class":"Crncy","cg":"","chart":"rate","chain":"","path":"/s/eurusd/"},{"sym":"UST2Y","name":"Treasury par yield, 2 year","class":"Govt","cg":"","chart":"rate","chain":"","path":"/s/ust2y/"},{"sym":"UST10Y","name":"Treasury par yield, 10 year","class":"Govt","cg":"","chart":"rate","chain":"","path":"/s/ust10y/"},{"sym":"SOFR","name":"SOFR","class":"M-Mkt","cg":"","chart":"rate","chain":"","path":"/s/sofr/"}]</script>
+<script src="/desk-logic.js" defer></script>
+<script src="/search.js" defer></script>
+<script src="/vendor/lightweight-charts-5.2.1.js" defer></script>
+<script src="/chart.js" defer></script>
 </body>
 </html>
