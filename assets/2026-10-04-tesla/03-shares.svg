@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 304" role="img">
+<title>Legal shares jumped. Basic EPS did not.</title>
+<rect width="920" height="304" fill="#0b0d10"/>
+<text x="28" y="36" fill="#f0a202" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">Legal shares jumped. Basic EPS did not.</text>
+<text x="28" y="90" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Dec 31, 2025 outstanding</text>
+<rect x="300" y="72" width="422.2" height="26" fill="#7eb6d6"/>
+<text x="730.2" y="90" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">3,751</text>
+<text x="28" y="136" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Mar 31, 2026 outstanding</text>
+<rect x="300" y="118" width="422.6" height="26" fill="#7eb6d6"/>
+<text x="730.6" y="136" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">3,755</text>
+<text x="28" y="182" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Jun 30, 2026 outstanding</text>
+<rect x="300" y="164" width="444.4" height="26" fill="#f0a202"/>
+<text x="752.4" y="182" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">3,949</text>
+<text x="28" y="228" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Q2 basic weighted average</text>
+<rect x="300" y="210" width="364.3" height="26" fill="#e85d4c"/>
+<text x="672.3" y="228" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">3,237</text>
+<text x="28" y="286" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11">Millions of shares. 10-Q rollforward. Cover count 3,949,547,394 on July 16, 2026.</text>
+</svg>

@@ -1,0 +1,89 @@
+{
+  "label": "Derived model math from SEC filing lines plus one prose close. Not a price feed.",
+  "close": {
+    "value": 370.59,
+    "bar": "2026-10-02",
+    "source": "MarketBeat closing price, 16:00 ET Oct 2, 2026"
+  },
+  "shares_cover_2026_07_16": 3949547394,
+  "equity": 1463662768742.46,
+  "net_cash": 34444000000,
+  "ev": 1429218768742.46,
+  "units": [
+    {
+      "q": "2025 Q2",
+      "cash_deliveries": 377452,
+      "asp": 41825.19,
+      "cogs_per": 35943.64,
+      "gp_per": 5881.54,
+      "gp_m": 2220.0
+    },
+    {
+      "q": "2025 Q3",
+      "cash_deliveries": 486869,
+      "asp": 41816.18,
+      "cogs_per": 35666.68,
+      "gp_per": 6149.5,
+      "gp_m": 2994.0
+    },
+    {
+      "q": "2025 Q4",
+      "cash_deliveries": 407231,
+      "asp": 41131.45,
+      "cogs_per": 34069.12,
+      "gp_per": 7062.33,
+      "gp_m": 2876.0
+    },
+    {
+      "q": "2026 Q1",
+      "cash_deliveries": 354593,
+      "asp": 43635.94,
+      "cogs_per": 35578.82,
+      "gp_per": 8057.12,
+      "gp_m": 2857.0
+    },
+    {
+      "q": "2026 Q2",
+      "cash_deliveries": 472546,
+      "asp": 42336.62,
+      "cogs_per": 35691.76,
+      "gp_per": 6644.86,
+      "gp_m": 3140.0
+    }
+  ],
+  "q2_gp_per_rounded": 6645,
+  "q2_capex_per_delivery": 12057,
+  "q2_sales_gp_m": 3140,
+  "ttm": {
+    "oi_m": 4372,
+    "ni_m": 3804,
+    "rev_m": 103619,
+    "window": "2025 Q3 to 2026 Q2"
+  },
+  "multiples": {
+    "equity_over_ttm_ni": 384.8,
+    "ev_over_ttm_rev": 13.8,
+    "ev_over_ttm_oi": 326.9
+  },
+  "earnings_needed_m": {
+    "10": 146366.3,
+    "20": 73183.1,
+    "40": 36591.6
+  },
+  "miles_to_fill_20x_gap_after_ttm_oi": {
+    "0.10": 688111384371,
+    "0.50": 137622276874,
+    "1.00": 68811138437
+  },
+  "q3_vs_year_ago_deliveries": -0.0213,
+  "factory_floor_sum": 2375000,
+  "q2_production_annualized": 1807032,
+  "floor_use": 0.761,
+  "scenarios": {
+    "note": "Model outcomes under stated assumptions. Not offers.",
+    "arith_3m": 340.0,
+    "geo_3m": 333.9,
+    "arith_12m": 319.0,
+    "geo_12m": 295.3
+  }
+}

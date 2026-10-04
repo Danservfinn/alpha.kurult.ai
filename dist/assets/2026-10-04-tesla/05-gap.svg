@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 304" role="img">
+<title>What the close implies versus trailing operating income</title>
+<rect width="920" height="304" fill="#0b0d10"/>
+<text x="28" y="36" fill="#f0a202" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">What the close implies versus trailing operating income</text>
+<text x="28" y="90" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Trailing operating income</text>
+<rect x="300" y="72" width="13.3" height="26" fill="#7eb6d6"/>
+<text x="321.3" y="90" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">4.4</text>
+<text x="28" y="136" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Implied earnings at 40x</text>
+<rect x="300" y="118" width="111.1" height="26" fill="#f0a202"/>
+<text x="419.1" y="136" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">36.6</text>
+<text x="28" y="182" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Implied earnings at 20x</text>
+<rect x="300" y="164" width="222.2" height="26" fill="#e85d4c"/>
+<text x="530.2" y="182" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">73.2</text>
+<text x="28" y="228" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Implied earnings at 10x</text>
+<rect x="300" y="210" width="444.4" height="26" fill="#e85d4c"/>
+<text x="752.4" y="228" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">146.4</text>
+<text x="28" y="286" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11">Billions of dollars. Multiples are assumptions. Not an offer.</text>
+</svg>
