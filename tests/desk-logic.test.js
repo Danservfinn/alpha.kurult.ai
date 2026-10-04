@@ -62,4 +62,35 @@ assert(firstEsc.clear === true && firstEsc.close === false, "first Esc clears on
 assert(secondEsc.clear === false && secondEsc.close === true, "second Esc closes");
 const zoom = logic.zoomLogical({ from: 0, to: 100 }, 1);
 assert(zoom.to - zoom.from === 80, "zoom");
+
+const fs = require("fs");
+const vm = require("vm");
+const assigns = [];
+const sandbox = {
+  console,
+  URLSearchParams,
+  fetch: function () { return Promise.resolve({ ok: false }); }
+};
+sandbox.window = {
+  AlphaLogic: logic,
+  location: {
+    search: "",
+    assign: function (href) { assigns.push(href); }
+  }
+};
+sandbox.document = {
+  querySelector: function () { return null; },
+  getElementById: function () { return null; },
+  addEventListener: function () {}
+};
+vm.createContext(sandbox);
+vm.runInContext(fs.readFileSync(path.join(__dirname, "..", "static", "search.js"), "utf8"), sandbox);
+const choose = sandbox.window.AlphaSearch.choose;
+assert(typeof choose === "function", "search.js must export choose");
+choose({ kind: "empty", href: "/#ledger", title: "No notes or licensed data for spacex" });
+assert(assigns.length === 0, "empty choose navigated to " + assigns.join(","));
+choose({ kind: "asset", href: "/s/btc/", title: "Bitcoin" });
+assert(assigns.length === 1 && assigns[0] === "/s/btc/", "asset choose " + assigns.join(","));
+choose(null);
+assert(assigns.length === 1, "null choose navigated");
 console.log("logic-ok");

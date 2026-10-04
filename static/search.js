@@ -127,11 +127,7 @@
   }
 
   function choose(row) {
-    if (!row) return;
-    if (row.kind === "empty") {
-      go(row.href || "/#ledger");
-      return;
-    }
+    if (!row || row.kind === "empty") return;
     go(row.href);
   }
 
@@ -253,6 +249,7 @@
 
   window.AlphaSearch = {
     suggest: function (query, data) { return logic.suggest(data || index || { assets: securities() }, query); },
-    parseCommand: function (query, assets) { return logic.parseCommand(query, assets || securities()); }
+    parseCommand: function (query, assets) { return logic.parseCommand(query, assets || securities()); },
+    choose: choose
   };
 })();
