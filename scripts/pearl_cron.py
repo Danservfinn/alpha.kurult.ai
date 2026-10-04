@@ -17,7 +17,8 @@ NIGHTLY = ROOT / "scripts" / "pearl_nightly.py"
 ALLOWED_BRANCH = "kublai/pearl-always-on"
 COMMIT_PATHS = ("data/pearl-kpi", "data/pearl-desk", "drafts")
 # Dropped from the add. Pulls stay on disk. Commit derived numbers only.
-EXCLUDED_COMMIT_PATHS = ("data/pearl-kpi/*/coingecko", "data/pearl-kpi/**/coingecko")
+# drafts/test/ is the self-test fixture. It is regenerated on every run and never committed.
+EXCLUDED_COMMIT_PATHS = ("data/pearl-kpi/*/coingecko", "data/pearl-kpi/**/coingecko", "drafts/test")
 
 
 def plan(skip_pull: bool = False) -> list[list[str]]:
@@ -47,11 +48,21 @@ def is_coingecko_raw(rel: str) -> bool:
     return norm.startswith("data/pearl-kpi/") and "/coingecko/" in norm
 
 
+def is_self_test_draft(rel: str) -> bool:
+    """True for the self-test fixture under drafts/test/."""
+    norm = rel[2:] if rel.startswith("./") else rel
+    return norm == "drafts/test" or norm.startswith("drafts/test/")
+
+
+def is_excluded(rel: str) -> bool:
+    return is_coingecko_raw(rel) or is_self_test_draft(rel)
+
+
 def files_to_commit(root: Path) -> list[str]:
-    """Paths the cron may stage. CoinGecko raws are not in this list."""
+    """Paths the cron may stage. CoinGecko raws and drafts/test/ are not in this list."""
     out: list[str] = []
     for item in COMMIT_PATHS:
-        if item != "data/pearl-kpi":
+        if item not in ("data/pearl-kpi", "drafts"):
             out.append(item)
             continue
         base = root / item
@@ -59,7 +70,7 @@ def files_to_commit(root: Path) -> list[str]:
             continue
         for path in sorted(p for p in base.rglob("*") if p.is_file()):
             rel = path.relative_to(root).as_posix()
-            if is_coingecko_raw(rel):
+            if is_excluded(rel):
                 continue
             out.append(rel)
     return out
@@ -81,7 +92,7 @@ def commit_raws(root: Path) -> int:
         capture_output=True,
         text=True,
     )
-    leaked = [line for line in staged_names.stdout.splitlines() if is_coingecko_raw(line)]
+    leaked = [line for line in staged_names.stdout.splitlines() if is_excluded(line)]
     if leaked:
         subprocess.run(["git", "reset", "-q", "--", *leaked], cwd=root, check=True)
     staged = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=root)

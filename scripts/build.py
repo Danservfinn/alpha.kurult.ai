@@ -637,6 +637,8 @@ def page(title: str, description: str, path: str, body: str, body_class: str, ma
   <span>{esc(SITE_NAME)}</span>
   <span class="colophon-sep" aria-hidden="true">|</span>
   <span>No wallet. No comments. No analytics. No third-party scripts.</span>
+  <span class="colophon-sep" aria-hidden="true">|</span>
+  <span class="colophon-credit"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a></span>
 </footer>
 <script src="/market.js" defer></script>
 </body>
