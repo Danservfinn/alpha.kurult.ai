@@ -107,8 +107,8 @@
   }
 
   function backOff(host) {
-    var prev = hostWait[host] || 30000;
-    var wait = Math.min(Math.max(prev * 2, 60000), 600000);
+    var prev = hostWait[host] || 7500;
+    var wait = Math.min(Math.max(prev * 2, 15000), 120000);
     hostWait[host] = wait;
     hostNext[host] = Date.now() + wait;
   }
@@ -208,7 +208,20 @@
     }
   }
 
-  async function getText(url) {
+  async function getJsonForce(url, timeout) {
+    // like getJson but ignores host backoff (used for chart centerpiece)
+    var ctrl = new AbortController();
+    var timer = setTimeout(function () { ctrl.abort(); }, timeout || 12000);
+    try {
+      var res = await fetch(url, { headers: { Accept: "application/json" }, signal: ctrl.signal });
+      if (!res.ok) throw new Error(String(res.status));
+      return await res.json();
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+    async function getText(url) {
     var host = hostOf(url);
     if (hostBlocked(host)) {
       var blocked = new Error("backoff");
@@ -611,11 +624,23 @@
   function chartSaved(key) {
     var live = state.chart[key];
     if (live && live.series && live.series.length) return live;
+    var allCharts = load("alpha.charts.v1");
+    if (allCharts && allCharts[key] && allCharts[key].series && allCharts[key].series.length) {
+      return { at: allCharts[key].at, series: allCharts[key].series };
+    }
     var stored = load("alpha.chart.v1");
     if (stored && stored.key === key && stored.series && stored.series.length) {
       return { at: stored.at, series: stored.series };
     }
     return null;
+  }
+
+  var chartChain = Promise.resolve();
+  function queueChart(sym, tf, force) {
+    chartChain = chartChain.then(function () {
+      return pullChart(sym, tf, force).catch(function () {});
+    });
+    return chartChain;
   }
 
   async function pullChart(sym, tf, force) {
@@ -631,23 +656,37 @@
       if (held) {
         state.chart[key] = held;
         paintChart(sym, tf, held.series, true);
-      } else {
-        paintChart(sym, tf, [], true);
+        return;
       }
-      return;
+      // No cache for this key: try anyway; a blocked host is better than no chart.
     }
     try {
-      var data = await getJson(chartUrl(sym, tf));
+      var data;
+      try {
+        data = await getJson(chartUrl(sym, tf));
+      } catch (chartErr) {
+        if (chartErr && chartErr.limited && !force) {
+          data = await getJsonForce(chartUrl(sym, tf));
+        } else {
+          throw chartErr;
+        }
+      }
       var series = normalizeSeries(tf, data);
       if (!series.length) throw new Error("empty");
       state.chart[key] = { at: Date.now(), series: series };
-      save("alpha.chart.v1", { key: key, at: Date.now(), series: series });
+      var allCharts = load("alpha.charts.v1") || {};
+      allCharts[key] = { at: Date.now(), series: series };
+      try { localStorage.setItem("alpha.charts.v1", JSON.stringify(allCharts)); } catch (e) {}
       paintChart(sym, tf, series, false);
     } catch (err) {
       var saved = chartSaved(key);
       if (saved) {
         state.chart[key] = saved;
         paintChart(sym, tf, saved.series, true);
+      } else if (!force) {
+        // this chart never loaded (rate limit, blip): retry once after a pause
+        setTimeout(function () { pullChart(sym, tf, true); }, 15000);
+        paintChart(sym, tf, [], true);
       } else {
         paintChart(sym, tf, [], true);
       }
@@ -927,6 +966,14 @@
     if (storedChart && storedChart.key && storedChart.series) {
       state.chart[storedChart.key] = { at: storedChart.at, series: storedChart.series };
     }
+    var allCharts = load("alpha.charts.v1");
+    if (allCharts) {
+      Object.keys(allCharts).forEach(function (k) {
+        if (allCharts[k] && allCharts[k].series && allCharts[k].series.length && !state.chart[k]) {
+          state.chart[k] = { at: allCharts[k].at, series: allCharts[k].series };
+        }
+      });
+    }
     state.chain = load("alpha.chain.v1");
     if (state.ticker) paintTicker(state.ticker, true);
     paintChips();
@@ -947,7 +994,7 @@
     if (document.getElementById("chips")) pullChips();
     if (document.getElementById("markets-body")) setTimeout(pullMarkets, 1500);
     if (document.getElementById("chart-panel")) {
-      setTimeout(function () { pullChart(selectedSymbol(), selectedTf(), false); }, 3000);
+      setTimeout(function () { queueChart(selectedSymbol(), selectedTf(), false); }, 3000);
     }
     if (document.getElementById("chain-panel")) pullChain();
     startPolls();

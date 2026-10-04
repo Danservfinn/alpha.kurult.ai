@@ -1,0 +1,252 @@
+{
+  "notes": [
+    {
+      "title": "Pearl (PRL): real proof-of-useful-work tech, a token priced ahead of its usage",
+      "summary": "Deep dive on Pearl, the matrix-multiplication proof-of-work chain: on-chain data, holder and pool concentration, emissions, liquidity, the hype cycle on X, and bear/base/bull scenarios. Research only.",
+      "path": "/articles/2026-10-02-pearl/",
+      "date": "2026-10-02",
+      "ticker": "PRL",
+      "tags": [
+        "PRL"
+      ],
+      "keywords": "pearl prl real proof useful work tech token priced ahead its usage deep dive the matrix multiplication chain data holder and pool concentration emissions liquidity hype cycle bear base bull scenarios research only not financial advice all times are utc labeling rule for this note every hashrate supply market cap figure marked unconfirmed each still carries source but none them has been independently confirmed explorer estimate derived from difficulty comes aggregator cross checked against emission formula thin venues charts diagrams drawn raw api pulls saved with coingecko pulled pearlchain live caption names fetch time simplified schematics their figures come same price line refreshed coins last updated 2026 24h change volume 80m latest chart point read 081 369 fully diluted value about 33b max call one paragraph most serious design have reviewed team unusually credible different question rated narrative since late august daily prices aug oct sep high roughly doubled fees close zero usefulness enabled protocol enforced grows three months twelve reported spot sits two low trust our view avoid outright long medium conviction case depends almost entirely fp8 gemm upgrade shipping verifiable demand mining what layer bitcoin mainnet launched replaces sha 256 noised gpu that serves inference can mine calls duplex compute core construction arxiv 2504 09971 smooth curve puts half out block 650 226 index describes minute blocks billion reports 194 second target diagram comparing assets how works svg sources stats reward weinsteinomri overhead 2606 04819 schematic omri weinstein nvidia vast ilan komargodski idan sugerman rafael pass scientist advisor economics paper 06700 claims premine allocation code github repo was created active 335 stars forks open issues recent releases emergency salted noise seed hardfork committers pull request 311 partner together may blog announced exclusive partnership said gemma 31b endpoint discounted over offset future crypto page model lists input output per tokens int8 32k context states available serverless discount availability unclear own product pearlresearch usd today there sink flow both does publish accounting structure following points days unless stated 374m fdv 36b rank 132 ath atl 1399 jul day 237 path labeled stamp 509 230 after july exploit 270 310 470 072 534 then 125 intraday through stamps broadly million claim brezshares thesis bigone usdt 64m safetrade 99m null scores tickers coinpaprika 81m uniswap wprl 397k reserves 165k geckoterminal headroomcapital measured depth within unverified peers ratio 011 lowest comparison set tao 071 render 056 zec 053 akt 034 like mid trades"
+    }
+  ],
+  "assets": [
+    {
+      "sym": "BTC",
+      "name": "Bitcoin",
+      "class": "Crypto",
+      "path": "/s/btc/",
+      "chart": "crypto",
+      "cg": "bitcoin"
+    },
+    {
+      "sym": "ETH",
+      "name": "Ether",
+      "class": "Crypto",
+      "path": "/s/eth/",
+      "chart": "crypto",
+      "cg": "ethereum"
+    },
+    {
+      "sym": "SOL",
+      "name": "Solana",
+      "class": "Crypto",
+      "path": "/s/sol/",
+      "chart": "crypto",
+      "cg": "solana"
+    },
+    {
+      "sym": "PRL",
+      "name": "Pearl",
+      "class": "Crypto",
+      "path": "/s/prl/",
+      "chart": "crypto",
+      "cg": "pearl-2"
+    },
+    {
+      "sym": "BTC.D",
+      "name": "Bitcoin dominance",
+      "class": "Index",
+      "path": "/s/btc.d/",
+      "chart": "index",
+      "cg": ""
+    },
+    {
+      "sym": "TOTAL",
+      "name": "Total crypto cap",
+      "class": "Index",
+      "path": "/s/total/",
+      "chart": "index",
+      "cg": ""
+    },
+    {
+      "sym": "EURUSD",
+      "name": "Euro reference rate",
+      "class": "Crncy",
+      "path": "/s/eurusd/",
+      "chart": "rate",
+      "cg": ""
+    },
+    {
+      "sym": "UST2Y",
+      "name": "Treasury par yield, 2 year",
+      "class": "Govt",
+      "path": "/s/ust2y/",
+      "chart": "rate",
+      "cg": ""
+    },
+    {
+      "sym": "UST10Y",
+      "name": "Treasury par yield, 10 year",
+      "class": "Govt",
+      "path": "/s/ust10y/",
+      "chart": "rate",
+      "cg": ""
+    },
+    {
+      "sym": "SOFR",
+      "name": "SOFR",
+      "class": "M-Mkt",
+      "path": "/s/sofr/",
+      "chart": "rate",
+      "cg": ""
+    }
+  ],
+  "pages": [
+    {
+      "title": "Ledger",
+      "path": "/#ledger",
+      "words": "home ledger notes research top"
+    },
+    {
+      "title": "Markets",
+      "path": "/#markets-panel",
+      "words": "markets movers gainers losers volume gmm most"
+    },
+    {
+      "title": "Rates",
+      "path": "/#chips",
+      "words": "rates sofr treasury ust2y ust10y eurusd btmm fx"
+    },
+    {
+      "title": "Help",
+      "path": "/help/",
+      "words": "help codes credits sources"
+    },
+    {
+      "title": "Search",
+      "path": "/search/",
+      "words": "search notes assets"
+    }
+  ],
+  "codes": [
+    {
+      "code": "DES",
+      "title": "Asset page",
+      "example": "PRL DES",
+      "status": "live",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "GP",
+      "title": "Price chart, line",
+      "example": "BTC GP",
+      "status": "live",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "GIP",
+      "title": "Intraday chart",
+      "example": "BTC GIP",
+      "status": "live",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "GPO",
+      "title": "Bar chart",
+      "example": "BTC GPO",
+      "status": "live",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "GPC",
+      "title": "Candle chart",
+      "example": "BTC GPC",
+      "status": "live",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "COMP",
+      "title": "Compare",
+      "example": "COMP BTC ETH",
+      "status": "live",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "TOP",
+      "title": "Ledger",
+      "example": "TOP",
+      "status": "live",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "HELP",
+      "title": "Help",
+      "example": "HELP",
+      "status": "live",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "GMM",
+      "title": "Markets",
+      "example": "GMM",
+      "status": "live",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "MOST",
+      "title": "Markets",
+      "example": "MOST",
+      "status": "live",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "BTMM",
+      "title": "Rates",
+      "example": "BTMM",
+      "status": "live",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "5Y",
+      "title": "Five-year chart",
+      "example": "5Y",
+      "status": "not buildable",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "Max",
+      "title": "Max chart",
+      "example": "Max",
+      "status": "not buildable",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "ECO",
+      "title": "Economic calendar",
+      "example": "ECO",
+      "status": "not buildable",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "EVTS",
+      "title": "Events calendar",
+      "example": "EVTS",
+      "status": "not buildable",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "CSV",
+      "title": "Export table",
+      "example": "CSV",
+      "status": "not buildable",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "AAPL GP",
+      "title": "Equity chart",
+      "example": "AAPL GP",
+      "status": "not buildable",
+      "href": "/help/#codes"
+    },
+    {
+      "code": "RSI",
+      "title": "RSI study",
+      "example": "RSI",
+      "status": "not buildable",
+      "href": "/help/#codes"
+    }
+  ]
+}
