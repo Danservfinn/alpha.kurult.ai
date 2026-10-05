@@ -1,14 +1,9 @@
 {
-  "label": "Derived model math from SEC filing lines plus one prose close. Not a price feed.",
-  "close": {
-    "value": 370.59,
-    "bar": "2026-10-02",
-    "source": "MarketBeat closing price, 16:00 ET Oct 2, 2026"
-  },
+  "label": "Derived model math from SEC filing lines. No close. No per-share level.",
   "shares_cover_2026_07_16": 3949547394,
-  "equity": 1463662768742.46,
+  "cash_sti_m": 43524,
+  "debt_principal_m": 9080,
   "net_cash": 34444000000,
-  "ev": 1429218768742.46,
   "units": [
     {
       "q": "2025 Q2",
@@ -60,30 +55,8 @@
     "rev_m": 103619,
     "window": "2025 Q3 to 2026 Q2"
   },
-  "multiples": {
-    "equity_over_ttm_ni": 384.8,
-    "ev_over_ttm_rev": 13.8,
-    "ev_over_ttm_oi": 326.9
-  },
-  "earnings_needed_m": {
-    "10": 146366.3,
-    "20": 73183.1,
-    "40": 36591.6
-  },
-  "miles_to_fill_20x_gap_after_ttm_oi": {
-    "0.10": 688111384371,
-    "0.50": 137622276874,
-    "1.00": 68811138437
-  },
   "q3_vs_year_ago_deliveries": -0.0213,
   "factory_floor_sum": 2375000,
   "q2_production_annualized": 1807032,
-  "floor_use": 0.761,
-  "scenarios": {
-    "note": "Model outcomes under stated assumptions. Not offers.",
-    "arith_3m": 340.0,
-    "geo_3m": 333.9,
-    "arith_12m": 319.0,
-    "geo_12m": 295.3
-  }
+  "floor_use": 0.761
 }

@@ -3,14 +3,13 @@
 
 Inputs are filing lines, company exhibits, or labeled assumptions.
 This script does not read a price feed, a price CSV, or a vendor price library.
-The one share price is a single prose close, cited in the note, used
-only to turn the cover share count into an equity value.
+It does not take a closing price. It does not emit a per-share level,
+an equity value, an enterprise value, or earnings implied by a price.
 """
 
 from __future__ import annotations
 
 import json
-import math
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -100,10 +99,6 @@ QUARTERS = [
 SHARES_COVER = 3_949_547_394
 CASH_STI_M = 43524  # June 30, 2026, Q2 update balance-sheet line
 DEBT_PRINCIPAL_M = 9080
-# One prose close. Not a series. Source named in the article.
-CLOSE = 370.59
-CLOSE_BAR = "2026-10-02"
-CLOSE_SOURCE = "MarketBeat closing price, 16:00 ET Oct 2, 2026"
 
 # Q3 2026 production and deliveries exhibit, filed 2026-10-02.
 # Financials for this quarter are not filed. Do not invent them.
@@ -118,17 +113,6 @@ FLOORS = [
     ("Cybertruck", 125_000),
     ("Cybercab", 125_000),
 ]
-
-# Model outcomes under stated assumptions. Not offers.
-# Share count held at the July 16 cover count.
-SCENARIOS = {
-    "weights_3m": {"bear": 0.25, "base": 0.50, "bull": 0.25},
-    "weights_12m": {"bear": 0.30, "base": 0.45, "bull": 0.25},
-    "price_3m": {"bear": 250, "base": 340, "bull": 430},
-    "price_12m": {"bear": 180, "base": 300, "bull": 520},
-    "multiple_assumption": [10, 20, 40],
-    "mile_profit_assumption": [0.10, 0.50, 1.00],
-}
 
 BG = "#0b0d10"
 INK = "#e6e1d6"
@@ -159,13 +143,6 @@ def unit_row(row: dict) -> dict:
     }
 
 
-def weighted(values: dict, weights: dict, geo: bool) -> float:
-    if geo:
-        acc = sum(weights[k] * math.log(values[k]) for k in values)
-        return round(math.exp(acc), 1)
-    return round(sum(weights[k] * values[k] for k in values), 1)
-
-
 def build() -> dict:
     units = [unit_row(row) for row in QUARTERS]
     q2 = QUARTERS[-1]
@@ -174,48 +151,26 @@ def build() -> dict:
     ttm_oi = sum(r["oi_m"] for r in ttm_rows)
     ttm_ni = sum(r["ni_m"] for r in ttm_rows)
     ttm_rev = sum(r["rev_m"] for r in ttm_rows)
-    equity = SHARES_COVER * CLOSE
     net_cash = (CASH_STI_M - DEBT_PRINCIPAL_M) * 1_000_000
-    ev = equity - net_cash
     capex_per = q2["capex_m"] * 1_000_000 / q2["deliveries"]
     yoy = (Q3["deliveries"] - QUARTERS[1]["deliveries"]) / QUARTERS[1]["deliveries"]
     floors_sum = sum(v for _, v in FLOORS)
     run_rate = q2["production"] * 4
-    gap_20 = equity / 20
-    miles = {
-        f"{p:.2f}": round((gap_20 - ttm_oi * 1_000_000) / p)
-        for p in SCENARIOS["mile_profit_assumption"]
-    }
     out = {
-        "label": "Derived model math from SEC filing lines plus one prose close. Not a price feed.",
-        "close": {"value": CLOSE, "bar": CLOSE_BAR, "source": CLOSE_SOURCE},
+        "label": "Derived model math from SEC filing lines. No close. No per-share level.",
         "shares_cover_2026_07_16": SHARES_COVER,
-        "equity": equity,
+        "cash_sti_m": CASH_STI_M,
+        "debt_principal_m": DEBT_PRINCIPAL_M,
         "net_cash": net_cash,
-        "ev": ev,
         "units": units,
         "q2_gp_per_rounded": round(q2u["gp_per"]),
         "q2_capex_per_delivery": round(capex_per),
         "q2_sales_gp_m": round((q2["auto_sales_m"] - q2["auto_cogs_m"]), 3),
         "ttm": {"oi_m": ttm_oi, "ni_m": ttm_ni, "rev_m": ttm_rev, "window": "2025 Q3 to 2026 Q2"},
-        "multiples": {
-            "equity_over_ttm_ni": round(equity / (ttm_ni * 1_000_000), 1),
-            "ev_over_ttm_rev": round(ev / (ttm_rev * 1_000_000), 1),
-            "ev_over_ttm_oi": round(ev / (ttm_oi * 1_000_000), 1),
-        },
-        "earnings_needed_m": {str(m): round(equity / m / 1_000_000, 1) for m in SCENARIOS["multiple_assumption"]},
-        "miles_to_fill_20x_gap_after_ttm_oi": miles,
         "q3_vs_year_ago_deliveries": round(yoy, 4),
         "factory_floor_sum": floors_sum,
         "q2_production_annualized": run_rate,
         "floor_use": round(run_rate / floors_sum, 3),
-        "scenarios": {
-            "note": "Model outcomes under stated assumptions. Not offers.",
-            "arith_3m": weighted(SCENARIOS["price_3m"], SCENARIOS["weights_3m"], False),
-            "geo_3m": weighted(SCENARIOS["price_3m"], SCENARIOS["weights_3m"], True),
-            "arith_12m": weighted(SCENARIOS["price_12m"], SCENARIOS["weights_12m"], False),
-            "geo_12m": weighted(SCENARIOS["price_12m"], SCENARIOS["weights_12m"], True),
-        },
     }
     if out["q2_gp_per_rounded"] != 6645:
         raise SystemExit(f"unit check failed: {out['q2_gp_per_rounded']}")
@@ -350,18 +305,6 @@ def draw(derived: dict) -> None:
         "Thousands of vehicles. Update exhibit through Q2 2026. Q3 from the Oct 2 8-K. No prices.",
         "Thousands of vehicles",
     )
-    needed = derived["earnings_needed_m"]
-    hbar(
-        OUT / "05-gap.svg",
-        "What the close implies versus trailing operating income",
-        [
-            ("Trailing operating income", derived["ttm"]["oi_m"] / 1000, BLUE),
-            ("Implied earnings at 40x", needed["40"] / 1000, AMBER),
-            ("Implied earnings at 20x", needed["20"] / 1000, RED),
-            ("Implied earnings at 10x", needed["10"] / 1000, RED),
-        ],
-        "Billions of dollars. Multiples are assumptions. Not an offer.",
-    )
     hbar(
         OUT / "06-floors.svg",
         "Stated factory floors versus the Q2 run rate",
@@ -379,15 +322,10 @@ def main() -> None:
     print(json.dumps({
         "gp_per": derived["q2_gp_per_rounded"],
         "capex_per": derived["q2_capex_per_delivery"],
-        "equity_t": round(derived["equity"] / 1e12, 3),
-        "ev_t": round(derived["ev"] / 1e12, 3),
         "net_cash_b": round(derived["net_cash"] / 1e9, 3),
         "ttm_oi_m": derived["ttm"]["oi_m"],
         "ttm_ni_m": derived["ttm"]["ni_m"],
-        "multiple_ni": derived["multiples"]["equity_over_ttm_ni"],
-        "needed_20_b": round(derived["earnings_needed_m"]["20"] / 1000, 1),
         "yoy": derived["q3_vs_year_ago_deliveries"],
-        "scenarios": derived["scenarios"],
         "units": derived["units"],
     }, indent=2))
 
