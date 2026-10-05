@@ -153,12 +153,12 @@ z
    <g id="text_6">
     <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(654.63233 229.483854)">Customers</text>
     <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(617.03608 239.086041)">Anthropic $1.25B/mo (90-day</text>
-    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(611.420455 248.688229)">exit after ramp); Google (press);</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(611.420455 248.688229)">exit after ramp); not named here;</text>
     <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(635.899205 258.290416)">Grok / X subscribers</text>
    </g>
    <g id="text_7">
     <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(254.725 365.466447)">Equity holders: Musk 82.4% of votes; Class A float ~2.6B shares today</text>
-    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(257.769375 375.068634)">+~2.75B unlockable by Dec 8 2026; ~6.4B Musk shares Jun 12 2027</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(257.769375 375.068634)">Dec 8 is 0.33B or 0.80B, not both; ~6.4B Musk shares Jun 12 2027</text>
    </g>
    <g id="patch_9">
     <path d="M 208.903651 103.392718 
@@ -261,8 +261,8 @@ L 394 324.736414
    </g>
   </g>
   <g id="text_17">
-   <text style="font-size: 6.3px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #555555" transform="translate(7.92 450.934277)">Source: SpaceX 424B4 (SEC acc. 0001628280-26-042639) and Q2 2026 8-K Ex. 99.1 (acc. 0001628280-26-052515), fetched 2026-10-02 19:09-19:10 ET; Starship orbit from @SpaceX status 2104653511883628569; lockups from 424B4; figures as</text>
-   <text style="font-size: 6.3px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #555555" transform="translate(7.92 458.496)">cited in the report. Research only, not financial advice.</text>
+   <text style="font-size: 6.3px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #555555" transform="translate(7.92 450.934277)">Source: SpaceX 424B4 (SEC acc. 0001628280-26-042639) and Q2 2026 8-K Ex. 99.1 (acc. 0001628280-26-052515), filings saved Oct 4, 2026; Sept 28 flight from the Motley Fool page saved Oct 4, 2026; lockups from 424B4; figures as</text>
+   <text style="font-size: 6.3px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #555555" transform="translate(7.92 458.496)">named in the note. Research only, not financial advice.</text>
   </g>
  </g>
  <defs>
