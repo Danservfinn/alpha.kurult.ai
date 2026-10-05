@@ -350,6 +350,17 @@ def render_list(lines: list[str], i: int, out: list[str], marker: re.Pattern, ta
             items.append(m.group(1).strip())
         elif line[:1] in (" ", "\t") and line.strip() and items:
             items[-1] += " " + line.strip()
+        elif not line.strip() and items:
+            # A blank line does not restart the list. CommonMark keeps the
+            # same <ol> so numbers continue. Stop only when the next
+            # non-blank line is not another item of this list.
+            j = i + 1
+            while j < len(lines) and not lines[j].strip():
+                j += 1
+            if j < len(lines) and marker.match(lines[j]):
+                i += 1
+                continue
+            break
         else:
             break
         i += 1
@@ -401,6 +412,22 @@ def render_table(lines: list[str], i: int, out: list[str], name: str) -> int:
     return i
 
 
+VIEWBOX_RE = re.compile(r'viewBox="\s*0\s+0\s+([0-9.]+)\s+([0-9.]+)\s*"')
+
+
+def figure_dims(src: str) -> tuple[str, str]:
+    """Intrinsic size from the SVG viewBox. Without it, a lazy <img> collapses
+    to 0 height and never intersects, so the chart never paints."""
+    text = (ROOT / src.lstrip("/")).read_text(encoding="utf-8")
+    m = VIEWBOX_RE.search(text)
+    if not m:
+        return "", ""
+    def px(raw: str) -> str:
+        value = float(raw)
+        return str(int(value)) if value.is_integer() else raw
+    return px(m.group(1)), px(m.group(2))
+
+
 def render_figure(m: re.Match, out: list[str], name: str) -> None:
     alt, src, caption = m.group(1).strip(), m.group(2), (m.group(3) or "").strip()
     if not alt:
@@ -410,9 +437,11 @@ def render_figure(m: re.Match, out: list[str], name: str) -> None:
     if not (ROOT / src.lstrip("/")).is_file():
         raise BuildError(f"{name}: image file not found: {src}")
     cap = f"<figcaption>{render_inline(caption)}</figcaption>" if caption else ""
+    w, h = figure_dims(src)
+    dims = f' width="{esc(w)}" height="{esc(h)}"' if w and h else ""
     out.append(
-        f'<figure class="figure"><a href="{esc(src)}"><img src="{esc(src)}" alt="{esc(alt)}" '
-        f'loading="lazy" decoding="async"></a>{cap}</figure>'
+        f'<figure class="figure"><a href="{esc(src)}"><img src="{esc(src)}" alt="{esc(alt)}"{dims} '
+        f'loading="eager" decoding="async"></a>{cap}</figure>'
     )
 
 
@@ -1336,23 +1365,39 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; grid-t
 }
 .keystrip {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1px;
-  background: var(--edge);
+  background: #000;
   border: 1px solid var(--edge);
   margin: 0 0 .7rem;
 }
-.keystrip div { background: #000; padding: .32rem .5rem; min-width: 0; }
+.keystrip div {
+  background: #000;
+  border: 1px solid var(--edge);
+  padding: .32rem .5rem;
+  min-width: 0;
+  overflow: hidden;
+}
+.keystrip div:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .keystrip dt {
   font-size: .68rem;
-  letter-spacing: .08em;
+  letter-spacing: .04em;
   text-transform: uppercase;
   color: var(--amber);
+  overflow-wrap: anywhere;
 }
 .keystrip dd {
   margin: 0;
   color: var(--data);
   font-size: .84rem;
+  overflow-wrap: anywhere;
+}
+.keystrip .key-note {
+  display: block;
+  margin-top: .2rem;
+  font-size: .72rem;
+  line-height: 1.35;
+  color: #9aa3ad;
   overflow-wrap: anywhere;
 }
 .article-title {
@@ -1522,9 +1567,6 @@ figure, table, pre { max-width: 100%; }
 }
 
 /* Wide -------------------------------------------------------------------- */
-@media (min-width: 40rem) {
-  .keystrip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
 @media (min-width: 48rem) {
   .entry { grid-template-columns: 7.5rem minmax(0, 1fr); }
   .entry-summary { grid-column: 2; }
