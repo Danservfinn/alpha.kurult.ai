@@ -300,7 +300,6 @@ a:hover { background: var(--yellow); color: #000; text-decoration: none; }
 .chart-empty { color: var(--text-dim); margin: 0; }
 .chart-svg { width: 100%; height: auto; display: block; }
 .badge { color: var(--text-dim); }
-.desk-split { display: grid; gap: 1.25rem; }
 .mkt-grid { display: grid; gap: 1rem; }
 .mkt { width: 100%; border-collapse: collapse; font-size: .78rem; }
 .mkt th, .mkt td { text-align: right; padding: .28rem .35rem; border-bottom: 1px solid var(--edge-soft); }
@@ -640,10 +639,7 @@ figure, table, pre { max-width: 100%; }
   .entry { grid-template-columns: 7.5rem minmax(0, 1fr); }
   .entry-summary { grid-column: 2; }
 }
-@media (min-width: 64rem) {
-  .desk-split { grid-template-columns: minmax(0, 1.4fr) minmax(0, .8fr); }
-  .mkt-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
+/* Single column, full page width (Danny 2026-10-05). Do not re-add column splits. */
 @media (min-width: 72rem) {
   .entry { grid-template-columns: 7.5rem 17rem minmax(0, 1fr); }
   .entry-summary { grid-column: 3; }
@@ -727,7 +723,8 @@ figure, table, pre { max-width: 100%; }
   .source-url { display: block; color: #000; }
 }
 
-/* Full-width desk grid. Mobile stays one column. */
+/* Single-column scaffolds at every viewport width. Panels span the full
+   page width; they stack top to bottom. */
 .desk-grid, .asset-layout, .article-layout { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
 .desk-chart-slot, .desk-markets, .desk-chain, .desk-intro, .desk-ledger, .asset-main, .asset-rail, .article-rail, .article, .article-desk { min-width: 0; }
 .chart-plot { height: 28rem; width: 100%; max-width: 100%; touch-action: pan-y; }
@@ -750,27 +747,8 @@ figure, table, pre { max-width: 100%; }
 .compare-row { border: 1px solid var(--edge-soft); padding: .45rem; margin: 0 0 .45rem; }
 .tick-on { outline: 1px solid var(--amber); }
 @media (max-width: 40rem) { .chart-plot { height: 18rem; } }
-@media (min-width: 48rem) {
-  .desk-grid, .asset-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .desk-chart-slot, .desk-intro, .desk-ledger { grid-column: 1 / -1; }
-  .ledger { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .article-layout { grid-template-columns: minmax(0, 1fr) minmax(16rem, 24rem); align-items: start; }
-  .article { grid-column: 1; grid-row: 1; }
-  .article-rail { grid-column: 2; grid-row: 1 / span 2; }
-  .article-desk { grid-column: 1; grid-row: 2; }
-}
-@media (min-width: 90rem) {
-  .desk-grid, .asset-layout { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .desk-chart-slot { grid-column: span 2; }
-  .desk-intro, .desk-ledger { grid-column: 1 / -1; }
-  .ledger { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .asset-main { grid-column: span 1; grid-row: 1; }
-  .asset-rail { grid-column: span 3; grid-row: 1; }
-  .article-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(18rem, 26rem); }
-  .article { grid-column: 1 / span 2; grid-row: 1; }
-  .article-rail { grid-column: 3; grid-row: 1 / span 2; }
-  .article-desk { grid-column: 1 / span 2; grid-row: 2; }
-}
+/* Wide-viewport layout stays one column. See Danny 2026-10-05: single
+   column, full page width. Panels stack; no side rails, no column splits. */
 @media (max-width: 700px) {
   .article-layout { gap: 0; }
   .article-rail { display: contents; }
