@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 212" role="img">
+<title>Q2 2026: profit per cash car versus capex per delivery</title>
+<rect width="920" height="212" fill="#0b0d10"/>
+<text x="28" y="36" fill="#f0a202" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">Q2 2026: profit per cash car versus capex per delivery</text>
+<text x="28" y="90" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Gross profit per cash car</text>
+<rect x="300" y="72" width="244.9" height="26" fill="#f0a202"/>
+<text x="552.9" y="90" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">6,645</text>
+<text x="28" y="136" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Capex per delivery</text>
+<rect x="300" y="118" width="444.4" height="26" fill="#e85d4c"/>
+<text x="752.4" y="136" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">12,057</text>
+<text x="28" y="194" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11">Derived. Capex is company spend per delivery, not a vehicle bill of materials.</text>
+</svg>
