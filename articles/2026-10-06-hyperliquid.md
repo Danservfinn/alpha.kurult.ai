@@ -44,6 +44,14 @@ This is the strongest fundamental chart in crypto: $68.5M fees and $53M revenue 
 
 ![Hyperliquid versus Bitcoin indexed to 100](/assets/2026-10-06-hyperliquid/01-vs-btc.svg "Hyperliquid (HYPE) versus BTC, indexed to 100 at the start of the window, daily, 90 days. Source: CoinGecko market_chart, publish pull Oct 6, 2026. [Data provided by CoinGecko](https://www.coingecko.com/).")
 
+
+## First principles: the fee engine
+
+The unit is a filled contract, and the physics are exchange economics: volume times fee, minus the cost of trustlessness. Hyperliquid runs about $197B of 30-day perp volume (DeFiLlama, read Oct 5). Fee tiers run single-digit basis points of notional. Multiply through and you get the $68.5M of 30-day fees, $53M of protocol revenue. Those are countable, on-chain, not narrative.
+
+The engine has two fuel lines. Line one is trading volume, cyclical, leveraged to crypto volatility. Line two arrived October 3: AQAv2 routes about 90% of USDC reserve yield to buybacks, roughly $193M a year extrapolated (EXTRAPOLATION from the first $14.58M monthly payment, not a confirmed run rate). Line two is volume-independent. It is bond-like: it scales with stablecoin float parked on the platform, not with how much people trade.
+
+The cost side is the part bulls skip. A $90B FDV implies the market is pre-paying roughly 130 years of current annualized earnings ($681M). Buybacks destroy supply at about $900M a year if the extrapolation holds, which is 1% of FDV annually. For the price to merely hold, every dollar of buyback must be matched by a dollar of new demand, forever, while unlocks feed supply the other way. The first-principles question is not whether Hyperliquid wins the DEX-perp war. At 58% share it already has. The question is what multiple the market pays for a fee engine whose cyclical line can halve in a quiet quarter and whose structural line is one governance vote old.
 ## Market table
 
 | Metric | Value |
