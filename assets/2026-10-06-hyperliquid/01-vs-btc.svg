@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 520" role="img">
+<title>Hyperliquid versus Bitcoin, indexed to 100</title>
+<rect width="920" height="520" fill="#0b0d10"/>
+<text x="28" y="36" fill="#f0a202" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">Hyperliquid (HYPE) vs BTC, indexed to 100, 90 days</text>
+<line x1="72" y1="460.0" x2="896" y2="460.0" stroke="#2a3038"/>
+<text x="64" y="464.0" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="end">77</text>
+<line x1="72" y1="357.5" x2="896" y2="357.5" stroke="#2a3038"/>
+<text x="64" y="361.5" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="end">94</text>
+<line x1="72" y1="255.0" x2="896" y2="255.0" stroke="#2a3038"/>
+<text x="64" y="259.0" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="end">110</text>
+<line x1="72" y1="152.5" x2="896" y2="152.5" stroke="#2a3038"/>
+<text x="64" y="156.5" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="end">127</text>
+<line x1="72" y1="50.0" x2="896" y2="50.0" stroke="#2a3038"/>
+<text x="64" y="54.0" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="end">144</text>
+<path d="M 72.0 319.4 L 81.2 310.1 L 90.3 301.0 L 99.5 304.2 L 108.6 304.6 L 117.8 319.1 L 126.9 292.4 L 136.1 295.0 L 145.2 304.1 L 154.4 303.0 L 163.6 294.2 L 172.7 295.5 L 181.9 290.4 L 191.0 277.2 L 200.2 281.6 L 209.3 291.7 L 218.5 301.2 L 227.6 298.9 L 236.8 288.8 L 246.0 305.0 L 255.1 303.3 L 264.3 302.9 L 273.4 294.7 L 282.6 313.8 L 291.7 314.2 L 300.9 307.0 L 310.0 307.4 L 319.2 301.5 L 328.4 296.1 L 337.5 299.5 L 346.7 293.4 L 355.8 293.0 L 365.0 293.6 L 374.1 302.9 L 383.3 306.7 L 392.4 307.9 L 401.6 307.7 L 410.8 312.1 L 419.9 311.7 L 429.1 313.5 L 438.2 297.2 L 447.4 295.3 L 456.5 249.8 L 465.7 212.9 L 474.8 160.5 L 484.0 172.8 L 493.2 166.5 L 502.3 154.1 L 511.5 158.6 L 520.6 153.6 L 529.8 141.3 L 538.9 165.5 L 548.1 161.5 L 557.2 167.1 L 566.4 158.2 L 575.6 169.5 L 584.7 170.6 L 593.9 131.4 L 603.0 147.2 L 612.2 145.7 L 621.3 140.7 L 630.5 152.9 L 639.6 159.2 L 648.8 160.9 L 658.0 178.0 L 667.1 171.6 L 676.3 171.0 L 685.4 175.4 L 694.6 162.0 L 703.7 187.5 L 712.9 182.0 L 722.0 179.8 L 731.2 135.3 L 740.4 131.7 L 749.5 132.3 L 758.7 78.7 L 767.8 82.8 L 777.0 100.6 L 786.1 100.6 L 795.3 103.6 L 804.4 100.2 L 813.6 99.9 L 822.8 109.5 L 831.9 107.9 L 841.1 108.6 L 850.2 96.0 L 859.4 99.4 L 868.5 97.0 L 877.7 79.7 L 886.8 86.9 L 896.0 89.6" fill="none" stroke="#9aa3ad" stroke-width="2"/>
+<path d="M 72.0 319.4 L 81.2 324.1 L 90.3 320.8 L 99.5 326.6 L 108.6 322.1 L 117.8 357.3 L 126.9 338.7 L 136.1 326.4 L 145.2 382.3 L 154.4 391.0 L 163.6 386.8 L 172.7 378.5 L 181.9 366.5 L 191.0 381.0 L 200.2 394.4 L 209.3 411.3 L 218.5 412.1 L 227.6 405.7 L 236.8 392.2 L 246.0 424.6 L 255.1 432.9 L 264.3 444.4 L 273.4 426.4 L 282.6 456.7 L 291.7 460.0 L 300.9 456.4 L 310.0 443.6 L 319.2 433.8 L 328.4 416.6 L 337.5 423.6 L 346.7 442.5 L 355.8 433.2 L 365.0 444.5 L 374.1 433.7 L 383.3 439.2 L 392.4 424.7 L 401.6 411.8 L 410.8 420.8 L 419.9 417.1 L 429.1 414.9 L 438.2 393.9 L 447.4 402.1 L 456.5 301.2 L 465.7 264.3 L 474.8 247.5 L 484.0 211.2 L 493.2 186.1 L 502.3 216.7 L 511.5 209.8 L 520.6 185.6 L 529.8 163.9 L 538.9 198.2 L 548.1 175.6 L 557.2 206.1 L 566.4 168.7 L 575.6 181.4 L 584.7 189.1 L 593.9 138.7 L 603.0 166.2 L 612.2 157.2 L 621.3 134.1 L 630.5 159.7 L 639.6 159.7 L 648.8 174.1 L 658.0 219.6 L 667.1 211.7 L 676.3 209.7 L 685.4 230.6 L 694.6 203.4 L 703.7 234.6 L 712.9 222.6 L 722.0 160.4 L 731.2 92.3 L 740.4 95.9 L 749.5 82.3 L 758.7 78.6 L 767.8 50.0 L 777.0 79.2 L 786.1 96.5 L 795.3 93.9 L 804.4 92.3 L 813.6 100.2 L 822.8 138.4 L 831.9 151.5 L 841.1 106.4 L 850.2 136.8 L 859.4 123.8 L 868.5 121.9 L 877.7 110.8 L 886.8 77.6 L 896.0 102.7" fill="none" stroke="#f0a202" stroke-width="2.5"/>
+<text x="72" y="496" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="middle">Jul 09</text>
+<text x="209" y="496" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="middle">Jul 24</text>
+<text x="347" y="496" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="middle">Aug 08</text>
+<text x="484" y="496" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="middle">Aug 23</text>
+<text x="621" y="496" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="middle">Sep 07</text>
+<text x="759" y="496" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="middle">Sep 22</text>
+<text x="896" y="496" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="middle">Oct 06</text>
+<rect x="72" y="18" width="12" height="12" fill="#f0a202"/>
+<text x="90" y="29" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12">HYPE</text>
+<rect x="162" y="18" width="12" height="12" fill="#9aa3ad"/>
+<text x="180" y="29" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12">BTC</text>
+<text x="896" y="29" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" text-anchor="end">HYPE 135 | BTC 137</text>
+</svg>
