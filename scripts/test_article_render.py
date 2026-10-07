@@ -37,5 +37,39 @@ class FigureRender(unittest.TestCase):
         self.assertNotIn('loading="lazy"', html)
 
 
+class EmptyLatestNote(unittest.TestCase):
+    def test_btc_and_eth_say_no_current_note_when_empty(self):
+        import desk_html
+
+        row = {
+            "sym": "BTC",
+            "name": "Bitcoin",
+            "class": "Crypto",
+            "credit": "Data provided by CoinGecko",
+            "credit_url": "https://www.coingecko.com/",
+            "chart": "none",
+        }
+        html = desk_html.render_asset_body(row, [], [], "")
+        self.assertIn("<p>No current note</p>", html)
+        self.assertNotIn("callstrip", html)
+        eth = dict(row, sym="ETH", name="Ether")
+        self.assertIn("<p>No current note</p>", desk_html.render_asset_body(eth, [], [], ""))
+
+    def test_other_assets_stay_quiet_when_empty(self):
+        import desk_html
+
+        row = {
+            "sym": "SOL",
+            "name": "Solana",
+            "class": "Crypto",
+            "credit": "Data provided by CoinGecko",
+            "credit_url": "https://www.coingecko.com/",
+            "chart": "none",
+        }
+        html = desk_html.render_asset_body(row, [], [], "")
+        self.assertNotIn("No current note", html)
+        self.assertNotIn("Latest note", html)
+
+
 if __name__ == "__main__":
     unittest.main()

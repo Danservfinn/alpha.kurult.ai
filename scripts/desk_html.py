@@ -258,6 +258,14 @@ def render_asset_body(row: dict, articles: list[Any], securities: list[dict], ch
     <p>{esc(note.summary)}</p>
   </div>
 </section>"""
+    elif row["sym"] in {"BTC", "ETH"}:
+        # Temujin 2026-10-06: when this panel empties, show one plain line.
+        latest = """<section class="panel" aria-label="Latest note">
+  <div class="panel-head"><span>Latest note</span></div>
+  <div class="panel-body">
+    <p>No current note</p>
+  </div>
+</section>"""
     all_notes = ""
     if notes:
         items = "\n".join(
