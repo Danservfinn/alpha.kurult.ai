@@ -1,13 +1,13 @@
 ---
 title: "Constellation (DAG): the snapshot fee is $2.93 a day"
 date: 2026-10-06
-summary: "Deep dive on Constellation (DAG). The scarce unit is one inclusion in a Hypergraph snapshot. Measured fees are $2.93 a day against a $30.6 million cap on the Oct 4 price box. Research view: avoid. Research only."
+summary: "Deep dive on Constellation (DAG). The scarce unit is one inclusion in a Hypergraph snapshot. Measured fees are $2.93 a day against a $30.6 million cap on the Oct 4 price box. Research view: Bearish, medium conviction. Research only."
 ticker: DAG
-rating: "Avoid"
+rating: "Bearish, medium conviction"
 conviction: "Medium"
 price: "$0.00777823 (CoinGecko price box, last_updated 15:31:50 ET Oct 4). Publish pull $0.0084973 at 20:44 ET Oct 6 is labeled and is not used in the ratios."
-call: "Our research view at the Oct 4 price box of $0.00777823 is avoid. Horizon 12 months. Conviction medium. There is no entry."
-position: "Research only. Not financial advice. No position. No compensation from Constellation Network, Inc., from a validator, or from a token holder. No token was acquired or disposed of for this research. Conflict: none known."
+call: "Our research view at the Oct 4 price box of $0.00777823 is Bearish, medium conviction. Horizon 12 months. Conviction medium."
+position: "Research only. Not financial advice. No compensation from Constellation Network, Inc., from a validator, or from a token holder. No token was acquired or disposed of for this research. Conflict: none known."
 keys:
   - label: "Fees a day"
     value: "$2.93"
@@ -34,7 +34,7 @@ sources:
     url: https://www.coingecko.com
   - label: "Constellation docs, What is DAG (snapshot fees burned)."
     url: https://docs.constellationnetwork.io/network-intro/what-is-dag.md
-  - label: "Constellation docs, Metanomics (emission split)."
+  - label: "Constellation docs, Metanomics (emission split, price in the formula, 6% falling to 0.5%, old model end just under 3.69 billion DAG). Saved Oct 4. Duwa confirmed the live page 21:14 ET Oct 6."
     url: https://docs.constellationnetwork.io/network-intro/white-papers/metanomics.md
   - label: "Constellation docs, Network fees whitepaper."
     url: https://docs.constellationnetwork.io/network-intro/white-papers/network-fees-on-the-hypergraph.md
@@ -70,7 +70,7 @@ sources:
     url: https://api.usaspending.gov/api/v2/awards/CONT_AWD_W912CH24CL012_9700_-NONE-_-NONE-/
   - label: "USAspending spending_by_award search that returned the three UEI awards, including W911S222P1470 (fetched 2026-10-04 15:46:44 ET)."
     url: https://api.usaspending.gov/api/v2/search/spending_by_award/
-  - label: "Justia docket, Morgan et al. v. Constellation Network, Inc. et al., N.D. Cal. 4:21-cv-08869. curl 403 at 21:14:17 ET. Disposition read from the saved page extract 21:16 to 21:21 ET. Status and allegations only. No amount."
+  - label: "Justia docket, Morgan et al. v. Constellation Network, Inc. et al., N.D. Cal. 4:21-cv-08869. curl 403 at 21:14:17 ET on Oct 4. Disposition read from the saved page extract 21:16 to 21:21 ET. Status and allegations only. No amount."
     url: https://dockets.justia.com/docket/california/candce/4:2021cv08869/387981
   - label: "Complaint PDF, Morgan et al. v. Constellation Network, Inc. et al., HTTP 200 at 21:14 ET, 55 pages. Allegations and a prayer for restitution, not findings. No amount is used from this file."
     url: https://scott-scott.com/wp-content/uploads/2022/08/2021-11-16-1-COMPLAINT-against-Altif-Brown-Constellation-Network-Inc-Benjamin-Diggles-Mathias-Goldmann-Main-Document.pdf
@@ -86,6 +86,14 @@ sources:
     url: https://docs.google.com/spreadsheets/d/17bJ6Ip7vJLgBDqhe52GQRMc6y0yqaLmdnHhrJqSCLG8/
   - label: "ip-api.com legal terms. Country counts in this note come from the graded Oct 4 batch. Orda should read this page before ship. Not a clearance."
     url: https://ip-api.com/docs/legal
+  - label: "CoinGecko public API, coins/wrapped-dag (fetched 2026-10-04 15:47:00 ET, last_updated 15:44:50 ET). Separate listing. Not added to the native cap."
+    url: https://api.coingecko.com/api/v3/coins/wrapped-dag
+  - label: "CoinGecko web, constellation-labs. Duwa read the markets table and the Why DAG is moving blurb about 21:16 ET Oct 6. Depth figures in the counter-view are that read. A later page extract about 21:31 ET is saved and is not substituted."
+    url: https://www.coingecko.com/en/coins/constellation-labs
+  - label: "Dagscan 90-day metagraph stats. Duwa read 21:18 ET Oct 6: DOR paid 19,607 of 29,970.50 DAG (65.4%), top two 84.8%. Saved pull 21:29 ET Oct 6 prints the same shares."
+    url: https://api.dagscan.io/stats/metagraphs?days=90
+  - label: "Dagscan staking, pending withdrawals. Duwa read 62.9 million DAG at 21:12 ET Oct 6. Saved pull captured 21:27 ET Oct 6 prints 62,890,310 DAG."
+    url: https://api.dagscan.io/stats/staking
 ---
 
 Research only. Not financial advice. All times are ET (UTC-4). **Labeling rule for this note:** every fee, issuance, node, and cap figure in the research body is the graded Oct 4 bundle. The price box is CoinGecko coins/constellation-labs, last_updated 15:31:50 ET on 2026-10-04, fetched 15:33:47 ET. A later peer pull at 15:39:42 ET is used only for peer comparisons and is labeled when used. The Oct 6 publish pull is a later tape. It is not mixed into the fee gap, the scenarios, or the call. **Charts:** market charts use the Oct 4 CoinGecko series. Operating charts use Dagscan, the L0 cluster, and the peer explorers named in the captions. Chart 17 from the bundle is internal and is not published. No CoinGecko raw JSON and no CSV is committed with this note. Morgan et al. v. Constellation Network is allegations and docket status only. No amount from that case is stated.
@@ -96,7 +104,25 @@ Research only. Not financial advice. All times are ET (UTC-4). **Labeling rule f
 
 ## The call in one paragraph
 
-Constellation charges applications, not end users, to record data in a global snapshot. That is a real product shape. The tape does not show the product earning. Measured fees are $2.93 a day, $1,068 a year, against a $30.6 million cap on the Oct 4 price box. A bottom-up reading of the published emission split plus the saved 90-day delegator yield implies about 489,964 new DAG a day. The observed CoinGecko circulating change has a median of 558,245 DAG a day. Those two prints are 13.9% apart, inside the 15% band. Fees do not pay the servers. New coins do. The October 15 cut to 30 validators, chosen each quarter by delegation ranking, shrinks the set that shares the validator slice. It does not create a fee stream. Conviction is medium because the fee gap is measured and does not depend on the dilution estimate. It is not high because an unratified emission vote can cut issuance, and because a fee step-up is a dated possibility, not a measured one. No entry price. There is no entry. Our research view is **avoid**.
+Constellation charges applications, not end users, to record data in a global snapshot. That is a real product shape. The tape does not show the product earning. Measured fees are $2.93 a day, $1,068 a year, against a $30.6 million cap on the Oct 4 price box. A bottom-up reading of the published emission split plus the saved 90-day delegator yield implies about 489,964 new DAG a day. The observed CoinGecko circulating change has a median of 558,245 DAG a day. Those two prints are 13.9% apart, inside the 15% band. Fees do not pay the servers. New coins do. The October 15 cut to 30 validators, chosen each quarter by delegation ranking, shrinks the set that shares the validator slice. It does not create a fee stream. Conviction is medium because the fee gap is measured and does not depend on the dilution estimate. It is not high because an unratified emission vote can cut issuance, and because a fee step-up is a dated possibility, not a measured one. Our research view is **Bearish, medium conviction**.
+
+## Counter-view
+
+Duwa's D4 read, 21:14 to 21:20 ET Oct 6. These points were missed or under-cited. They do not change the call. No figure below is used without a saved source and her ET time.
+
+Metanomics emissions depend on price. The saved Metanomics page says the formula takes the DAG market price as an input ("When the token price is higher, less inflation is required"), starting at 6% and falling to 0.5%. Supply growth is not a constant. Duwa confirmed that page at 21:14 ET Oct 6. Source: the Oct 4 docs pull of https://docs.constellationnetwork.io/network-intro/white-papers/metanomics.md.
+
+The +839,185,032 CoinGecko step lands at about 3.71 billion DAG, against the old model's end of just under 3.69 billion DAG on that same page. That supports the restatement reading, not a mint. The step is the Oct 4 CoinGecko daily series, fetched 15:39:28 ET. Duwa noted the comparison at 21:14 ET Oct 6. Whether CoinGecko switched from circulating to total is unknown.
+
+Fee concentration. Dagscan 90-day metagraph file, Duwa read 21:18 ET Oct 6: one metagraph, DAG0CyySf35ftDQDQBnd1bdQ9aPyUdacMghpnCuM, paid 19,607 of 29,970.50 DAG of submission fees (65.4%). The top two paid 84.8%. The Oct 4 metagraph list names that id DOR (Dor Technologies), and its owner address is the DOR Node 1 wallet. A saved pull at 21:29 ET Oct 6 prints 19,608.907 of 29,973.04 DAG (65.4%) and the same 84.8% top-two share. The 21:18 figures are the ones used. The later file is not substituted.
+
+Thin book. CoinGecko web markets table, Duwa read about 21:16 ET Oct 6: about $20.7k of -2% depth and $17.3k of +2% depth, against $649,107 of 24h volume. Record: her D4 review. A later tickers pull at 21:30 ET is saved and is not substituted into these figures.
+
+The unlabeled wallet is 524,084,295 DAG (Dagscan wallets, 15:39 ET Oct 4). Pending withdrawals were 62.9 million DAG on Duwa's Dagscan staking read at 21:12 ET Oct 6. The saved staking pull captured 21:27 ET prints 62,890,310 DAG.
+
+CoinGecko's "Why DAG is moving" blurb credits Constellation Energy, a different company. Duwa read that blurb about 21:16 ET. A saved page extract about 21:31 ET still shows "Constellation Energy Deals Drive DAG Price Up Amid Network Streamlining", and that page prints a 14-day move of 40.8%. Part of that move may be name confusion. The news rows on that extract are Constellation Energy, not this network.
+
+Emissions are reflexive to price, depth is about $20k, and dated catalysts sit on Oct 9 and Oct 15. That is context for the call, not a second call.
 
 ## What Constellation is
 
@@ -106,17 +132,17 @@ Metaphor: a toll booth on a road where most cars pass free. The booth burns the 
 
 Memorable number, before any other figure: $2.93 a day of measured fees, $1,068 a year, against a $30.6 million market cap.
 
-The native asset is CoinGecko id constellation-labs, symbol DAG, name Constellation. The platforms object on the Oct 4 coin pull is empty. No contract address on the native coin. wrapped-dag (WDAG), Ethereum contract 0x2e3cfe45e3ee7c017277f22e35d2f29edc99d570, also has a Base address. That listing is separate. Its cap is not added to the native cap. Its price was $0.00780055 at its fetch. Search hits that are not this asset, and are not used: blockdag (BDAG), dagger (XDAG), hoodagent, dagora (DADA), kdag, dagama-world, and several Constellation Energy stock tokens. Anagram's "Constellation" SIMD note is a Solana proposal, not this network.
+The native asset is CoinGecko id constellation-labs, symbol DAG, name Constellation. The platforms object on the Oct 4 coin pull is empty. No contract address on the native coin. wrapped-dag (WDAG), Ethereum contract 0x2e3cfe45e3ee7c017277f22e35d2f29edc99d570, also has a Base address. That listing is separate. Its cap is not added to the native cap. Its price was $0.00780055, CoinGecko last_updated 15:44:50 ET Oct 4, fetched 15:47:00 ET Oct 4. Search hits that are not this asset, and are not used: blockdag (BDAG), dagger (XDAG), hoodagent, dagora (DADA), kdag, dagama-world, and several Constellation Energy stock tokens. Anagram's "Constellation" SIMD note is a Solana proposal, not this network.
 
 ![Diagram of a snapshot slot, a burned toll, and new coins paying the operator](/assets/2026-10-06-constellation/07-how-it-works.svg "How the snapshot slot works. Sources: Constellation docs, what-is-dag and metanomics, saved 2026-10-04. Simplified schematic from the graded bundle. Not a market chart.")
 
-![Diagram of fees burned and new coins paying operators](/assets/2026-10-06-constellation/08-money-cascade.svg "Money cascade. Snapshot fees are burned. Operators are paid in new DAG. Sources: Dagscan 90-day fees, 2026-10-04 15:39 ET; Metanomics split; CoinGecko price box. [Data provided by CoinGecko](https://www.coingecko.com/).")
+![Diagram of fees burned and new coins paying operators](/assets/2026-10-06-constellation/08-money-cascade.svg "Even split across 119 Ready nodes: $1,969 a year. Hosting is $79.70 a month, $956 a year. Not the withdrawn $80 assumption and not 123 nodes. Sources: cloud-mercato CPX51; Frankfurter EURUSD 1.1225, rate date 2026-10-02; construction A validator slice; CoinGecko price box. [Data provided by CoinGecko](https://www.coingecko.com/).")
 
 ## First principles: the snapshot slot
 
 The scarce unit is one inclusion in a Hypergraph snapshot. The metric that values it is the DAG fee paid per snapshot, which is $0.000053 at the price box (30,400.13 DAG of snapshot fees over 4,424,056 snapshots in 90 days). A validator seat is not the unit being sold. It is the right to write snapshots. That right is capped by a rule, not by physics. Every later section comes back to fee per snapshot, or to the daily sum of those fees.
 
-Unit line: one snapshot inclusion is worth $0.000053 today.
+Unit line: one snapshot inclusion clears at the measured fee. No scarcity premium is in the tape.
 
 ### What one unit earns
 
@@ -204,7 +230,7 @@ Unit line: $2.93 a day of fees does not pay a $79.70 server, and the coins that 
 
 ![Cost per snapshot on a log scale](/assets/2026-10-06-constellation/18-cost-per-snapshot.svg "Cost per snapshot. The hollow bar is the price-implied fee, an unproven level, not a result. Measured fee $0.000053. Sources: Dagscan 90-day snapshot fees; CoinGecko price box, fetched 15:33 to 15:39 ET. [Data provided by CoinGecko](https://www.coingecko.com/).")
 
-![Fees against the issuance proxy](/assets/2026-10-06-constellation/04-fees-vs-issuance-proxy.svg "Fees against the issuance proxy. $2.93 a day of fees versus construction A at 489,964 DAG a day. Sources: Dagscan; CoinGecko circulating series. [Data provided by CoinGecko](https://www.coingecko.com/).")
+![Fees against the issuance proxy](/assets/2026-10-06-constellation/04-fees-vs-issuance-proxy.svg "Fees against the issuance proxy. The bars are measured fees, $2.93 a day, and the CoinGecko median circulating change, 558,245 DAG a day, about $4,342 a day at the price box. Not construction A. Sources: Dagscan; CoinGecko circulating series, fetched 2026-10-04. [Data provided by CoinGecko](https://www.coingecko.com/).")
 
 ## Why the pivot does not show on the tape
 
@@ -286,14 +312,14 @@ The +839 million step. In the saved 365-day CoinGecko series the daily circulati
 
 Forward, using construction A at 489,964 DAG a day, from the L0 print:
 
-- 3 months (91 days): 3.978 billion DAG. At a constant $30,588,422 cap, implied price $0.00769.
-- 12 months: 4.112 billion DAG. Implied price $0.00744.
+- 3 months (91 days): 3.978 billion DAG. Supply growth +1.1% from the L0 print.
+- 12 months: 4.112 billion DAG. Supply growth +4.5% from the L0 print.
 
 Daily issuance in dollars: 489,964 x $0.00777823 = $3,811, which is 0.74% of the $512,900 daily volume. Fees are about 6 millionths of that volume. Dilution is visible on the tape. It is not a volume event.
 
 No unlock calendar was found. The supply chart is the circulating path, not a vest schedule. Max supply null means there is no cap to unlock into.
 
-Unit line: even if issuance matches construction A, constant-cap dilution over 12 months is about 4% of the price. The fee gap is the other 1,145x. Do not confuse them.
+Unit line: even if issuance matches construction A, supply is about 4.5% higher at 12 months. The fee gap is the other 1,145x. Do not confuse them.
 
 ![Holder concentration](/assets/2026-10-06-constellation/02-holder-concentration.svg "Holder concentration. Top 10 are 29.1% of the Dagscan total. Largest wallet 524,084,295 DAG, unlabeled. Source: Dagscan wallets, 2026-10-04 15:39 ET.")
 
@@ -344,11 +370,11 @@ Unit line: peers process more. Sonic's transaction count is down on the 30-day m
 | Securities status | No SEC or CFTC order was fetched. The 1,000,000 DAG qualification and the allowlist history are the facts a regulator would read | Headwind, unadjudicated. Not a finding that it is a security |
 | Sanctions | No OFAC designation fetched for the company or the token | Not rated. Absence of a search hit is not a clearance |
 | Government as customer | Three DoD awards, below. None pay in DAG. The blockchain-described one ended in 2022 | Neutral to mild tailwind for the company, not for the token. A past purchase order is not token demand |
-| ICO-era lawsuit | Morgan et al. v. Constellation Network, Inc. et al., N.D. Cal. No. 4:21-cv-08869, filed Nov 16, 2021. ERC-20 DAG holders alleging exclusion from the swap to mainnet DAG. Tentative settlement noticed Jan 9, 2023. Dismissed by stipulation Jul 14, 2023. Terminated Jul 17, 2023. Settlement terms not on the docket text. No class certified | Resolved legacy headwind. A governance and disclosure signal. Not a live case, and not token demand |
+| ICO-era lawsuit | Morgan et al. v. Constellation Network, Inc. et al., N.D. Cal. No. 4:21-cv-08869, filed Nov 16, 2021. ERC-20 DAG holders alleging exclusion from the swap to mainnet DAG. Tentative settlement noticed Jan 9, 2023. Dismissed by stipulation Jul 14, 2023. Terminated Jul 17, 2023. Settlement terms not on the docket text. No class certified | Resolved legacy headwind. Closed by stipulated dismissal. No findings. Not a live case, and not token demand |
 
 SAM.gov entity API returned 404. The SAM search HTML did not contain the UEI. SBIR.gov keyword search for "Constellation Network" returned unrelated balloon awards, not this company. AFWERX search HTML contained the query and no award body. Those three are recorded blockers, not evidence of no award. The awards themselves are on USAspending. A highergov reprint of FA864921P1550 calls it an SBIR Phase II (topic AF211-DCSO1). That classification is from the reprint, not from a sbir.gov award page.
 
-Morgan et al. v. Constellation Network, Inc. et al., N.D. Cal. No. 4:21-cv-08869, filed Nov 16, 2021. ERC-20 DAG holders alleging exclusion from the swap to mainnet DAG. Tentative settlement noticed Jan 9, 2023. Dismissed by stipulation Jul 14, 2023. Terminated Jul 17, 2023. Settlement terms not public. No class certified. Docket: https://dockets.justia.com/docket/california/candce/4:2021cv08869/387981. Complaint: the plaintiffs' counsel PDF, fetched 21:14 ET (HTTP 200, 55 pages). curl of the Justia URL at 21:14:17 ET was HTTP 403. The live docket text was read through a page extract at 21:16 to 21:21 ET. An archive.org copy of the same URL, snapshot 20230319233210, was fetched 21:17 ET. Justia says that docket text was last retrieved July 17, 2023, and that a later listing may be on PACER. PACER was not fetched. No dollar amount appears in the saved docket rows or in this note. The complaint's running header prints Case 3:21-cv-08869. That is the same matter. A CourtListener search of 3:21-cv-08869 without a district filter returned a D.N.J. case, not this one. classaction.org remains a derivative news page and is not the disposition. Rating: resolved legacy headwind, and a governance and disclosure signal. It does not change the fee metric.
+Morgan et al. v. Constellation Network, Inc. et al., N.D. Cal. No. 4:21-cv-08869, filed Nov 16, 2021. ERC-20 DAG holders alleging exclusion from the swap to mainnet DAG. Tentative settlement noticed Jan 9, 2023. Dismissed by stipulation Jul 14, 2023. Terminated Jul 17, 2023. Settlement terms are not in the docket text. No class certified. Docket: https://dockets.justia.com/docket/california/candce/4:2021cv08869/387981. Complaint: the plaintiffs' counsel PDF, fetched 21:14 ET (HTTP 200, 55 pages). curl of the Justia URL at 21:14:17 ET on Oct 4 was HTTP 403. The live docket text was read through a page extract at 21:16 to 21:21 ET. An archive.org copy of the same URL, snapshot 20230319233210, was fetched 21:17 ET. Justia says that docket text was last retrieved July 17, 2023, and that a later listing may be on PACER. PACER was not fetched. No dollar amount appears in the saved docket rows or in this note. The complaint's running header prints Case 3:21-cv-08869. That is the same matter. A CourtListener search of 3:21-cv-08869 without a district filter returned a D.N.J. case, not this one. classaction.org remains a derivative news page and is not the disposition. Rating: resolved legacy headwind. Closed by stipulated dismissal. No findings. It does not change the fee metric.
 
 The complaint alleges a Token Swap from ERC-20 DAG tokens to mainnet DAG tokens on a single day in April 2020, and alleges that holders were excluded. Those sentences are allegations, not findings. The PDF caption prints Case 3:21-cv-08869, Document 1, filed 11/16/21. The one-for-one language in that PDF is a prayer for restitution (paragraph 187), not a finding that the 2020 swap was 1:1. No amount from the complaint is used here.
 
@@ -380,8 +406,8 @@ Where the toll-booth metaphor breaks: the operator is paid in new coins, the tol
 | Layer | Gating variable | Earliest year | Unit volume | Unit price | Revenue range | Probability |
 |---|---|---|---|---|---|---|
 | Core | Metagraphs already submitting snapshots | 2026, measured | 49,156 snapshots a day | $0.000053 | $1,068 a year | 100% measured |
-| Adjacent | October 15 cut lands and fees rise to cover 30 servers | 2027 | same snapshot volume, ASSUMPTION | about $0.0016 if fees equal $28,691 | $0 to $28,691 | 15%, range 5% to 30%, ASSUMPTION |
-| Option | A published DAG fee rate for Gate, and a start date | Not dated | Unknown | Unknown | $0 to $5 million, ASSUMPTION ceiling | 5%, range 1% to 15%, ASSUMPTION |
+| Adjacent | October 15 cut lands and fees rise to cover 30 servers | 2027 | same snapshot volume, ASSUMPTION | about 30x the measured fee if fees cover the 30 servers | hosting cover for 30 servers, ASSUMPTION | 15%, range 5% to 30%, ASSUMPTION |
+| Option | A published DAG fee rate for Gate, and a start date | Not dated | Unknown | Unknown | $0 to $5 million, ASSUMPTION high | 5%, range 1% to 15%, ASSUMPTION |
 
 Company claim, Ben Jorgensen, 2026-09-29, same saved page: "The market for AI compute and inference is projected at roughly $109 billion today, scaling toward $500 billion within four years." No source is named in the sentence. Our core is $1,068. We do not adopt $109 billion.
 
@@ -389,7 +415,7 @@ Second-order effects. If home GPUs actually clear Gate requests, a slice of clou
 
 Unit line: the only layer with a unit price and a volume is $1,068 a year. The loss analogies are the saved-year paths. None of them rescue a $2.93 fee day.
 
-![Analogy panel](/assets/2026-10-06-constellation/14-analogy-panel.svg "Saved-year paths. IOTA indexed 31.9, Hedera 47.9, Sonic 14.6. DAG drawdown 98.3% from the 2021 high to the price box. [Data provided by CoinGecko](https://www.coingecko.com/).")
+![Analogy panel](/assets/2026-10-06-constellation/14-analogy-panel.svg "Saved-year indexed endings, first saved day = 100. IOTA 31.9, Hedera 47.9, Sonic 14.6. [Data provided by CoinGecko](https://www.coingecko.com/).")
 
 ![TAM stack, core measured, option unproven](/assets/2026-10-06-constellation/12-tam-stack.svg "TAM stack. Only the core bar, $1,068 a year, is measured. The option bar is an unproven level, not a result. CoinGecko price box only. [Data provided by CoinGecko](https://www.coingecko.com/).")
 
@@ -457,11 +483,11 @@ The hurdle column does not depend on the multiple. It is the other assumption. B
 
 Steelman, in the company's words. The network is being aimed at AI inference. Operators with their own hardware get paid in DAG for work a Gate user has already paid for. Emissions get tighter. Snapshot fees start to reflect work. If that happens, the unit metric stops being a rounding error, the burn starts to matter, and a 30-node set is cheaper to run than 119. The strongest version is not "the cap is cheap versus $109 billion." The strongest version is "a measured fee step-up is coming, and the token is the meter."
 
-Price the steelman as an option. Value if the option layer fully hits the $5 million ASSUMPTION ceiling, at the 25x assumption: a $125 million cap, about 4 times today. Probability 5%. Time to cash: not dated, so no discount is applied beyond the probability. Expected cap from the option: about $6.3 million. Core business at 25x on measured fees: $26,700. The cap is $30.6 million. The unexplained remainder is the option, and the option's expected value as priced here is below that remainder. The steelman does not cover the price on these assumptions. Change the probability to 25% and it still does not cover, because 25% of a 4x is not 1,145x fees.
+Price the steelman as an option. Value if the option layer fully hits the $5 million ASSUMPTION high, at the 25x assumption: about 4 times the current cap. Probability 5%. Time to cash: not dated, so no discount is applied beyond the probability. Expected value of the option: about 0.2 times the current cap. Core business at 25x on measured fees: under 0.1% of the current cap. The cap is $30.6 million. The unexplained remainder is the option, and the option's expected value as priced here is below that remainder. The steelman does not cover the cap on these assumptions. Change the probability to 25% and it still does not cover, because 25% of a 4x is not 1,145x fees.
 
-Bear, same standard. Fees stay near $1,068. Issuance continues near construction A. The October 15 set is the same concentrated delegators. The unlabeled wallet meets a thin book. Price path: the scenario bear, $0.0035 in 12 months. That is a 55% decline from the price box, which is less severe than the saved year's 72% decline. It is not a crash case. It is the fee tape persisting.
+Bear, same standard. Fees stay near $1,068. Issuance continues near construction A. The October 15 set is the same concentrated delegators. The unlabeled wallet meets a thin book. It is the fee tape persisting.
 
-The price discounts the steelman, not the core. A core-only price at 25x on measured fees is about $0.0000068 per DAG, not $0.0078. Almost the entire price is the option. The call says the option is not worth that.
+The cap discounts the steelman, not the core. A core-only reading at 25x on measured fees is under 0.1% of the $30.6 million cap. Almost the entire cap is the option. The call says the option is not worth that.
 
 Unit line: the price needs $1.22 million a year of fees. The unit delivers $1,068. The price is a bet that $2.93 a day becomes $1.22 million a year. The steelman does not show the path in the saved files.
 
@@ -469,33 +495,29 @@ Unit line: the price needs $1.22 million a year of fees. The unit delivers $1,06
 
 ## Scenarios
 
-Paths are assumptions, not forecasts. Weights sum to 100%. Geometric and arithmetic expected values are both stated. v1 prices and weights are unchanged from the graded bundle. What changed in that bundle is the driver, which now names a row above. Nothing here is an order.
+Paths are assumptions, not forecasts. Weights sum to 100%. What is stated is the driver and the weight. No price path is drawn. Nothing here is an order.
 
 12-month:
 
-| Path | Price | Weight | Row | Driver |
-|---|---|---|---|---|
-| Bear | $0.0035 | 35% | Fee row stays at today | Cutover seats the concentrated delegators, issuance near construction A, no fee step |
-| Base | $0.0080 | 45% | Fee row stays immaterial | Cutover lands, a few metagraphs continue, token tracks the saved peer path |
-| Bull | $0.0180 | 20% | Fee row moves toward hosting cover, not toward 25x | Gate fees appear on the snapshot tape and a named customer is in a primary record |
+| Path | Weight | Row | Driver |
+|---|---|---|---|
+| Bear | 35% | Fee row stays at today | Cutover seats the concentrated delegators, issuance near construction A, no fee step |
+| Base | 45% | Fee row stays immaterial | Cutover lands, a few metagraphs continue |
+| Bull | 20% | Fee row moves toward hosting cover, not toward 25x | Gate fees appear on the snapshot tape and a named customer is in a primary record |
 
-Geometric expected value: $0.00704. Arithmetic: $0.00843. Geometric is below the price box. That is the research view: the weighted midpoint does not pay for a position.
+The weighted view sits below the Oct 4 box.
 
 3-month:
 
-| Path | Price | Weight | Row | Driver |
-|---|---|---|---|---|
-| Bear | $0.0045 | 30% | Fee row stays at today | Ranking on October 9 and the cut on October 15 read as concentration, volume stays thin |
-| Base | $0.0075 | 50% | Fee row stays immaterial | Cutover lands, no fee step, price stays near the box |
-| Bull | $0.0120 | 20% | Hosting-cover row starts, does not arrive | A fee week above the signpost, or a published Gate rate |
+| Path | Weight | Row | Driver |
+|---|---|---|---|
+| Bear | 30% | Fee row stays at today | Ranking on October 9 and the cut on October 15 read as concentration, volume stays thin |
+| Base | 50% | Fee row stays immaterial | Cutover lands, no fee step |
+| Bull | 20% | Hosting-cover row starts, does not arrive | A fee week above the signpost, or a published Gate rate |
 
-Geometric: $0.00707. Arithmetic: $0.00750.
+Opinion, labeled as the research view: Bearish, medium conviction. The bull path is the only one that names an improvement on the fee row, and it is still far from the 25x row. Nothing in the weights depends on a seat shortage.
 
-Opinion, labeled as the research view: avoid. The bull path is the only one that touches an improvement on the fee row, and it is still far from the 25x row. Nothing in the weights depends on a seat shortage.
-
-Unit line: the weighted 12-month price is under the box because $2.93 a day is the base, not the bull.
-
-![Scenario fan](/assets/2026-10-06-constellation/06-scenario-fan.svg "Scenario fan. 12-month geometric expected value $0.00704, below the Oct 4 price box of $0.00777823. Paths are assumptions, not forecasts. [Data provided by CoinGecko](https://www.coingecko.com/).")
+Unit line: the 12-month weight sits on the fee row staying immaterial, because $2.93 a day is the base, not the bull.
 
 ## Catalysts, risks, and what would change the view
 
@@ -507,7 +529,7 @@ Catalysts, dated:
 - October 15, 2026: active set of 30, Lattice frontend closes, testnets retire.
 - Emission vote with the Stardust Collective: "over the coming weeks" from September 29. No published schedule in the saved post.
 
-Hypothetical expression, not an order: none. If someone were forced to keep a position, size it as a full loss against the fee gap, and do not add until the signpost prints. Liquidity for a $30.6 million cap with $512,900 of daily volume does not support a large exit. No stop is stated because there is no entry.
+This note states no trade or level. For context, a $30.6 million cap with $512,900 of daily volume is a thin market.
 
 Risk register:
 
@@ -520,7 +542,7 @@ Risk register:
 
 Incidents: PacaSwap exploit, September 9, 2026. Unknowns: who was made whole, marked unverified pending the sheet.
 
-Kill criteria: revisit the avoid if snapshot fees exceed 50,000 DAG in any rolling 7 days on Dagscan and the same jump is visible on the official explorer, with a published fee wallet. That is 21x the current 90-day week. A landed October 15 cut is not a kill of the avoid. It is the base path.
+Kill criteria: revisit the Bearish, medium conviction view if snapshot fees exceed 50,000 DAG in any rolling 7 days on Dagscan and the same jump is visible on the official explorer, with a published fee wallet. That is 21x the current 90-day week. A landed October 15 cut is not a kill of that view. It is the base path.
 
 Monitoring:
 
@@ -534,7 +556,7 @@ Monitoring:
 
 Constraint sweep, binding limits that survived: the fee tape, the host, and the seat rule. Physics of snapshot inclusion is not binding at measured volume. Geography is a host choice (Hetzner, Germany and Finland, 63.4%). Law is unadjudicated. Seat allocation is a rewriteable rule: $15,237 to match the cutoff, $243,791 for 16 seats. Supply chain is the CPX51 at $79.70 in the EU, or $267.16 in the US. Energy is not binding for a CPU node. GPU inference is unpriced. Capital is token collateral and delegation: protocol, $963 a day of new coins; 1,000,000 DAG to qualify. Talent is not measured. Time: October 9 and October 15 are dated. Network effects are not evidenced by fees. A new metagraph pays $0.000053 a snapshot.
 
-Unit line: no physical limit makes a snapshot worth more than $0.000053 today. The memo is avoid because $1,068 a year is the measured business.
+Unit line: no physical limit raises the fee above the measured print. The research view is Bearish, medium conviction, because $1,068 a year is the measured business.
 
 ## Data we could not get
 
@@ -542,10 +564,10 @@ Unit line: no physical limit makes a snapshot worth more than $0.000053 today. T
 - PacaSwap sheet rows. URL saved. HTML view had no rows.
 - SAM.gov entity print, a sbir.gov award page for this UEI, and an AFWERX award body. USAspending awards stand.
 - Hedera has no calendar-day total, only two interval censuses. The inclusive count includes 553 rejected duplicates. The like-for-like count is the one used for growth.
-- Order-book depth and active addresses.
+- CoinGecko web markets table, Duwa read about 21:16 ET Oct 6: about $20.7k of -2% depth and $17.3k of +2% depth, against $649,107 of volume. Active addresses are still not in the saved stats files.
 - A long-form independent skeptic essay. The search across YouTube, Substack, Medium, Reddit, and Messari saved no essay. The named gap is accepted. It is not evidence of safety.
 - Industry insider added in the bundle: BioFi, a metagraph builder, 2026-08-12. Three managed nodes, fees paid in DAG, no dollar rate.
-- D4 red team (Duwa) has not been done. Placeholder: [D4 pending].
+- D4 red team (Duwa) done Oct 6, 2026, 21:14 to 21:20 ET. Verdict FIX 6. Review file: /Users/kublai/arghun-inbox/dag/reviews/2026-10-06-duwa-d4-publish-5872f50.md. This commit is the fix. Confirm SHA is the commit that lands these edits.
 - ip-api.com terms: geolocation used the free batch endpoint. Country counts in this note are the graded Oct 4 figures (Germany 52, United States 33, Finland 32, and 6 elsewhere; Hetzner 78 of 123). Orda should read https://ip-api.com/docs/legal before any public display is treated as cleared. This flag is not a clearance.
 - The two Justia browser saves from Oct 4 22:15 ET are outside the bundle hash manifest. They are not cited as a second source. The disposition used here is the page extract and the complaint PDF.
 
@@ -560,8 +582,8 @@ Unit line: no physical limit makes a snapshot worth more than $0.000053 today. T
 - Implied fees: cap divided by the assumed multiple, divided by annualized fees. Hurdle is cap times the rate, a perpetuity, labeled as such.
 - Peer set: IOTA, Hedera, Sonic. IOTA is the last closed 24-hour epoch. Sonic's labelled point is the explorer daily chart. Sonic's 12-month growth is the 30-day mean from that chart. Hedera is an interval census. The like-for-like Hedera count drops DUPLICATE_TRANSACTION rows. IOTA and Sonic dollar legs use the 15:39:42 CoinGecko print. Hedera fee dollars use the mirror-node exchange rate.
 - Geolocation: ip-api.com batch on L0 IPs. Third party. Not a network field. Flagged for Orda.
-- Charts in this note are the graded bundle drawings, except chart 17, which is omitted. No new package was installed to redraw them. No CoinGecko raw is committed.
+- Charts in this note are the graded bundle drawings, except chart 06 and chart 17, which are omitted. Charts 08, 10, 12, 13, 14, and 18 were redrawn to match the text. No new package was installed.
 
-Charts in this note use the Oct 4 research pulls. The Oct 6 publish pull is prose only. No CoinGecko raw JSON or CSV is committed with the article. [Data provided by CoinGecko](https://www.coingecko.com/).
+Charts in this note use the Oct 4 research pulls, except the redraws named above. The Oct 6 publish pull is prose only. No CoinGecko raw JSON or CSV is committed with the article. [Data provided by CoinGecko](https://www.coingecko.com/).
 
 Research only. Not financial advice. Nothing here is an offer to buy, sell or hold any asset.

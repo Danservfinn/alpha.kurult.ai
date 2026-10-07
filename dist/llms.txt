@@ -8,7 +8,7 @@ First-party scripts only. No third-party script host. No wallet. No comments. No
 
 ## Articles
 
-- [Constellation (DAG): the snapshot fee is $2.93 a day](https://alpha.kurult.ai/articles/2026-10-06-constellation/): Deep dive on Constellation (DAG). The scarce unit is one inclusion in a Hypergraph snapshot. Measured fees are $2.93 a day against a $30.6 million cap on the Oct 4 price box. Research view: avoid. Research only.
+- [Constellation (DAG): the snapshot fee is $2.93 a day](https://alpha.kurult.ai/articles/2026-10-06-constellation/): Deep dive on Constellation (DAG). The scarce unit is one inclusion in a Hypergraph snapshot. Measured fees are $2.93 a day against a $30.6 million cap on the Oct 4 price box. Research view: Bearish, medium conviction. Research only.
 - [Tesla (TSLA): the car pays, the close assumes a mile](https://alpha.kurult.ai/articles/2026-10-04-tesla/): Tesla's Q2 sales gross profit was $6,645 per cash delivery. The Oct 2 close assumes a paid driverless mile that is not in the accounts. Research only.
 - [Pearl (PRL): the multiply is real, the bid is not](https://alpha.kurult.ai/articles/2026-10-04-pearl/): Updated deep dive on Pearl, the matrix-multiplication proof-of-work chain: first-principles unit economics, on-chain holders and pools, emissions, liquidity, and bear/base/bull scenarios at Oct 4 prices. Research only.
 - [Pearl (PRL): real proof-of-useful-work tech, a token priced ahead of its usage](https://alpha.kurult.ai/articles/2026-10-02-pearl/): Deep dive on Pearl, the matrix-multiplication proof-of-work chain: on-chain data, holder and pool concentration, emissions, liquidity, the hype cycle on X, and bear/base/bull scenarios. Research only.
