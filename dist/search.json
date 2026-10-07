@@ -1,6 +1,17 @@
 {
   "notes": [
     {
+      "title": "Constellation (DAG): the snapshot fee is $2.93 a day",
+      "summary": "Deep dive on Constellation (DAG). The scarce unit is one inclusion in a Hypergraph snapshot. Measured fees are $2.93 a day against a $30.6 million cap on the Oct 4 price box. Research view: avoid. Research only.",
+      "path": "/articles/2026-10-06-constellation/",
+      "date": "2026-10-06",
+      "ticker": "DAG",
+      "tags": [
+        "DAG"
+      ],
+      "keywords": "constellation dag the snapshot fee day deep dive scarce unit one inclusion hypergraph measured fees are against million cap oct price box research view avoid only not financial advice all times utc labeling rule for this note every issuance node and figure body graded bundle coingecko coins labs last updated 2026 fetched later peer pull used comparisons labeled when publish tape mixed into gap scenarios call charts market use series operating dagscan cluster explorers named captions chart from internal published raw json csv committed with morgan network allegations docket status amount that case stated line print uses 00777823 588 422 24h volume 512 900 circulating supply 932 917 287 max null fully diluted value defined time high 451761 2021 drawdown low 00110189 2019 rank search 708 data provided https www com ratios 0084973 429 679 652 332 field 934 151 121 8136578 659 percentage fields 55169 97924 30d 02094 30946 ath atl dates match these prints substituted 145x scenario paths paragraph charges applications end users record global real product shape does show earning 068 year bottom reading emission split plus saved delegator yield implies about 489 964 new observed change has median 558 245 those two apart inside band pay servers october cut validators chosen each quarter delegation ranking shrinks set shares validator slice create stream conviction medium because depend dilution estimate unratified vote can step dated possibility entry there our what records thing slot other people sending token usually nothing recorded shrink who may write snapshots rewrite receives newly minted tokens metaphor toll booth road where most cars pass free burns collects pricing like bridge breaks operator comes memorable number before any native asset symbol name platforms object coin empty contract address wrapped wdag ethereum 0x2e3cfe45e3ee7c017277f22e35d2f29edc99d570 also base listing separate its added was 00780055 fetch hits blockdag bdag dagger xdag hoodagent dagora dada kdag dagama world several energy stock anagram simd solana proposal diagram burned paying assets how works svg sources docs metanomics simplified schematic operators money cascade paid first principles metric values per which 000053 400 over 424 056 days seat being sold right capped physics section back daily sum worth today earns ending 236 say burn reduction cash transfer same window 463 sample recent explorer transfers uniformly datum 000 destination documented combined revenue profit different things here zero received minus hosting converts lifetime external costs spec vcpu ram 320 ssd guide names hetzner cpx51 recommended says cpx41"
+    },
+    {
       "title": "Tesla (TSLA): the car pays, the close assumes a mile",
       "summary": "Tesla's Q2 sales gross profit was $6,645 per cash delivery. The Oct 2 close assumes a paid driverless mile that is not in the accounts. Research only.",
       "path": "/articles/2026-10-04-tesla/",

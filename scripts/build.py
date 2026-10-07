@@ -401,6 +401,24 @@ def render_table(lines: list[str], i: int, out: list[str], name: str) -> int:
     return i
 
 
+VIEWBOX_RE = re.compile(r'viewBox="\s*0\s+0\s+([0-9.]+)\s+([0-9.]+)\s*"')
+
+
+def figure_dims(src: str) -> tuple[str, str]:
+    """Intrinsic size from the SVG viewBox. Without width and height, a lazy
+    image collapses and never intersects, so the chart never paints."""
+    text = (ROOT / src.lstrip("/")).read_text(encoding="utf-8")
+    match = VIEWBOX_RE.search(text)
+    if not match:
+        return "", ""
+
+    def px(raw: str) -> str:
+        value = float(raw)
+        return str(int(value)) if value.is_integer() else raw
+
+    return px(match.group(1)), px(match.group(2))
+
+
 def render_figure(m: re.Match, out: list[str], name: str) -> None:
     alt, src, caption = m.group(1).strip(), m.group(2), (m.group(3) or "").strip()
     if not alt:
@@ -410,9 +428,11 @@ def render_figure(m: re.Match, out: list[str], name: str) -> None:
     if not (ROOT / src.lstrip("/")).is_file():
         raise BuildError(f"{name}: image file not found: {src}")
     cap = f"<figcaption>{render_inline(caption)}</figcaption>" if caption else ""
+    w, h = figure_dims(src)
+    dims = f' width="{esc(w)}" height="{esc(h)}"' if w and h else ""
     out.append(
-        f'<figure class="figure"><a href="{esc(src)}"><img src="{esc(src)}" alt="{esc(alt)}" '
-        f'loading="lazy" decoding="async"></a>{cap}</figure>'
+        f'<figure class="figure"><a href="{esc(src)}"><img src="{esc(src)}" alt="{esc(alt)}"{dims} '
+        f'loading="eager" decoding="async"></a>{cap}</figure>'
     )
 
 
