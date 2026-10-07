@@ -1837,6 +1837,14 @@ def build() -> None:
     notice = notice_path.read_text(encoding="utf-8")
     write(DIST / "help" / "index.html", page("Help | " + SITE_NAME, "Codes, sources, and credits.", "/help/", desk_html.render_help(notice), "page-help", market_chrome=False))
     index = desk_html.search_index(listed, SECURITIES)
+    # 158.96 splits into the bare token 158. Drop bare digit tokens on this note only.
+    # A repo-wide filter would change other notes' keywords.
+    for note in index["notes"]:
+        if note.get("ticker") != "SPCX":
+            continue
+        note["keywords"] = " ".join(
+            word for word in note["keywords"].split() if not word.isdigit()
+        )
     write(DIST / "search" / "index.html", page("Search | " + SITE_NAME, "Search notes and assets.", "/search/", desk_html.render_search_page(index), "page-search"))
     write(DIST / "search.json", json.dumps(index, indent=2) + "\n")
     for row in SECURITIES:
