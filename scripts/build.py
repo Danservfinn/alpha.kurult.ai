@@ -44,6 +44,44 @@ DISCLAIMER = (
     "Research only. Not financial advice. Nothing on this site is an offer "
     "to buy, sell, or hold any asset. No wallet. No comments."
 )
+EXACT_DISCLAIMER = (
+    "Research only. Not financial advice. Nothing here is an offer to buy, sell or hold any asset."
+)
+REMOVED_OCT6_SLUGS = (
+    "2026-10-06-akash",
+    "2026-10-06-bitcoin",
+    "2026-10-06-canton",
+    "2026-10-06-ethena",
+    "2026-10-06-ethereum",
+    "2026-10-06-hyperliquid",
+    "2026-10-06-midnight",
+    "2026-10-06-sui",
+    "2026-10-06-venice",
+)
+BANNED_BRAND_WORD = "bloomberg"
+RATING_VERBS = (
+    "buy",
+    "sell",
+    "hold",
+    "accumulate",
+    "add",
+    "trim",
+    "exit",
+    "entry",
+    "stop",
+    "size",
+    "underweight",
+    "overweight",
+    "chase",
+    "short",
+)
+# A hyphen is part of the token, so short-term and font-size are not hits.
+RATING_VERB_RE = re.compile(
+    "(?<![\\w-])(?:" + "|".join(RATING_VERBS) + ")(?![\\w-])",
+    re.I,
+)
+TESLA_DIST_PAGE = Path("articles") / "2026-10-04-tesla" / "index.html"
+TESLA_SOURCE = "2026-10-04-tesla.md"
 DRAFT_BANNER = "DRAFT. Not published. No outside post. Research only. Not financial advice."
 
 FILENAME_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})-([a-z0-9]+(?:-[a-z0-9]+)*)\.md$")
@@ -1837,6 +1875,49 @@ def reset_dist() -> None:
     DIST.mkdir(parents=True)
 
 
+def assert_receipt_202_condition_4(dist: Path = DIST, articles_dir: Path = ARTICLES_DIR) -> None:
+    """Orda receipt 202 condition 4.
+
+    (a) none of the 9 removed slugs is linked or referenced anywhere in dist.
+    (b) the banned brand word does not appear anywhere in dist.
+    (c) the Tesla note has no rating verb outside the exact closing disclaimer.
+    The site notice is a different sentence and is removed before the verb scan.
+    """
+    if not dist.is_dir():
+        raise BuildError(f"missing dist for receipt 202 check: {dist}")
+    for path in sorted(p for p in dist.rglob("*") if p.is_file()):
+        raw = path.read_bytes()
+        rel = path.relative_to(dist)
+        folded = raw.lower()
+        for slug in REMOVED_OCT6_SLUGS:
+            if slug.encode("ascii") in raw:
+                raise BuildError(f"removed slug {slug} referenced in {rel}")
+        if BANNED_BRAND_WORD.encode("ascii") in folded:
+            raise BuildError(f"banned brand word in {rel}")
+    tesla_html = dist / TESLA_DIST_PAGE
+    if not tesla_html.is_file():
+        raise BuildError(f"missing Tesla page for receipt 202 check: {tesla_html}")
+    page = tesla_html.read_text(encoding="utf-8")
+    if EXACT_DISCLAIMER not in page:
+        raise BuildError("Tesla page is missing the exact closing disclaimer")
+    _assert_no_rating_verb(page, str(TESLA_DIST_PAGE))
+    source = articles_dir / TESLA_SOURCE
+    if source.is_file():
+        md = source.read_text(encoding="utf-8")
+        if EXACT_DISCLAIMER not in md:
+            raise BuildError("Tesla source is missing the exact closing disclaimer")
+        if 'rating: "More downside than upside"' not in md:
+            raise BuildError("Tesla rating was changed")
+        _assert_no_rating_verb(md, TESLA_SOURCE)
+
+
+def _assert_no_rating_verb(text: str, label: str) -> None:
+    scanned = text.replace(EXACT_DISCLAIMER, " ").replace(DISCLAIMER, " ")
+    hit = RATING_VERB_RE.search(scanned)
+    if hit:
+        raise BuildError(f"rating verb {hit.group(0)!r} outside the exact disclaimer in {label}")
+
+
 def build() -> None:
     if not MARK_SRC.is_file():
         raise BuildError(f"missing {MARK_SRC.name} at repository root")
@@ -1896,6 +1977,7 @@ def build() -> None:
     if ASSETS_DIR.is_dir():
         shutil.copytree(ASSETS_DIR, DIST / "assets")
         print("  copied assets/")
+    assert_receipt_202_condition_4()
 
 
 def main() -> int:
