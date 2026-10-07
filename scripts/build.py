@@ -36,6 +36,7 @@ ASSETS_DIR = ROOT / "assets"
 SITE_HOST = "alpha.kurult.ai"
 SITE_URL = f"https://{SITE_HOST}"
 SITE_NAME = "alpha.kurult.ai"
+SITE_BRAND = "Kurultai Alpha"
 SITE_KICKER = "Arghun, Crypto Analyst"
 SITE_TAGLINE = "Daily research notes. Research only. Not a trading desk."
 
@@ -698,9 +699,9 @@ def page(
 <header class="masthead">
   <input class="search-open" id="search-open" type="checkbox">
   <div class="sheet masthead-row">
-    <a class="wordmark" href="/" aria-label="{esc(SITE_NAME)} home">
+    <a class="wordmark" href="/" aria-label="{esc(SITE_BRAND)} home">
       <img class="mark" src="/mark.svg" alt="" width="22" height="22">
-      <span class="wordmark-text">{esc(SITE_NAME)}</span>
+      <span class="wordmark-text">{esc(SITE_BRAND)}</span>
     </a>
     <span class="kicker">{esc(SITE_KICKER)}</span>
     <label class="search-toggle" for="search-open">Search</label>

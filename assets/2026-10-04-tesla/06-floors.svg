@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 442" role="img">
+<title>Stated factory floors versus the Q2 run rate</title>
+<rect width="920" height="442" fill="#0b0d10"/>
+<text x="28" y="36" fill="#f0a202" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">Stated factory floors versus the Q2 run rate</text>
+<text x="28" y="90" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">California 3/Y</text>
+<rect x="300" y="72" width="135.3" height="26" fill="#7eb6d6"/>
+<text x="443.3" y="90" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">550</text>
+<text x="28" y="136" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Shanghai 3/Y</text>
+<rect x="300" y="118" width="233.7" height="26" fill="#7eb6d6"/>
+<text x="541.7" y="136" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">950</text>
+<text x="28" y="182" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Berlin Y</text>
+<rect x="300" y="164" width="92.2" height="26" fill="#7eb6d6"/>
+<text x="400.2" y="182" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">375</text>
+<text x="28" y="228" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Texas Y</text>
+<rect x="300" y="210" width="61.5" height="26" fill="#7eb6d6"/>
+<text x="369.5" y="228" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">250</text>
+<text x="28" y="274" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Cybertruck</text>
+<rect x="300" y="256" width="30.7" height="26" fill="#7eb6d6"/>
+<text x="338.7" y="274" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">125</text>
+<text x="28" y="320" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Cybercab</text>
+<rect x="300" y="302" width="30.7" height="26" fill="#7eb6d6"/>
+<text x="338.7" y="320" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">125</text>
+<text x="28" y="366" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Q2 production, annualized</text>
+<rect x="300" y="348" width="444.4" height="26" fill="#f0a202"/>
+<text x="752.4" y="366" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">1,807</text>
+<text x="28" y="424" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11">Thousands of vehicles a year. Floors are stated greater-than figures, not a rate.</text>
+</svg>

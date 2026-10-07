@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 520" role="img">
+<title>Production and deliveries, no prices</title>
+<rect width="920" height="520" fill="#0b0d10"/>
+<text x="28" y="36" fill="#f0a202" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">Production and deliveries, no prices</text>
+<text x="18" y="260.0" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" transform="rotate(-90 18 260.0)">Thousands of vehicles</text>
+<line x1="72" y1="351.0" x2="896" y2="351.0" stroke="#2a3038"/>
+<text x="64" y="355.0" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="end">139</text>
+<line x1="72" y1="260.0" x2="896" y2="260.0" stroke="#2a3038"/>
+<text x="64" y="264.0" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="end">278</text>
+<line x1="72" y1="169.0" x2="896" y2="169.0" stroke="#2a3038"/>
+<text x="64" y="173.0" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="end">418</text>
+<line x1="72" y1="78.0" x2="896" y2="78.0" stroke="#2a3038"/>
+<text x="64" y="82.0" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="end">557</text>
+<text x="140.7" y="464" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" text-anchor="middle">25 Q2</text>
+<rect x="112.7" y="173.8" width="25.0" height="268.2" fill="#7eb6d6"/>
+<rect x="140.7" y="190.9" width="25.0" height="251.1" fill="#f0a202"/>
+<text x="278.0" y="464" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" text-anchor="middle">25 Q3</text>
+<rect x="250.0" y="149.5" width="25.0" height="292.5" fill="#7eb6d6"/>
+<rect x="278.0" y="117.0" width="25.0" height="325.0" fill="#f0a202"/>
+<text x="415.3" y="464" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" text-anchor="middle">25 Q4</text>
+<rect x="387.3" y="158.0" width="25.0" height="284.0" fill="#7eb6d6"/>
+<rect x="415.3" y="168.6" width="25.0" height="273.4" fill="#f0a202"/>
+<text x="552.7" y="464" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" text-anchor="middle">26 Q1</text>
+<rect x="524.7" y="175.0" width="25.0" height="267.0" fill="#7eb6d6"/>
+<rect x="552.7" y="207.9" width="25.0" height="234.1" fill="#f0a202"/>
+<text x="690.0" y="464" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" text-anchor="middle">26 Q2</text>
+<rect x="662.0" y="146.6" width="25.0" height="295.4" fill="#7eb6d6"/>
+<rect x="690.0" y="128.1" width="25.0" height="313.9" fill="#f0a202"/>
+<text x="827.3" y="464" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" text-anchor="middle">26 Q3</text>
+<rect x="799.3" y="138.4" width="25.0" height="303.6" fill="#7eb6d6"/>
+<rect x="827.3" y="123.9" width="25.0" height="318.1" fill="#f0a202"/>
+<rect x="72" y="50" width="12" height="12" fill="#7eb6d6"/>
+<text x="90" y="61" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12">Production</text>
+<rect x="186" y="50" width="12" height="12" fill="#f0a202"/>
+<text x="204" y="61" fill="#e6e1d6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12">Deliveries</text>
+<text x="28" y="502" fill="#9aa3ad" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11">Thousands of vehicles. Update exhibit through Q2 2026. Q3 from the Oct 2 8-K. No prices.</text>
+</svg>
