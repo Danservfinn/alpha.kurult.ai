@@ -44,6 +44,44 @@ DISCLAIMER = (
     "Research only. Not financial advice. Nothing on this site is an offer "
     "to buy, sell, or hold any asset. No wallet. No comments."
 )
+EXACT_DISCLAIMER = (
+    "Research only. Not financial advice. Nothing here is an offer to buy, sell or hold any asset."
+)
+REMOVED_OCT6_SLUGS = (
+    "2026-10-06-akash",
+    "2026-10-06-bitcoin",
+    "2026-10-06-canton",
+    "2026-10-06-ethena",
+    "2026-10-06-ethereum",
+    "2026-10-06-hyperliquid",
+    "2026-10-06-midnight",
+    "2026-10-06-sui",
+    "2026-10-06-venice",
+)
+BANNED_BRAND_WORD = "bloomberg"
+RATING_VERBS = (
+    "buy",
+    "sell",
+    "hold",
+    "accumulate",
+    "add",
+    "trim",
+    "exit",
+    "entry",
+    "stop",
+    "size",
+    "underweight",
+    "overweight",
+    "chase",
+    "short",
+)
+# A hyphen is part of the token, so short-term and font-size are not hits.
+RATING_VERB_RE = re.compile(
+    "(?<![\\w-])(?:" + "|".join(RATING_VERBS) + ")(?![\\w-])",
+    re.I,
+)
+TESLA_DIST_PAGE = Path("articles") / "2026-10-04-tesla" / "index.html"
+TESLA_SOURCE = "2026-10-04-tesla.md"
 DRAFT_BANNER = "DRAFT. Not published. No outside post. Research only. Not financial advice."
 
 FILENAME_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})-([a-z0-9]+(?:-[a-z0-9]+)*)\.md$")
@@ -350,6 +388,17 @@ def render_list(lines: list[str], i: int, out: list[str], marker: re.Pattern, ta
             items.append(m.group(1).strip())
         elif line[:1] in (" ", "\t") and line.strip() and items:
             items[-1] += " " + line.strip()
+        elif not line.strip() and items:
+            # A blank line does not restart the list. CommonMark keeps the
+            # same <ol> so numbers continue. Stop only when the next
+            # non-blank line is not another item of this list.
+            j = i + 1
+            while j < len(lines) and not lines[j].strip():
+                j += 1
+            if j < len(lines) and marker.match(lines[j]):
+                i += 1
+                continue
+            break
         else:
             break
         i += 1
@@ -401,6 +450,22 @@ def render_table(lines: list[str], i: int, out: list[str], name: str) -> int:
     return i
 
 
+VIEWBOX_RE = re.compile(r'viewBox="\s*0\s+0\s+([0-9.]+)\s+([0-9.]+)\s*"')
+
+
+def figure_dims(src: str) -> tuple[str, str]:
+    """Intrinsic size from the SVG viewBox. Without it, a lazy <img> collapses
+    to 0 height and never intersects, so the chart never paints."""
+    text = (ROOT / src.lstrip("/")).read_text(encoding="utf-8")
+    m = VIEWBOX_RE.search(text)
+    if not m:
+        return "", ""
+    def px(raw: str) -> str:
+        value = float(raw)
+        return str(int(value)) if value.is_integer() else raw
+    return px(m.group(1)), px(m.group(2))
+
+
 def render_figure(m: re.Match, out: list[str], name: str) -> None:
     alt, src, caption = m.group(1).strip(), m.group(2), (m.group(3) or "").strip()
     if not alt:
@@ -410,9 +475,11 @@ def render_figure(m: re.Match, out: list[str], name: str) -> None:
     if not (ROOT / src.lstrip("/")).is_file():
         raise BuildError(f"{name}: image file not found: {src}")
     cap = f"<figcaption>{render_inline(caption)}</figcaption>" if caption else ""
+    w, h = figure_dims(src)
+    dims = f' width="{esc(w)}" height="{esc(h)}"' if w and h else ""
     out.append(
-        f'<figure class="figure"><a href="{esc(src)}"><img src="{esc(src)}" alt="{esc(alt)}" '
-        f'loading="lazy" decoding="async"></a>{cap}</figure>'
+        f'<figure class="figure"><a href="{esc(src)}"><img src="{esc(src)}" alt="{esc(alt)}"{dims} '
+        f'loading="eager" decoding="async"></a>{cap}</figure>'
     )
 
 
@@ -1202,7 +1269,6 @@ a:hover { background: var(--yellow); color: #000; text-decoration: none; }
 .chart-empty { color: var(--text-dim); margin: 0; }
 .chart-svg { width: 100%; height: auto; display: block; }
 .badge { color: var(--text-dim); }
-.desk-split { display: grid; gap: 1.25rem; }
 .mkt-grid { display: grid; gap: 1rem; }
 .mkt { width: 100%; border-collapse: collapse; font-size: .78rem; }
 .mkt th, .mkt td { text-align: right; padding: .28rem .35rem; border-bottom: 1px solid var(--edge-soft); }
@@ -1336,23 +1402,39 @@ main { flex: 1; padding-block: 1.75rem 3rem; display: grid; gap: 1.25rem; grid-t
 }
 .keystrip {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1px;
-  background: var(--edge);
+  background: #000;
   border: 1px solid var(--edge);
   margin: 0 0 .7rem;
 }
-.keystrip div { background: #000; padding: .32rem .5rem; min-width: 0; }
+.keystrip div {
+  background: #000;
+  border: 1px solid var(--edge);
+  padding: .32rem .5rem;
+  min-width: 0;
+  overflow: hidden;
+}
+.keystrip div:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .keystrip dt {
   font-size: .68rem;
-  letter-spacing: .08em;
+  letter-spacing: .04em;
   text-transform: uppercase;
   color: var(--amber);
+  overflow-wrap: anywhere;
 }
 .keystrip dd {
   margin: 0;
   color: var(--data);
   font-size: .84rem;
+  overflow-wrap: anywhere;
+}
+.keystrip .key-note {
+  display: block;
+  margin-top: .2rem;
+  font-size: .72rem;
+  line-height: 1.35;
+  color: #9aa3ad;
   overflow-wrap: anywhere;
 }
 .article-title {
@@ -1522,17 +1604,11 @@ figure, table, pre { max-width: 100%; }
 }
 
 /* Wide -------------------------------------------------------------------- */
-@media (min-width: 40rem) {
-  .keystrip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
 @media (min-width: 48rem) {
   .entry { grid-template-columns: 7.5rem minmax(0, 1fr); }
   .entry-summary { grid-column: 2; }
 }
-@media (min-width: 64rem) {
-  .desk-split { grid-template-columns: minmax(0, 1.4fr) minmax(0, .8fr); }
-  .mkt-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
+/* Single column, full page width (Danny 2026-10-05). Do not re-add column splits. */
 @media (min-width: 72rem) {
   .entry { grid-template-columns: 7.5rem 17rem minmax(0, 1fr); }
   .entry-summary { grid-column: 3; }
@@ -1616,7 +1692,8 @@ figure, table, pre { max-width: 100%; }
   .source-url { display: block; color: #000; }
 }
 
-/* Full-width desk grid. Mobile stays one column. */
+/* Single-column scaffolds at every viewport width. Panels span the full
+   page width; they stack top to bottom. */
 .desk-grid, .asset-layout, .article-layout { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
 .desk-chart-slot, .desk-markets, .desk-chain, .desk-intro, .desk-ledger, .asset-main, .asset-rail, .article-rail, .article, .article-desk { min-width: 0; }
 .chart-plot { height: 28rem; width: 100%; max-width: 100%; touch-action: pan-y; }
@@ -1639,27 +1716,8 @@ figure, table, pre { max-width: 100%; }
 .compare-row { border: 1px solid var(--edge-soft); padding: .45rem; margin: 0 0 .45rem; }
 .tick-on { outline: 1px solid var(--amber); }
 @media (max-width: 40rem) { .chart-plot { height: 18rem; } }
-@media (min-width: 48rem) {
-  .desk-grid, .asset-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .desk-chart-slot, .desk-intro, .desk-ledger { grid-column: 1 / -1; }
-  .ledger { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .article-layout { grid-template-columns: minmax(0, 1fr) minmax(16rem, 24rem); align-items: start; }
-  .article { grid-column: 1; grid-row: 1; }
-  .article-rail { grid-column: 2; grid-row: 1 / span 2; }
-  .article-desk { grid-column: 1; grid-row: 2; }
-}
-@media (min-width: 90rem) {
-  .desk-grid, .asset-layout { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .desk-chart-slot { grid-column: span 2; }
-  .desk-intro, .desk-ledger { grid-column: 1 / -1; }
-  .ledger { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .asset-main { grid-column: span 1; grid-row: 1; }
-  .asset-rail { grid-column: span 3; grid-row: 1; }
-  .article-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(18rem, 26rem); }
-  .article { grid-column: 1 / span 2; grid-row: 1; }
-  .article-rail { grid-column: 3; grid-row: 1 / span 2; }
-  .article-desk { grid-column: 1 / span 2; grid-row: 2; }
-}
+/* Wide-viewport layout stays one column. See Danny 2026-10-05: single
+   column, full page width. Panels stack; no side rails, no column splits. */
 @media (max-width: 700px) {
   .article-layout { gap: 0; }
   .article-rail { display: contents; }
@@ -1817,6 +1875,49 @@ def reset_dist() -> None:
     DIST.mkdir(parents=True)
 
 
+def assert_receipt_202_condition_4(dist: Path = DIST, articles_dir: Path = ARTICLES_DIR) -> None:
+    """Orda receipt 202 condition 4.
+
+    (a) none of the 9 removed slugs is linked or referenced anywhere in dist.
+    (b) the banned brand word does not appear anywhere in dist.
+    (c) the Tesla note has no rating verb outside the exact closing disclaimer.
+    The site notice is a different sentence and is removed before the verb scan.
+    """
+    if not dist.is_dir():
+        raise BuildError(f"missing dist for receipt 202 check: {dist}")
+    for path in sorted(p for p in dist.rglob("*") if p.is_file()):
+        raw = path.read_bytes()
+        rel = path.relative_to(dist)
+        folded = raw.lower()
+        for slug in REMOVED_OCT6_SLUGS:
+            if slug.encode("ascii") in raw:
+                raise BuildError(f"removed slug {slug} referenced in {rel}")
+        if BANNED_BRAND_WORD.encode("ascii") in folded:
+            raise BuildError(f"banned brand word in {rel}")
+    tesla_html = dist / TESLA_DIST_PAGE
+    if not tesla_html.is_file():
+        raise BuildError(f"missing Tesla page for receipt 202 check: {tesla_html}")
+    page = tesla_html.read_text(encoding="utf-8")
+    if EXACT_DISCLAIMER not in page:
+        raise BuildError("Tesla page is missing the exact closing disclaimer")
+    _assert_no_rating_verb(page, str(TESLA_DIST_PAGE))
+    source = articles_dir / TESLA_SOURCE
+    if source.is_file():
+        md = source.read_text(encoding="utf-8")
+        if EXACT_DISCLAIMER not in md:
+            raise BuildError("Tesla source is missing the exact closing disclaimer")
+        if 'rating: "More downside than upside"' not in md:
+            raise BuildError("Tesla rating was changed")
+        _assert_no_rating_verb(md, TESLA_SOURCE)
+
+
+def _assert_no_rating_verb(text: str, label: str) -> None:
+    scanned = text.replace(EXACT_DISCLAIMER, " ").replace(DISCLAIMER, " ")
+    hit = RATING_VERB_RE.search(scanned)
+    if hit:
+        raise BuildError(f"rating verb {hit.group(0)!r} outside the exact disclaimer in {label}")
+
+
 def build() -> None:
     if not MARK_SRC.is_file():
         raise BuildError(f"missing {MARK_SRC.name} at repository root")
@@ -1876,6 +1977,7 @@ def build() -> None:
     if ASSETS_DIR.is_dir():
         shutil.copytree(ASSETS_DIR, DIST / "assets")
         print("  copied assets/")
+    assert_receipt_202_condition_4()
 
 
 def main() -> int:
