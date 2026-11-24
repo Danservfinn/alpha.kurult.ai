@@ -100,8 +100,8 @@ def render_peers(root: Path) -> str:
             f"<td>{desk.esc(row.get('ticker'))}</td>"
             f"<td>{desk.esc(_cell(row.get('price_usd')))}</td>"
             f"<td>{vom_cell}</td>"
-            f"<td>{vol_cell}</td>"
-            f"<td>{iss_cell}{gap}</td>"
+            f"<td>{vol_cell}{gap}</td>"
+            f"<td>{iss_cell}</td>"
             "</tr>"
         )
     return f"""<section class="desk panel" aria-labelledby="peers-heading">

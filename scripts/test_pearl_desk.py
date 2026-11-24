@@ -6,6 +6,7 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -119,7 +120,7 @@ class PeerFallbackTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             empty = Path(tmp)
             for ticker, coin_id in nightly.PEERS:
-                row = nightly.peer_row_from_chart(ticker, coin_id, note_data=empty, committed=committed)
+                row = nightly.peer_row_from_pull(ticker, coin_id, pull_dir=empty, committed=committed)
                 self.assertEqual(row, committed[ticker])
                 self.assertIsNotNone(row["price_usd"], ticker)
             self.assertEqual(list(empty.rglob("*")), [], "fallback must not write raws")
@@ -128,7 +129,7 @@ class PeerFallbackTests(unittest.TestCase):
         import pearl_nightly as nightly
 
         with tempfile.TemporaryDirectory() as tmp:
-            row = nightly.peer_row_from_chart("BTC", "bitcoin", note_data=Path(tmp))
+            row = nightly.peer_row_from_pull("BTC", "bitcoin", pull_dir=Path(tmp))
         self.assertIsNotNone(row["price_usd"])
         self.assertEqual(row["credit"], desk.CREDIT)
 
@@ -136,7 +137,7 @@ class PeerFallbackTests(unittest.TestCase):
         import pearl_nightly as nightly
 
         with tempfile.TemporaryDirectory() as tmp:
-            row = nightly.peer_row_from_chart("ZEC", "zcash", note_data=Path(tmp), committed={})
+            row = nightly.peer_row_from_pull("ZEC", "zcash", pull_dir=Path(tmp), committed={})
         self.assertIsNone(row["price_usd"])
         self.assertEqual(row["gap"], "No CoinGecko price on hand.")
 
@@ -144,11 +145,108 @@ class PeerFallbackTests(unittest.TestCase):
         import pearl_nightly as nightly
 
         peers = json.loads((nightly.DESK / "peers.json").read_text(encoding="utf-8"))
-        texts = [nightly.NO_HISTORY_GAP] + [r.get("gap") or "" for r in peers["rows"]]
+        texts = [nightly.NO_HISTORY_GAP] + [r.get("gap") or "" for r in peers["rows"]] + [r.get("as_of") or "" for r in peers["rows"]]
         for text in texts:
             self.assertNotIn("archive", text.lower())
             self.assertNotIn("file", text.lower())
+            self.assertNotIn("\u2014", text)
         self.assertEqual(sum(1 for r in peers["rows"] if r.get("gap") == nightly.NO_HISTORY_GAP), 2)
+        self.assertEqual({r["ticker"] for r in peers["rows"] if r.get("gap")}, {"AKT", "ZEC"})
+
+    def test_gap_line_sits_in_the_vol_cell(self):
+        import desk_panels
+        import pearl_nightly as nightly
+
+        html = desk_panels.render_peers(nightly.ROOT)
+        for row in html.split("<tr>")[2:]:
+            if nightly.NO_HISTORY_GAP not in row:
+                continue
+            cells = row.split("</td>")
+            self.assertIn(nightly.NO_HISTORY_GAP, cells[3], "gap belongs with 30d vol, not issuance yield")
+            self.assertNotIn("key-note", cells[4])
+
+
+class PeerReaderTests(unittest.TestCase):
+    """Orda 101 follow-up: the nightly peer reader reads the nightly pull, not the removed
+    data/2026-10-02-pearl/coingecko folder."""
+
+    def _pull(self, root: Path, coin_id: str, price: float, chart_days: int | None) -> None:
+        import pearl_nightly as nightly
+
+        cg = root / "coingecko"
+        cg.mkdir(parents=True, exist_ok=True)
+        body = {"market_data": {"current_price": {"usd": price}, "market_cap": {"usd": 1000.0}, "total_volume": {"usd": 50.0}, "last_updated": "2026-11-24T12:00:00.000Z"}}
+        nightly.coin_file(root, coin_id).write_text(json.dumps(body), encoding="utf-8")
+        if chart_days:
+            start = dt.datetime(2026, 10, 1, tzinfo=dt.timezone.utc)
+            prices = [[int((start + dt.timedelta(days=i)).timestamp() * 1000), price * (1 + 0.01 * ((-1) ** i))] for i in range(chart_days)]
+            nightly.chart_file(root, coin_id).write_text(json.dumps({"prices": prices}), encoding="utf-8")
+
+    def test_reader_does_not_point_at_the_removed_folder(self):
+        import inspect
+        import pearl_nightly as nightly
+
+        src = inspect.getsource(nightly)
+        self.assertNotIn('NOTE_DATA / "coingecko"', src)
+        self.assertNotIn("note_data / \"coingecko\"", src)
+        self.assertFalse((nightly.NOTE_DATA / "coingecko").exists(), "the Oct 2 CoinGecko folder stays out of the repo")
+        self.assertFalse(hasattr(nightly, "peer_row_from_chart"))
+
+    def test_reads_price_and_vol_from_the_nightly_pull(self):
+        import pearl_nightly as nightly
+
+        with tempfile.TemporaryDirectory() as tmp:
+            pull = Path(tmp) / "20261124T010000-0500"
+            self._pull(pull, "akash-network", 0.5, 35)
+            row = nightly.peer_row_from_pull("AKT", "akash-network", pull_dir=pull, committed={})
+        self.assertEqual(row["price_usd"], 0.5)
+        self.assertEqual(row["vol_over_mc"], 0.05)
+        self.assertIsNotNone(row["realized_vol_30d_ann"])
+        self.assertIsNone(row["gap"])
+        self.assertIn("vendor stamp 2026-11-24", row["as_of"])
+
+    def test_price_without_history_gets_the_plain_gap_line(self):
+        import pearl_nightly as nightly
+
+        with tempfile.TemporaryDirectory() as tmp:
+            pull = Path(tmp) / "20261124T010000-0500"
+            self._pull(pull, "zcash", 40.0, None)
+            row = nightly.peer_row_from_pull("ZEC", "zcash", pull_dir=pull, committed={})
+        self.assertEqual(row["price_usd"], 40.0)
+        self.assertIsNone(row["realized_vol_30d_ann"])
+        self.assertEqual(row["gap"], nightly.NO_HISTORY_GAP)
+
+    def test_latest_pull_and_refresh_keep_unpriced_rows(self):
+        import pearl_nightly as nightly
+
+        with tempfile.TemporaryDirectory() as tmp:
+            kpi = Path(tmp) / "pearl-kpi"
+            old = kpi / "20261101T010000-0500"
+            new = kpi / "20261124T010000-0500"
+            self._pull(old, "bitcoin", 1.0, None)
+            self._pull(new, "bitcoin", 2.0, 35)
+            (kpi / "payee-1000-20261003").mkdir(parents=True)
+            self.assertEqual(nightly.latest_peer_pull(kpi), new)
+            desk_dir = Path(tmp) / "desk"
+            desk_dir.mkdir()
+            shutil.copy(nightly.DESK / "peers.json", desk_dir / "peers.json")
+            before = nightly.committed_peer_rows(desk_dir / "peers.json")
+            payload = nightly.refresh_peers(new, desk_dir)
+        rows = {r["ticker"]: r for r in payload["rows"]}
+        self.assertEqual(rows["BTC"]["price_usd"], 2.0)
+        for ticker in ("PRL", "TAO", "RENDER", "AKT", "ZEC"):
+            self.assertEqual(rows[ticker], before[ticker], ticker)
+        self.assertEqual(payload["credit"], desk.CREDIT)
+
+    def test_pull_writes_coingecko_bodies_only_under_the_excluded_path(self):
+        import pearl_cron
+        import pearl_nightly as nightly
+
+        pull = nightly.ROOT / "data" / "pearl-kpi" / "20261124T010000-0500"
+        for _t, coin_id in nightly.PEERS:
+            for path in (nightly.coin_file(pull, coin_id), nightly.chart_file(pull, coin_id)):
+                rel = path.relative_to(nightly.ROOT).as_posix()
+                self.assertTrue(pearl_cron.is_excluded(rel), rel)
 
 
 class CronExcludeTests(unittest.TestCase):
