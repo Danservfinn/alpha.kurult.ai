@@ -747,6 +747,25 @@ figure, table, pre { max-width: 100%; }
 .compare-row { border: 1px solid var(--edge-soft); padding: .45rem; margin: 0 0 .45rem; }
 .tick-on { outline: 1px solid var(--amber); }
 @media (max-width: 40rem) { .chart-plot { height: 18rem; } }
+/* /markets/ (P1). Panels stack, full width. Numbers line up. */
+.mkt-page { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); margin-top: .4rem; }
+.mkt-more { padding-top: 0; }
+.mkt-jump { margin: .6rem 0 .2rem; }
+.mkt-jump .seg-btn, .page-markets .mkt td a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; text-decoration: none; }
+.mkt-jump .seg-btn { justify-content: center; }
+.page-markets .mkt td { vertical-align: middle; }
+.mkt-name { color: var(--text-dim); }
+.mkt-status { color: var(--amber-mid); font-size: .75rem; margin: .3rem 0 0; min-height: 1.1rem; }
+.dom-bar { display: flex; height: 1.4rem; width: 100%; border: 1px solid var(--edge); margin: 0 0 .7rem; overflow: hidden; }
+.dom-bar span { display: block; height: 100%; min-width: 0; }
+.dom-btc { background: var(--amber); }
+.dom-eth { background: var(--edge); }
+.dom-rest { background: var(--edge-soft); }
+.dom-strip { margin: 0 0 .4rem; }
+.dom-strip dd, .page-markets .mkt { font-variant-numeric: tabular-nums; }
+@media (max-width: 40rem) {
+  .page-markets .mkt-name, .page-markets .mkt-cap { display: none; }
+}
 /* Wide-viewport layout stays one column. See Danny 2026-10-05: single
    column, full page width. Panels stack; no side rails, no column splits. */
 @media (max-width: 700px) {

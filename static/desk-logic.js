@@ -411,6 +411,138 @@
     return GROUP_ORDER[name] == null ? 9 : GROUP_ORDER[name];
   }
 
+  // ---- /markets/ (P1): movers, sector baskets, dominance. Pure, no DOM. ----
+
+  var MOVER_SKIP_SYMBOLS = {
+    usdt: 1, usdc: 1, usds: 1, dai: 1, fdusd: 1, usde: 1, pyusd: 1, tusd: 1, usdd: 1, usd1: 1,
+    rlusd: 1, usdg: 1, gho: 1, frax: 1, crvusd: 1, susde: 1, susds: 1, buidl: 1,
+    wbtc: 1, weth: 1, steth: 1, wsteth: 1, weeth: 1, cbbtc: 1, wbt: 1, reth: 1, meth: 1,
+    cbeth: 1, rseth: 1, ezeth: 1, oseth: 1, wbeth: 1, jitosol: 1, msol: 1, bnsol: 1,
+    lbtc: 1, solvbtc: 1, sfrxeth: 1, xaut: 1, paxg: 1, kau: 1, kag: 1
+  };
+  var MOVER_SKIP_NAME = /wrapped|bridged|staked|restak|tokeni[sz]ed|xstock|bstock|\bgold\b|\bfund\b|\betf\b|treasury|\bvault\b|\bpeg\b|\busd|usd\b/i;
+  var WINDOWS = { "24h": "price_change_percentage_24h_in_currency", "7d": "price_change_percentage_7d_in_currency" };
+
+  function num(value) {
+    var n = Number(value);
+    return value == null || value === "" || !Number.isFinite(n) ? null : n;
+  }
+
+  function changeOf(row, win) {
+    if (!row) return null;
+    if (win === "24h") {
+      var a = num(row[WINDOWS["24h"]]);
+      return a == null ? num(row.price_change_percentage_24h) : a;
+    }
+    return num(row[WINDOWS[win] || WINDOWS["7d"]]);
+  }
+
+  function isPegged(row) {
+    var px = num(row.current_price);
+    var d1 = changeOf(row, "24h");
+    var d7 = changeOf(row, "7d");
+    if (px == null || px < 0.97 || px > 1.03) return false;
+    return Math.abs(d1 || 0) < 2 && Math.abs(d7 || 0) < 3;
+  }
+
+  function moverEligible(row) {
+    if (!row || !row.symbol || !row.id) return false;
+    if (MOVER_SKIP_SYMBOLS[String(row.symbol).toLowerCase()]) return false;
+    if (MOVER_SKIP_NAME.test(String(row.name || ""))) return false;
+    return !isPegged(row);
+  }
+
+  function slimMarketRow(row) {
+    return {
+      id: row.id,
+      symbol: row.symbol,
+      name: row.name,
+      current_price: num(row.current_price),
+      market_cap: num(row.market_cap),
+      market_cap_rank: num(row.market_cap_rank),
+      price_change_percentage_24h_in_currency: changeOf(row, "24h"),
+      price_change_percentage_7d_in_currency: changeOf(row, "7d")
+    };
+  }
+
+  function topMovers(rows, win, n) {
+    var count = n || 10;
+    var key = WINDOWS[win] ? win : "24h";
+    var usable = (rows || []).filter(function (row) {
+      return moverEligible(row) && changeOf(row, key) != null;
+    });
+    var gainers = usable.filter(function (row) { return changeOf(row, key) > 0; })
+      .sort(function (a, b) { return changeOf(b, key) - changeOf(a, key); })
+      .slice(0, count);
+    var losers = usable.filter(function (row) { return changeOf(row, key) < 0; })
+      .sort(function (a, b) { return changeOf(a, key) - changeOf(b, key); })
+      .slice(0, count);
+    return { window: key, considered: usable.length, gainers: gainers, losers: losers };
+  }
+
+  function sectorRows(categories, baskets) {
+    var byId = {};
+    (categories || []).forEach(function (cat) {
+      if (cat && cat.id) byId[cat.id] = cat;
+    });
+    var out = [];
+    (baskets || []).forEach(function (basket) {
+      var cat = byId[basket.id];
+      if (!cat) return;
+      var cap = num(cat.market_cap);
+      if (cap == null || cap <= 0) return;
+      out.push({
+        id: basket.id,
+        label: basket.label || cat.name || basket.id,
+        market_cap: cap,
+        change_24h: num(cat.market_cap_change_24h),
+        volume_24h: num(cat.volume_24h),
+        updated_at: cat.updated_at || ""
+      });
+    });
+    return out;
+  }
+
+  function sortSectors(rows, by) {
+    var list = (rows || []).slice();
+    if (by === "cap") {
+      list.sort(function (a, b) { return b.market_cap - a.market_cap; });
+      return list;
+    }
+    list.sort(function (a, b) {
+      if (a.change_24h == null && b.change_24h == null) return b.market_cap - a.market_cap;
+      if (a.change_24h == null) return 1;
+      if (b.change_24h == null) return -1;
+      return b.change_24h - a.change_24h;
+    });
+    return list;
+  }
+
+  function dominance(global) {
+    var body = global && global.data ? global.data : global;
+    if (!body) return null;
+    var pct = body.market_cap_percentage || {};
+    var btc = num(pct.btc);
+    var eth = num(pct.eth);
+    var total = num(body.total_market_cap && body.total_market_cap.usd);
+    if (btc == null || eth == null || btc < 0 || eth < 0 || btc + eth > 100) return null;
+    return {
+      btc: btc,
+      eth: eth,
+      rest: Math.max(0, 100 - btc - eth),
+      total: total,
+      btc_cap: total == null ? null : total * btc / 100,
+      eth_cap: total == null ? null : total * eth / 100,
+      change_24h: num(body.market_cap_change_percentage_24h_usd),
+      updated_at: num(body.updated_at)
+    };
+  }
+
+  function nextRetryMs(attempt) {
+    var steps = [15000, 30000, 60000, 120000];
+    return steps[Math.min(Math.max(attempt || 0, 0), steps.length - 1)];
+  }
+
   var api = {
     RANGES: RANGES,
     BLOCKED_RANGE: BLOCKED_RANGE,
@@ -436,7 +568,15 @@
     resolveQuery: resolveQuery,
     escapeStep: escapeStep,
     groupRank: groupRank,
-    assetBySym: assetBySym
+    assetBySym: assetBySym,
+    moverEligible: moverEligible,
+    slimMarketRow: slimMarketRow,
+    topMovers: topMovers,
+    changeOf: changeOf,
+    sectorRows: sectorRows,
+    sortSectors: sortSectors,
+    dominance: dominance,
+    nextRetryMs: nextRetryMs
   };
 
   root.AlphaLogic = api;

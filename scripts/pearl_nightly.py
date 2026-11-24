@@ -54,7 +54,6 @@ def seed_kpis() -> dict:
     """Baseline print from the 2026-10-02 saved pulls. No network. No invented fields."""
     stats_path = newest(NOTE_DATA / "pearlchain", "stats_*.json")
     charts_path = newest(NOTE_DATA / "pearlchain", "charts_*.json")
-    coin_path = newest(NOTE_DATA / "coingecko", "pearl-2_coin_*.json")
     kpis: dict = {"source": "data/2026-10-02-pearl", "gaps": []}
     if stats_path:
         stats = load_json(stats_path)
@@ -80,14 +79,12 @@ def seed_kpis() -> dict:
             daily[stamp.isoformat()] = row.get("coins")
         kpis["issuance_oct1_prl"] = daily.get("2026-10-01")
         kpis["charts_file"] = charts_path.name
-    if coin_path:
-        coin = load_json(coin_path)
-        md = coin.get("market_data") or {}
-        kpis["price_usd"] = (md.get("current_price") or {}).get("usd")
-        kpis["market_cap_usd"] = (md.get("market_cap") or {}).get("usd")
-        kpis["volume_24h_usd"] = (md.get("total_volume") or {}).get("usd")
-        kpis["price_as_of"] = "CoinGecko coins/pearl-2, 2026-10-02 18:41 ET"
-        kpis["coin_file"] = coin_path.name
+    # The Oct 2 CoinGecko body is not in the repo. Keep the price the committed seed print carries.
+    for item in ((_read_json(DESK / "series.json") or {}).get("prints") or [])[:1]:
+        prior = item.get("kpis") or {}
+        for key in ("price_usd", "market_cap_usd", "volume_24h_usd", "price_as_of", "coin_file"):
+            if prior.get(key) is not None:
+                kpis[key] = prior[key]
     return {
         "id": "2026-10-02-note",
         "fetched_et": "2026-10-02T19:33:00-04:00",
@@ -95,7 +92,14 @@ def seed_kpis() -> dict:
     }
 
 
-NO_HISTORY_GAP = "365-day history not available. 30d vol not computed. Last print only."
+# Shown in the peer table when 30d vol is missing. Plain words: what is missing and why.
+NO_HISTORY_GAP = "30d vol not shown: we hold only the latest CoinGecko price for this coin, not 30 days of daily prices."
+NO_PRICE_GAP = "No CoinGecko price on hand."
+VOL_LABEL = "30d realized vol, annualized, computed by us from CoinGecko daily prices. Not advice."
+# Nightly peer pulls land here: data/pearl-kpi/<stamp>/coingecko/. The Oct 2 note
+# folder data/2026-10-02-pearl/coingecko/ was removed from the repo; nothing reads it.
+KPI = ROOT / "data" / "pearl-kpi"
+PEER_CHART_DAYS = 35
 
 
 def committed_peer_rows(path: Path | None = None) -> dict[str, dict]:
@@ -110,62 +114,103 @@ def committed_peer_rows(path: Path | None = None) -> dict[str, dict]:
     return {str(r.get("ticker")): r for r in payload.get("rows") or [] if isinstance(r, dict) and r.get("ticker")}
 
 
-def peer_row_from_chart(ticker: str, coin_id: str, note_data: Path | None = None, committed: dict[str, dict] | None = None) -> dict:
-    """One peer row. Reads saved CoinGecko chart JSON if it is on disk (the raws are
-    not committed, so normally it is not). Without it, the committed peers.json row
-    is kept as is, so a rerun never blanks the table. Nothing is fetched or written here."""
+def coin_file(pull_dir: Path, coin_id: str) -> Path:
+    return pull_dir / "coingecko" / f"{coin_id}_coin.json"
+
+
+def chart_file(pull_dir: Path, coin_id: str) -> Path:
+    return pull_dir / "coingecko" / f"{coin_id}_market_chart_{PEER_CHART_DAYS}d.json"
+
+
+def latest_peer_pull(kpi: Path | None = None) -> Path | None:
+    """Newest nightly pull directory that holds at least one CoinGecko coin body."""
+    kpi = kpi or KPI
+    if not kpi.is_dir():
+        return None
+    found = [d for d in kpi.iterdir() if d.is_dir() and any((d / "coingecko").glob("*_coin.json"))]
+    return max(found, key=lambda d: d.name) if found else None
+
+
+def _read_json(path: Path) -> dict | None:
+    if not path.is_file():
+        return None
+    try:
+        payload = load_json(path)
+    except (OSError, ValueError):
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def peer_row_from_pull(ticker: str, coin_id: str, pull_dir: Path | None = None, committed: dict[str, dict] | None = None) -> dict:
+    """One peer row from a nightly pull (data/pearl-kpi/<stamp>/coingecko/). Price and
+    volume over market cap come from coins/<id>; 30d vol from a daily market_chart.
+    If the coin body is missing (a 429 or no pull yet), the committed peers.json row is
+    kept as is, so a rerun never blanks the table. Nothing is fetched or written here."""
     desk.assert_peer_columns(desk.PEER_COLUMNS)
-    note_data = note_data or NOTE_DATA
+    kept = (committed if committed is not None else committed_peer_rows()).get(ticker)
+    coin = (_read_json(coin_file(pull_dir, coin_id)) if pull_dir else None) or {}
+    md = coin.get("market_data") or {}
+    spot = (md.get("current_price") or {}).get("usd")
+    if pull_dir is None or not isinstance(spot, (int, float)):
+        if kept:
+            return dict(kept)
+        return {
+            "ticker": ticker,
+            "coin_id": coin_id,
+            "price_usd": None,
+            "as_of": None,
+            "vol_over_mc": None,
+            "realized_vol_30d_ann": None,
+            "issuance_yield": None,
+            "gap": NO_PRICE_GAP,
+            "credit": desk.CREDIT,
+            "vol_label": VOL_LABEL,
+        }
+    stamp = md.get("last_updated") or coin.get("last_updated") or ""
+    as_of = f"CoinGecko coins/{coin_id}" + (f", vendor stamp {stamp}" if stamp else "")
     row = {
         "ticker": ticker,
         "coin_id": coin_id,
-        "price_usd": None,
-        "as_of": None,
+        "price_usd": spot,
+        "as_of": as_of,
         "vol_over_mc": None,
         "realized_vol_30d_ann": None,
-        "issuance_yield": None,
+        "issuance_yield": ((issuance_yield_from_note() or (kept or {}).get("issuance_yield")) if ticker == "PRL" else None),
         "gap": None,
         "credit": desk.CREDIT,
-        "vol_label": "30d realized vol, annualized, computed by us from CoinGecko daily prices. Not advice.",
+        "vol_label": VOL_LABEL,
     }
-    chart = newest(note_data / "coingecko", f"{coin_id}_market_chart_365_*.json")
-    if chart is None:
-        chart = newest(note_data / "coingecko", f"{coin_id}_market_chart_1_*.json")
+    mcap = (md.get("market_cap") or {}).get("usd")
+    vol24 = (md.get("total_volume") or {}).get("usd")
+    if isinstance(mcap, (int, float)) and isinstance(vol24, (int, float)) and mcap > 0:
+        row["vol_over_mc"] = round(vol24 / mcap, 6)
+        row["vol_mc_as_of"] = as_of
+    chart = _read_json(chart_file(pull_dir, coin_id))
+    daily = desk.daily_prices(chart) if chart else {}
+    vol = desk.realized_vol_30d(daily) if daily else None
+    if vol is None:
         row["gap"] = NO_HISTORY_GAP
-    if chart is None:
-        kept = (committed if committed is not None else committed_peer_rows()).get(ticker)
-        if kept:
-            return dict(kept)
-        row["gap"] = "No CoinGecko price on hand."
-        return row
-    payload = load_json(chart)
-    daily = desk.daily_prices(payload)
-    if daily:
-        last_day = max(daily)
-        row["price_usd"] = round(daily[last_day], 6)
-        row["as_of"] = f"{last_day.isoformat()} 00:00 UTC daily stamp, file {chart.name}"
-        row["realized_vol_30d_ann"] = _round(desk.realized_vol_30d(daily), 4)
-    ts, cap = desk.last_chart_point(payload, "market_caps")
-    _, vol = desk.last_chart_point(payload, "total_volumes")
-    if cap and vol is not None and cap > 0:
-        row["vol_over_mc"] = round(vol / cap, 6)
-        if ts is not None:
-            row["vol_mc_as_of"] = ts.strftime("%Y-%m-%d %H:%M UTC")
-    if ticker == "PRL":
-        row["issuance_yield"] = issuance_yield_from_note()
-        coin = newest(note_data / "coingecko", "pearl-2_coin_*.json")
-        if coin:
-            md = load_json(coin).get("market_data") or {}
-            spot = (md.get("current_price") or {}).get("usd")
-            if spot is not None:
-                row["price_usd"] = spot
-                row["as_of"] = "CoinGecko coins/pearl-2, 2026-10-02 18:41 ET"
-                mcap = (md.get("market_cap") or {}).get("usd")
-                vol24 = (md.get("total_volume") or {}).get("usd")
-                if mcap and vol24 is not None and mcap > 0:
-                    row["vol_over_mc"] = round(vol24 / mcap, 6)
-                    row["vol_mc_as_of"] = "CoinGecko coins/pearl-2, 2026-10-02 18:41 ET"
+    else:
+        row["realized_vol_30d_ann"] = round(vol, 4)
     return row
+
+
+def refresh_peers(pull_dir: Path | None, desk_dir: Path | None = None) -> dict:
+    """Rewrite peers.json from a nightly pull. Rows the pull cannot price are kept."""
+    desk_dir = desk_dir or DESK
+    path = desk_dir / "peers.json"
+    committed = committed_peer_rows(path)
+    prior = _read_json(path) or {}
+    payload = {
+        "schema": "pearl-desk-peers/v1",
+        "columns": list(desk.PEER_COLUMNS),
+        "excluded": prior.get("excluded") or ["third-party TVL feed", "revenue-multiple feed", "MC/TVL", "P/F", "P/revenue"],
+        "credit": desk.CREDIT,
+        "rows": [peer_row_from_pull(t, c, pull_dir, committed) for t, c in PEERS],
+    }
+    desk_dir.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return payload
 
 
 def issuance_yield_from_note() -> float | None:
@@ -200,22 +245,14 @@ def _round(value, places):
 
 def build_seed() -> None:
     desk.assert_peer_columns(desk.PEER_COLUMNS)
-    committed = committed_peer_rows()
     DESK.mkdir(parents=True, exist_ok=True)
     series = {
         "schema": "pearl-desk-series/v1",
         "credit": desk.CREDIT,
         "prints": [seed_kpis()],
     }
-    peers = {
-        "schema": "pearl-desk-peers/v1",
-        "columns": list(desk.PEER_COLUMNS),
-        "excluded": ["third-party TVL feed", "revenue-multiple feed", "MC/TVL", "P/F", "P/revenue"],
-        "credit": desk.CREDIT,
-        "rows": [peer_row_from_chart(ticker, coin_id, committed=committed) for ticker, coin_id in PEERS],
-    }
     (DESK / "series.json").write_text(json.dumps(series, indent=2) + "\n", encoding="utf-8")
-    (DESK / "peers.json").write_text(json.dumps(peers, indent=2) + "\n", encoding="utf-8")
+    refresh_peers(latest_peer_pull())
     fresh_payee = desk.payee_alert({}, window=desk.PAYEE_WINDOW_BLOCKS)
     fresh_payee["reason"] = (
         "Oct 2 crawl is 200 blocks. Need 1,000. Not evaluated. The 52.5% figure in the note is not this alert."
@@ -335,16 +372,23 @@ def payee_from_disk(root: Path | None = None) -> dict:
 
 
 def pull(stamp: str) -> Path:
-    """One archive directory. JSON only. Asks the existing fetcher for 1,000 blocks."""
+    """One archive directory. JSON only. Asks the existing fetcher for 1,000 blocks.
+    CoinGecko bodies go to <stamp>/coingecko/, which the cron never commits."""
+    import time
+
     out = ROOT / "data" / "pearl-kpi" / stamp
     pc = out / "pearlchain"
     cg = out / "coingecko"
     pc.mkdir(parents=True, exist_ok=True)
     cg.mkdir(parents=True, exist_ok=True)
     subprocess.run(pearlchain_argv(pc), check=True)
-    for coin_id in ("pearl-2", "bittensor", "render-token", "zcash", "akash-network", "bitcoin"):
+    for _ticker, coin_id in PEERS:
         url = f"https://api.coingecko.com/api/v3/coins/{coin_id}?localization=false&tickers=false&community_data=false&developer_data=false"
-        fetch_json(url, cg / f"{coin_id}_coin.json")
+        fetch_json(url, coin_file(out, coin_id))
+        time.sleep(6)
+        url = f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart?vs_currency=usd&days={PEER_CHART_DAYS}&interval=daily"
+        fetch_json(url, chart_file(out, coin_id))
+        time.sleep(6)
     desk.write_manifest(out)
     return out
 
@@ -427,6 +471,7 @@ def ingest(archive: Path) -> None:
         alerts["payee_crawl"] = payee["crawl"]
     (DESK / "alerts.json").write_text(json.dumps(alerts, indent=2) + "\n", encoding="utf-8")
     write_alert_drafts(alerts, dt.datetime.now().astimezone().date().isoformat())
+    refresh_peers(archive)
     desk.write_manifest(DESK)
 
 

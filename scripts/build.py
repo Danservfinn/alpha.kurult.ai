@@ -695,9 +695,10 @@ def chart_mount(symbols: tuple[str, ...], default: str, locked: bool) -> str:
 
 
 def markets_mount() -> str:
-    return """<section class="panel" id="markets-panel" aria-labelledby="markets-heading">
+    return f"""<section class="panel" id="markets-panel" aria-labelledby="markets-heading">
   <div class="panel-head"><span id="markets-heading">Markets</span><span class="badge" id="markets-badge">…</span></div>
   <div class="panel-body" id="markets-body"><p class="chart-empty">Loading markets.</p></div>
+  <div class="panel-body mkt-more">{desk_html.markets_quick()}</div>
 </section>"""
 
 
@@ -709,7 +710,7 @@ def chain_mount(scope: str) -> str:
 </section>"""
 
 
-def script_tags(market_chrome: bool, chart: bool, lazy_chart: bool) -> str:
+def script_tags(market_chrome: bool, chart: bool, lazy_chart: bool, extra: tuple[str, ...] = ()) -> str:
     tags = [
         '<script src="/desk-logic.js" defer></script>',
         '<script src="/search.js" defer></script>',
@@ -720,6 +721,7 @@ def script_tags(market_chrome: bool, chart: bool, lazy_chart: bool) -> str:
         tags.append('<script src="/vendor/lightweight-charts-5.2.1.js" defer></script>')
     if chart:
         tags.append('<script src="/chart.js" defer></script>')
+    tags += [f'<script src="{esc(src)}" defer></script>' for src in extra]
     return "\n".join(tags)
 
 
@@ -741,9 +743,10 @@ def page(
     market_chrome: bool = True,
     chart: bool = False,
     lazy_chart: bool = False,
+    extra_scripts: tuple[str, ...] = (),
 ) -> str:
     chrome = ticker_html() if market_chrome else ""
-    scripts = script_tags(market_chrome, chart, lazy_chart)
+    scripts = script_tags(market_chrome, chart, lazy_chart, extra_scripts)
     securities = desk_html.securities_payload(SECURITIES)
     assets = desk_html.asset_links(SECURITIES)
     jump = asset_jump(SECURITIES)
@@ -785,6 +788,7 @@ def page(
 <nav class="fnkeys" aria-label="Function keys">
   <div class="sheet fnkeys-row">
     <a class="fnkey" href="/">F1 LEDGER</a>
+    <a class="fnkey" href="/markets/">MARKETS</a>
     <a class="fnkey" href="/help/">HELP</a>
     {assets}
   </div>
@@ -1716,6 +1720,25 @@ figure, table, pre { max-width: 100%; }
 .compare-row { border: 1px solid var(--edge-soft); padding: .45rem; margin: 0 0 .45rem; }
 .tick-on { outline: 1px solid var(--amber); }
 @media (max-width: 40rem) { .chart-plot { height: 18rem; } }
+/* /markets/ (P1). Panels stack, full width. Numbers line up. */
+.mkt-page { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); margin-top: .4rem; }
+.mkt-more { padding-top: 0; }
+.mkt-jump { margin: .6rem 0 .2rem; }
+.mkt-jump .seg-btn, .page-markets .mkt td a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; text-decoration: none; }
+.mkt-jump .seg-btn { justify-content: center; }
+.page-markets .mkt td { vertical-align: middle; }
+.mkt-name { color: var(--text-dim); }
+.mkt-status { color: var(--amber-mid); font-size: .75rem; margin: .3rem 0 0; min-height: 1.1rem; }
+.dom-bar { display: flex; height: 1.4rem; width: 100%; border: 1px solid var(--edge); margin: 0 0 .7rem; overflow: hidden; }
+.dom-bar span { display: block; height: 100%; min-width: 0; }
+.dom-btc { background: var(--amber); }
+.dom-eth { background: var(--edge); }
+.dom-rest { background: var(--edge-soft); }
+.dom-strip { margin: 0 0 .4rem; }
+.dom-strip dd, .page-markets .mkt { font-variant-numeric: tabular-nums; }
+@media (max-width: 40rem) {
+  .page-markets .mkt-name, .page-markets .mkt-cap { display: none; }
+}
 /* Wide-viewport layout stays one column. See Danny 2026-10-05: single
    column, full page width. Panels stack; no side rails, no column splits. */
 @media (max-width: 700px) {
@@ -1832,7 +1855,7 @@ def render_sitemap(articles: list[Article]) -> str:
         return f"  <url>\n    <loc>{esc(loc)}</loc>\n    <lastmod>{lastmod}</lastmod>\n  </url>"
 
     newest = articles[0].date.isoformat() if articles else dt.date.today().isoformat()
-    entries = [url(SITE_URL + "/", newest), url(SITE_URL + "/help/", newest), url(SITE_URL + "/search/", newest)]
+    entries = [url(SITE_URL + "/", newest), url(SITE_URL + desk_html.MARKETS_PATH, newest), url(SITE_URL + "/help/", newest), url(SITE_URL + "/search/", newest)]
     entries += [url(SITE_URL + desk_html.sym_path(row["sym"]), newest) for row in SECURITIES]
     entries += [url(a.url, a.date.isoformat()) for a in articles]
     return (
@@ -1940,6 +1963,20 @@ def build() -> None:
     index = desk_html.search_index(listed, SECURITIES)
     write(DIST / "search" / "index.html", page("Search | " + SITE_NAME, "Search notes and assets.", "/search/", desk_html.render_search_page(index), "page-search"))
     write(DIST / "search.json", json.dumps(index, indent=2) + "\n")
+    write(
+        DIST / "markets" / "index.html",
+        page(
+            "Markets | " + SITE_NAME,
+            "Top movers, sector baskets, and BTC and ETH dominance. Data provided by CoinGecko.",
+            desk_html.MARKETS_PATH,
+            desk_html.render_markets_body(),
+            "page-markets",
+            # No ticker or chips here: they fill the 375x667 fold and spend CoinGecko
+            # calls this page needs. market.js still loads for the shared fetch queue.
+            market_chrome=False,
+            extra_scripts=("/market.js", "/markets.js"),
+        ),
+    )
     for row in SECURITIES:
         chain = chain_mount(row["chain"]) if row.get("chain") else ""
         asset_body = desk_html.render_asset_body(row, listed, SECURITIES, chain)
@@ -1957,7 +1994,7 @@ def build() -> None:
         )
     write(DIST / "404.html", render_404())
     write(DIST / "styles.css", STYLES)
-    for name in ("market.js", "desk-logic.js", "search.js", "chart.js"):
+    for name in ("market.js", "desk-logic.js", "search.js", "chart.js", "markets.js"):
         copy_shipped(ROOT / "static" / name, DIST / name)
     vendor_src = ROOT / "static" / "vendor" / "lightweight-charts-5.2.1.js"
     vendor_sha = hashlib.sha256(vendor_src.read_bytes()).hexdigest()

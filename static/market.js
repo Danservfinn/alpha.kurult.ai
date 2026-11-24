@@ -532,8 +532,8 @@
     if (!body) return;
     var pack = state.markets;
     if (!pack || !pack.rows) {
-      body.innerHTML = '<p class="chart-empty">Markets unavailable.</p>';
-      if (badge) badge.textContent = "unavailable";
+      body.innerHTML = '<p class="chart-empty">Loading markets.</p><p class="src-foot"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a></p>';
+      if (badge) badge.textContent = "waiting";
       return;
     }
     var rows = pack.rows.filter(function (item) {
@@ -585,6 +585,9 @@
         state.markets = held;
         state.markets.stale = true;
         paintMarkets();
+      } else {
+        var wait = document.getElementById("markets-body");
+        if (wait) wait.innerHTML = '<p class="chart-empty">Waiting on CoinGecko. Retrying in about two minutes.</p><p class="src-foot"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a></p>';
       }
       return;
     }
@@ -609,7 +612,7 @@
         paintMarkets();
       } else {
         var body = document.getElementById("markets-body");
-        if (body) body.innerHTML = '<p class="chart-empty">Markets unavailable.</p>';
+        if (body) body.innerHTML = '<p class="chart-empty">Waiting on CoinGecko. Retrying in about two minutes.</p><p class="src-foot"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a></p>';
       }
     }
   }
