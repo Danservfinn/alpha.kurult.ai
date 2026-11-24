@@ -8,6 +8,7 @@ from __future__ import annotations
 import html
 import json
 import re
+from pathlib import Path
 from typing import Any
 
 
@@ -91,6 +92,9 @@ def search_index(articles: list[Any], securities: list[dict]) -> dict:
     pages = [
         {"title": "Ledger", "path": "/#ledger", "words": "home ledger notes research top"},
         {"title": "Markets", "path": "/#markets-panel", "words": "markets movers gainers losers volume gmm most"},
+        {"title": "Top movers", "path": "/markets/#movers", "words": "top movers gainers losers biggest winners losers 24h 7d week"},
+        {"title": "Sector baskets", "path": "/markets/#sectors", "words": "sector sectors baskets categories defi ai meme layer 1 layer 2 rwa gaming"},
+        {"title": "BTC and ETH dominance", "path": "/markets/#dominance", "words": "dominance btc eth bitcoin ether share market cap btc.d"},
         {"title": "Rates", "path": "/#chips", "words": "rates sofr treasury ust2y ust10y eurusd btmm fx"},
         {"title": "Help", "path": "/help/", "words": "help codes credits sources"},
         {"title": "Search", "path": "/search/", "words": "search notes assets"},
@@ -315,3 +319,93 @@ def securities_payload(securities: list[dict]) -> str:
         "path": sym_path(row["sym"]),
     } for row in securities]
     return json.dumps(payload, separators=(",", ":"))
+
+
+# --------------------------------------------------------------------------- #
+# /markets/ : top movers, sector baskets, BTC and ETH dominance (P1)
+# --------------------------------------------------------------------------- #
+
+MARKETS_PATH = "/markets/"
+# CoinGecko category ids, curated in data/markets-baskets.json: real sectors only,
+# no portfolio or vanity categories. Our label is shown, not CoinGecko's.
+BASKETS_FILE = Path(__file__).resolve().parent.parent / "data" / "markets-baskets.json"
+
+
+def sector_baskets(path: Path | None = None) -> list[dict]:
+    rows = json.loads((path or BASKETS_FILE).read_text(encoding="utf-8"))
+    out = []
+    for row in rows:
+        cid, label = str(row.get("id") or "").strip(), str(row.get("label") or "").strip()
+        if not cid or not label:
+            raise ValueError(f"bad basket row: {row!r}")
+        if "portfolio" in cid:
+            raise ValueError(f"portfolio category is not a sector: {cid}")
+        out.append({"id": cid, "label": label})
+    if len({r["id"] for r in out}) != len(out):
+        raise ValueError("duplicate basket id")
+    return out
+
+
+def _credit_line(extra: str = "") -> str:
+    tail = f" {esc(extra)}" if extra else ""
+    return f'<p class="src-foot"><a href="{CREDIT_URL}" rel="noopener">{CREDIT}</a>{tail}</p>'
+
+
+def _seg(group: str, label: str, options: tuple[tuple[str, str], ...], pressed: str) -> str:
+    btns = "".join(
+        f'<button type="button" class="seg-btn" data-{group}="{esc(value)}" aria-pressed="{"true" if value == pressed else "false"}">{esc(text)}</button>'
+        for value, text in options
+    )
+    return f'<div class="seg" role="group" aria-label="{esc(label)}">{btns}</div>'
+
+
+def markets_quick() -> str:
+    """Home panel link row: the full pages are one click away."""
+    return (
+        '<nav class="seg mkt-jump" aria-label="Market pages">'
+        f'<a class="seg-btn" href="{MARKETS_PATH}#movers">Top movers</a>'
+        f'<a class="seg-btn" href="{MARKETS_PATH}#sectors">Sector baskets</a>'
+        f'<a class="seg-btn" href="{MARKETS_PATH}#dominance">BTC and ETH dominance</a>'
+        "</nav>"
+    )
+
+
+def render_markets_body() -> str:
+    baskets = json.dumps(sector_baskets(), separators=(",", ":"))
+    windows = (("24h", "24h"), ("7d", "7 days"))
+    sort = (("change", "24h change"), ("cap", "Market cap"))
+    return f"""<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">&gt;</span> <span>Markets</span></nav>
+<h1 class="visually-hidden">Markets: top movers, BTC and ETH dominance, sector baskets</h1>
+<div class="mkt-page">
+<section class="panel mkt-movers" id="movers" aria-labelledby="movers-heading">
+  <div class="panel-head"><span id="movers-heading">Top movers</span><span class="badge" id="movers-badge">…</span></div>
+  <div class="panel-body">
+    <div class="chart-toolbar">{_seg("window", "Window", windows, "24h")}</div>
+    <p class="breadth" id="movers-note">Top 250 coins by market cap. Stablecoins and wrapped tokens left out.</p>
+    <div class="mkt-grid" id="movers-body"><p class="chart-empty">Loading movers.</p></div>
+    {_credit_line("Aggregated, not one exchange.")}
+    <p class="mkt-status" id="movers-status" aria-live="polite"></p>
+  </div>
+</section>
+<section class="panel mkt-dominance" id="dominance" aria-labelledby="dominance-heading">
+  <div class="panel-head"><span id="dominance-heading">BTC and ETH dominance</span><span class="badge" id="dominance-badge">…</span></div>
+  <div class="panel-body">
+    <p class="breadth">Share of total crypto market cap. Everything else is the rest of the market.</p>
+    <div id="dominance-body"><p class="chart-empty">Loading dominance.</p></div>
+    {_credit_line()}
+    <p class="mkt-status" id="dominance-status" aria-live="polite"></p>
+  </div>
+</section>
+<section class="panel mkt-sectors" id="sectors" aria-labelledby="sectors-heading">
+  <div class="panel-head"><span id="sectors-heading">Sector baskets</span><span class="badge" id="sectors-badge">…</span></div>
+  <div class="panel-body">
+    <div class="chart-toolbar">{_seg("sort", "Sort", sort, "change")}</div>
+    <p class="breadth">CoinGecko categories. Market cap and 24h change of each basket. A coin can sit in more than one basket.</p>
+    <div id="sectors-body"><p class="chart-empty">Loading sectors.</p></div>
+    {_credit_line("Category membership is CoinGecko's.")}
+    <p class="mkt-status" id="sectors-status" aria-live="polite"></p>
+  </div>
+</section>
+</div>
+<script type="application/json" id="alpha-baskets">{baskets}</script>
+<noscript><p class="noscript">These tables need JavaScript. <a href="{CREDIT_URL}" rel="noopener">{CREDIT}</a>.</p></noscript>"""

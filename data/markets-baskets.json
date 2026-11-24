@@ -1,0 +1,22 @@
+[
+  {"id": "layer-1", "label": "Layer 1"},
+  {"id": "layer-2", "label": "Layer 2"},
+  {"id": "decentralized-finance-defi", "label": "DeFi"},
+  {"id": "decentralized-exchange", "label": "DEX"},
+  {"id": "decentralized-perpetuals", "label": "Perpetuals"},
+  {"id": "lending-borrowing", "label": "Lending"},
+  {"id": "liquid-staking", "label": "Liquid staking"},
+  {"id": "real-world-assets-rwa", "label": "Real world assets"},
+  {"id": "stablecoins", "label": "Stablecoins"},
+  {"id": "meme-token", "label": "Meme"},
+  {"id": "artificial-intelligence", "label": "AI"},
+  {"id": "ai-agents", "label": "AI agents"},
+  {"id": "depin", "label": "DePIN"},
+  {"id": "gaming", "label": "Gaming"},
+  {"id": "privacy-coins", "label": "Privacy"},
+  {"id": "zero-knowledge-zk", "label": "Zero knowledge"},
+  {"id": "oracle", "label": "Oracles"},
+  {"id": "exchange-based-tokens", "label": "Exchange tokens"},
+  {"id": "proof-of-work-pow", "label": "Proof of work"},
+  {"id": "storage", "label": "Storage"}
+]

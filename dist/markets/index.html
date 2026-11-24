@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Markets | alpha.kurult.ai</title>
+<meta name="description" content="Top movers, sector baskets, and BTC and ETH dominance. Data provided by CoinGecko.">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'self' https://api.coingecko.com https://markets.newyorkfed.org https://data-api.ecb.europa.eu https://api.alternative.me https://mempool.space https://blockstream.info; font-src 'self'; object-src 'none'; base-uri 'self'">
+<link rel="canonical" href="https://alpha.kurult.ai/markets/">
+<link rel="icon" href="/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body class="page-markets">
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <input class="search-open" id="search-open" type="checkbox">
+  <div class="sheet masthead-row">
+    <a class="wordmark" href="/" aria-label="Kurultai Alpha home">
+      <img class="mark" src="/mark.svg" alt="" width="22" height="22">
+      <span class="wordmark-text">Kurultai Alpha</span>
+    </a>
+    <span class="kicker">Arghun, Crypto Analyst</span>
+    <label class="search-toggle" for="search-open">Search</label>
+    <select class="asset-jump" aria-label="Asset"><option value="">Asset</option><option value="/s/btc/">BTC</option><option value="/s/eth/">ETH</option><option value="/s/sol/">SOL</option><option value="/s/prl/">PRL</option><option value="/s/btc.d/">BTC.D</option><option value="/s/total/">TOTAL</option><option value="/s/eurusd/">EURUSD</option><option value="/s/ust2y/">UST2Y</option><option value="/s/ust10y/">UST10Y</option><option value="/s/sofr/">SOFR</option></select>
+  </div>
+  <form class="sheet desk-search" role="search" action="/search/" method="get">
+    <label class="visually-hidden" for="q">Search notes and assets</label>
+    <input id="q" name="q" type="search" role="combobox" aria-expanded="false" aria-controls="search-list" aria-autocomplete="list" placeholder="Search notes and assets, e.g. pearl" autocomplete="off">
+    <button type="submit">Search</button>
+    <ul id="search-list" role="listbox" hidden></ul>
+    <p id="search-live" class="visually-hidden" aria-live="polite"></p>
+  </form>
+</header>
+<nav class="fnkeys" aria-label="Function keys">
+  <div class="sheet fnkeys-row">
+    <a class="fnkey" href="/">F1 LEDGER</a>
+    <a class="fnkey" href="/markets/">MARKETS</a>
+    <a class="fnkey" href="/help/">HELP</a>
+    <nav class="asset-select seg" aria-label="Asset"><a class="seg-btn asset-link" href="/s/btc/" data-asset="BTC">BTC</a><a class="seg-btn asset-link" href="/s/eth/" data-asset="ETH">ETH</a><a class="seg-btn asset-link" href="/s/sol/" data-asset="SOL">SOL</a><a class="seg-btn asset-link" href="/s/prl/" data-asset="PRL">PRL</a><a class="seg-btn asset-link" href="/s/btc.d/" data-asset="BTC.D">BTC.D</a><a class="seg-btn asset-link" href="/s/total/" data-asset="TOTAL">TOTAL</a><a class="seg-btn asset-link" href="/s/eurusd/" data-asset="EURUSD">EURUSD</a><a class="seg-btn asset-link" href="/s/ust2y/" data-asset="UST2Y">UST2Y</a><a class="seg-btn asset-link" href="/s/ust10y/" data-asset="UST10Y">UST10Y</a><a class="seg-btn asset-link" href="/s/sofr/" data-asset="SOFR">SOFR</a></nav>
+  </div>
+</nav>
+
+<aside class="notice" role="note" aria-label="Disclaimer">
+  <div class="sheet"><span class="notice-mark" aria-hidden="true">!</span>Research only. Not financial advice. Nothing on this site is an offer to buy, sell, or hold any asset. No wallet. No comments.</div>
+</aside>
+<main id="main" class="sheet">
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">&gt;</span> <span>Markets</span></nav>
+<h1 class="visually-hidden">Markets: top movers, BTC and ETH dominance, sector baskets</h1>
+<div class="mkt-page">
+<section class="panel mkt-movers" id="movers" aria-labelledby="movers-heading">
+  <div class="panel-head"><span id="movers-heading">Top movers</span><span class="badge" id="movers-badge">…</span></div>
+  <div class="panel-body">
+    <div class="chart-toolbar"><div class="seg" role="group" aria-label="Window"><button type="button" class="seg-btn" data-window="24h" aria-pressed="true">24h</button><button type="button" class="seg-btn" data-window="7d" aria-pressed="false">7 days</button></div></div>
+    <p class="breadth" id="movers-note">Top 250 coins by market cap. Stablecoins and wrapped tokens left out.</p>
+    <div class="mkt-grid" id="movers-body"><p class="chart-empty">Loading movers.</p></div>
+    <p class="src-foot"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a> Aggregated, not one exchange.</p>
+    <p class="mkt-status" id="movers-status" aria-live="polite"></p>
+  </div>
+</section>
+<section class="panel mkt-dominance" id="dominance" aria-labelledby="dominance-heading">
+  <div class="panel-head"><span id="dominance-heading">BTC and ETH dominance</span><span class="badge" id="dominance-badge">…</span></div>
+  <div class="panel-body">
+    <p class="breadth">Share of total crypto market cap. Everything else is the rest of the market.</p>
+    <div id="dominance-body"><p class="chart-empty">Loading dominance.</p></div>
+    <p class="src-foot"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a></p>
+    <p class="mkt-status" id="dominance-status" aria-live="polite"></p>
+  </div>
+</section>
+<section class="panel mkt-sectors" id="sectors" aria-labelledby="sectors-heading">
+  <div class="panel-head"><span id="sectors-heading">Sector baskets</span><span class="badge" id="sectors-badge">…</span></div>
+  <div class="panel-body">
+    <div class="chart-toolbar"><div class="seg" role="group" aria-label="Sort"><button type="button" class="seg-btn" data-sort="change" aria-pressed="true">24h change</button><button type="button" class="seg-btn" data-sort="cap" aria-pressed="false">Market cap</button></div></div>
+    <p class="breadth">CoinGecko categories. Market cap and 24h change of each basket. A coin can sit in more than one basket.</p>
+    <div id="sectors-body"><p class="chart-empty">Loading sectors.</p></div>
+    <p class="src-foot"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a> Category membership is CoinGecko&#x27;s.</p>
+    <p class="mkt-status" id="sectors-status" aria-live="polite"></p>
+  </div>
+</section>
+</div>
+<script type="application/json" id="alpha-baskets">[{"id":"layer-1","label":"Layer 1"},{"id":"layer-2","label":"Layer 2"},{"id":"decentralized-finance-defi","label":"DeFi"},{"id":"decentralized-exchange","label":"DEX"},{"id":"decentralized-perpetuals","label":"Perpetuals"},{"id":"lending-borrowing","label":"Lending"},{"id":"liquid-staking","label":"Liquid staking"},{"id":"real-world-assets-rwa","label":"Real world assets"},{"id":"stablecoins","label":"Stablecoins"},{"id":"meme-token","label":"Meme"},{"id":"artificial-intelligence","label":"AI"},{"id":"ai-agents","label":"AI agents"},{"id":"depin","label":"DePIN"},{"id":"gaming","label":"Gaming"},{"id":"privacy-coins","label":"Privacy"},{"id":"zero-knowledge-zk","label":"Zero knowledge"},{"id":"oracle","label":"Oracles"},{"id":"exchange-based-tokens","label":"Exchange tokens"},{"id":"proof-of-work-pow","label":"Proof of work"},{"id":"storage","label":"Storage"}]</script>
+<noscript><p class="noscript">These tables need JavaScript. <a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a>.</p></noscript>
+</main>
+<footer class="colophon sheet">
+  <span>alpha.kurult.ai</span>
+  <span class="colophon-sep" aria-hidden="true">|</span>
+  <span class="colophon-credit"><a href="https://www.coingecko.com/" rel="noopener">Data provided by CoinGecko</a></span>
+  <span class="colophon-sep" aria-hidden="true">|</span>
+  <a href="/help/">Help</a>
+  <span class="colophon-sep" aria-hidden="true">|</span>
+  <a href="/help/#credits">Credits</a>
+  <span class="colophon-sep" aria-hidden="true">|</span>
+  <span>No wallet. No comments. No analytics. No third-party script host.</span>
+</footer>
+<script type="application/json" id="alpha-securities">[{"sym":"BTC","name":"Bitcoin","class":"Crypto","cg":"bitcoin","chart":"crypto","chain":"BTC","path":"/s/btc/"},{"sym":"ETH","name":"Ether","class":"Crypto","cg":"ethereum","chart":"crypto","chain":"ETH","path":"/s/eth/"},{"sym":"SOL","name":"Solana","class":"Crypto","cg":"solana","chart":"crypto","chain":"SOL","path":"/s/sol/"},{"sym":"PRL","name":"Pearl","class":"Crypto","cg":"pearl-2","chart":"crypto","chain":"PRL","path":"/s/prl/"},{"sym":"BTC.D","name":"Bitcoin dominance","class":"Index","cg":"","chart":"index","chain":"","path":"/s/btc.d/"},{"sym":"TOTAL","name":"Total crypto cap","class":"Index","cg":"","chart":"index","chain":"","path":"/s/total/"},{"sym":"EURUSD","name":"Euro reference rate","class":"Crncy","cg":"","chart":"rate","chain":"","path":"/s/eurusd/"},{"sym":"UST2Y","name":"Treasury par yield, 2 year","class":"Govt","cg":"","chart":"rate","chain":"","path":"/s/ust2y/"},{"sym":"UST10Y","name":"Treasury par yield, 10 year","class":"Govt","cg":"","chart":"rate","chain":"","path":"/s/ust10y/"},{"sym":"SOFR","name":"SOFR","class":"M-Mkt","cg":"","chart":"rate","chain":"","path":"/s/sofr/"}]</script>
+<script src="/desk-logic.js" defer></script>
+<script src="/search.js" defer></script>
+<script src="/market.js" defer></script>
+<script src="/markets.js" defer></script>
+</body>
+</html>

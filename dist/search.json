@@ -128,6 +128,21 @@
       "words": "markets movers gainers losers volume gmm most"
     },
     {
+      "title": "Top movers",
+      "path": "/markets/#movers",
+      "words": "top movers gainers losers biggest winners losers 24h 7d week"
+    },
+    {
+      "title": "Sector baskets",
+      "path": "/markets/#sectors",
+      "words": "sector sectors baskets categories defi ai meme layer 1 layer 2 rwa gaming"
+    },
+    {
+      "title": "BTC and ETH dominance",
+      "path": "/markets/#dominance",
+      "words": "dominance btc eth bitcoin ether share market cap btc.d"
+    },
+    {
       "title": "Rates",
       "path": "/#chips",
       "words": "rates sofr treasury ust2y ust10y eurusd btmm fx"
